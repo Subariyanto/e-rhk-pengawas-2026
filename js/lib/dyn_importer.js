@@ -187,7 +187,7 @@
       </li>`).join('');
     const panes = sheets.map((s, i) => `
       <div class="tab-pane fade ${i === 0 ? 'show active' : ''}" id="${uid}-${i}" data-sheet-idx="${i}">
-        <div class="table-wide-wrap" style="max-height: calc(100vh - 220px);">
+        <div class="table-wide-wrap" style="max-height: calc(100vh - 160px); overflow-x: scroll; overflow-y: auto;">
           ${renderSheetTable(s, opts)}
         </div>
       </div>`).join('');

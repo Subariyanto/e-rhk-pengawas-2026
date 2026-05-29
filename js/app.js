@@ -9,6 +9,7 @@
     Router.on('/master-rhk', () => Page.MasterRHK(), { requireAuth: true });
     Router.on('/master-rhk/:id', (p) => Page.MasterRHKDetail(p.id), { requireAuth: true });
     Router.on('/skp-atasan', () => Page.SKPAtasan(), { requireAuth: true });
+    Router.on('/matriks-peran-hasil', () => Page.MatriksPeranHasil(), { requireAuth: true });
     Router.on('/madrasah', () => Page.Madrasah(), { requireAuth: true });
     Router.on('/kegiatan', () => Page.KegiatanList(), { requireAuth: true });
     Router.on('/kegiatan/baru', () => Page.KegiatanForm(null), { requireAuth: true });

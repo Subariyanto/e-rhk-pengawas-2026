@@ -8,6 +8,7 @@
       { href: '#/identitas', icon: 'person-badge', label: 'Identitas Pengawas' },
       { href: '#/master-rhk', icon: 'list-check', label: 'Master RHK' },
       { href: '#/skp-atasan', icon: 'person-workspace', label: 'SKP Atasan Langsung' },
+      { href: '#/matriks-peran-hasil', icon: 'diagram-3', label: 'Matriks Peran Hasil' },
       { href: '#/madrasah', icon: 'building', label: 'Madrasah Binaan' },
       { href: '#/kegiatan', icon: 'journal-text', label: 'Data Kegiatan' },
       { href: '#/eviden', icon: 'file-earmark-text', label: 'Generator Eviden' },

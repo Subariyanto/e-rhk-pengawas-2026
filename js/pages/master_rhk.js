@@ -482,13 +482,6 @@
           <div class="mt-3 small text-muted"><i class="bi bi-info-circle"></i> Untuk mengubah field di atas, kembali ke daftar Master RHK lalu klik <i class="bi bi-pencil"></i> di kolom Aksi.</div>
         </div>
       </div>
-
-      <div class="card">
-        <div class="card-header"><i class="bi bi-file-earmark-text"></i> Daftar Bukti Dukung</div>
-        <ol class="list-group list-group-numbered list-group-flush">
-          ${(r.bukti_dukung || []).map(b => `<li class="list-group-item">${U.escapeHtml(b)}</li>`).join('') || '<li class="list-group-item text-muted">Belum ada bukti dukung.</li>'}
-        </ol>
-      </div>
     `);
 
     if (r.is_custom) {

@@ -1,6 +1,6 @@
 // Service worker — network-first untuk file aplikasi sendiri (selalu update),
 // cache-first untuk CDN. Kalau gagal network, fallback ke cache (offline-friendly).
-const CACHE = 'erhk-2026-v4-2026-05-30-r6';
+const CACHE = 'erhk-2026-v4-2026-05-30-r7';
 const SHELL = [
   './',
   './index.html',

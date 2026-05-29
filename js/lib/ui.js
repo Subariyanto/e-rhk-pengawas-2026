@@ -36,8 +36,8 @@
           <div class="brand">
             <div class="logo">📋</div>
             <div>
-              <div class="title">E-RHK Pengawas</div>
-              <div class="subtitle">Madrasah 2026</div>
+              <div class="title">e-SKP Pengawas</div>
+              <div class="subtitle">Pokjawas Kab. Jember</div>
             </div>
           </div>
           <nav>${navHTML}</nav>

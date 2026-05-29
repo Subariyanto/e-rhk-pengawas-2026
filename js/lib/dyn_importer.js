@@ -113,11 +113,11 @@
 
   async function importFile(file) {
     const ext = (file.name.split('.').pop() || '').toLowerCase();
-    if (ext === 'xlsx' || ext === 'xls') {
+    if (ext === 'xlsx' || ext === 'xls' || ext === 'xlsm' || ext === 'xlsb') {
       const payload = await parseExcel(file);
       return { kind: 'excel', payload, fileName: file.name, importedAt: Date.now() };
     }
-    if (ext === 'docx') {
+    if (ext === 'docx' || ext === 'docm') {
       const payload = await parseDocx(file);
       return { kind: 'docx', payload, fileName: file.name, importedAt: Date.now() };
     }
@@ -238,10 +238,10 @@
     const doc = Store.get(storeKey, null);
     UI.shell(title, `
       <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
-        <input type="file" id="impFile" accept=".xlsx,.xls,.docx,.pdf" class="form-control" style="max-width:380px;" />
+        <input type="file" id="impFile" accept=".xlsx,.xls,.xlsm,.xlsb,.docx,.docm,.pdf" class="form-control" style="max-width:380px;" />
         <button class="btn btn-success" id="btnImport"><i class="bi bi-upload"></i> Import</button>
         ${doc ? '<button class="btn btn-outline-danger ms-auto" id="btnClear"><i class="bi bi-trash"></i> Hapus</button>' : ''}
-        <div class="text-muted small ms-2">Format: Excel (.xlsx/.xls), Word (.docx), PDF</div>
+        <div class="text-muted small ms-2">Format: Excel (.xlsx/.xls/.xlsm/.xlsb), Word (.docx/.docm), PDF</div>
       </div>
 
       ${doc ? renderDoc(doc) : `

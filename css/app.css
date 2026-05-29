@@ -33,9 +33,15 @@ a:hover { color: var(--kemenag-dark); }
   padding: 12px 0 0;
   width: 240px; flex: 0 0 240px;
   position: sticky; top: 0; align-self: flex-start;
-  height: 100vh; overflow-y: auto;
-  overscroll-behavior: contain;
+  height: 100vh;
+  overflow: hidden;
   display: flex; flex-direction: column;
+}
+.app-sidebar > nav {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  min-height: 0;
 }
 .app-sidebar nav { flex: 0 0 auto; }
 .sidebar-credit {
@@ -57,7 +63,7 @@ a:hover { color: var(--kemenag-dark); }
 .app-sidebar nav a:hover { background: rgba(255,255,255,.08); color: #fff; }
 .app-sidebar nav a.active { background: rgba(255,255,255,.18); color: #fff; font-weight: 600; }
 .app-sidebar nav .section-label { padding: 14px 16px 4px; font-size: 11px; opacity: .65; text-transform: uppercase; letter-spacing: .5px; }
-.app-sidebar .userbox { margin-top: auto; padding: 8px 12px; border-top: 1px solid rgba(255,255,255,.15); font-size: 12px; opacity: .9; }
+.app-sidebar .userbox { flex: 0 0 auto; padding: 8px 12px; border-top: 1px solid rgba(255,255,255,.15); font-size: 12px; opacity: .9; }
 
 .app-main { flex: 1 1 auto; min-width: 0; }
 .app-topbar { background: #fff; border-bottom: 1px solid #e7eee9; padding: 10px 16px; display: flex; align-items: center; gap: 10px; position: sticky; top: 0; z-index: 5; }

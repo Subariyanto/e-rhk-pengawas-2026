@@ -563,6 +563,25 @@ a:hover { color: var(--primary-dark); }
   background: #fff !important;
   box-shadow: 0 0 0 2px rgba(30,42,90,.15);
 }
+
+/* Display-mode link inside cells (e.g. Nama Eviden -> detail) */
+.rhk-table .cell-display-link {
+  display: block;
+  padding: 4px 6px;
+  color: var(--primary);
+  text-decoration: none;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.rhk-table .cell-display-link:hover {
+  text-decoration: underline;
+  color: var(--primary-dark);
+}
+.rhk-table tr.row-editing .cell-display-link { display: none; }
+.rhk-table .cell-link-wrap .cell-editor { display: none; }
+.rhk-table tr.row-editing .cell-link-wrap .cell-editor { display: block; }
 .rhk-table .cell-textarea {
   min-height: 32px;
   overflow: hidden;

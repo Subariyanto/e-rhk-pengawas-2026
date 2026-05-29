@@ -205,7 +205,10 @@
         <td class="cell-wrap"><textarea class="cell-textarea" data-field="indikator_kuantitas" rows="1" readonly>${U.escapeHtml(r.indikator_kuantitas || '')}</textarea></td>
         <td class="cell-wrap"><textarea class="cell-textarea" data-field="target_kuantitas" rows="1" readonly>${U.escapeHtml(r.target_kuantitas || '')}</textarea></td>
         <td rowspan="2" class="cell-wrap"><textarea class="cell-textarea" data-field="rencana_aksi" rows="1" readonly>${U.escapeHtml(r.rencana_aksi || '')}</textarea></td>
-        <td rowspan="2" class="cell-wrap"><textarea class="cell-textarea" data-field="nama_eviden" rows="1" readonly>${U.escapeHtml(r.nama_eviden || '')}</textarea></td>
+        <td rowspan="2" class="cell-wrap cell-link-wrap" data-link-target="#/master-rhk/${idEnc}" data-field-text="nama_eviden">
+          <a class="cell-display-link" href="#/master-rhk/${idEnc}" title="Buka detail RHK">${U.escapeHtml(r.nama_eviden || '—')}</a>
+          <textarea class="cell-textarea cell-editor" data-field="nama_eviden" rows="1" readonly>${U.escapeHtml(r.nama_eviden || '')}</textarea>
+        </td>
         <td rowspan="2" class="cell-wrap"><textarea class="cell-textarea" data-field="target_waktu" rows="1" title="Durasi (sama dengan target waktu)" readonly>${U.escapeHtml(r.target_waktu || '')}</textarea></td>
         <td rowspan="2" class="text-center text-nowrap cell-actions" style="vertical-align:middle;">
           <div class="actions-view d-flex gap-1 justify-content-center flex-wrap">
@@ -395,6 +398,9 @@
       if (n.value !== rec.target_waktu) n.value = rec.target_waktu || '';
     });
 
+    // Refresh display-mode link text (Nama Eviden)
+    syncDisplayLinks(rhkId, rec);
+
     UI.toast('RHK ' + rhkId + ' tersimpan.');
     regrowAll();
   }
@@ -436,7 +442,15 @@
     }
 
     applyEditModeUI(rhkId, false);
+    syncDisplayLinks(rhkId, snap);
     regrowAll();
+  }
+
+  function syncDisplayLinks(rhkId, rec) {
+    const wrap = document.querySelector(`tr[data-rhk-id="${CSS.escape(rhkId)}"] .cell-link-wrap[data-field-text="nama_eviden"]`);
+    if (!wrap) return;
+    const link = wrap.querySelector('.cell-display-link');
+    if (link) link.textContent = rec.nama_eviden && rec.nama_eviden.trim() ? rec.nama_eviden : '—';
   }
 
   // ===== Detail page (read-only deep view) =====

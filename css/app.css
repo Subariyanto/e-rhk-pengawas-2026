@@ -521,19 +521,47 @@ a:hover { color: var(--primary-dark); }
   box-sizing: border-box;
   display: block;
 }
-.rhk-table .cell-input:hover,
-.rhk-table .cell-textarea:hover,
-.rhk-table .cell-select:hover {
-  border-color: var(--border);
-  background: #fafbfd;
+
+/* Read-only mode: textareas, inputs, selects look like plain text (no editable hint). */
+.rhk-table .cell-textarea[readonly],
+.rhk-table .cell-input[readonly],
+.rhk-table .cell-select[disabled] {
+  cursor: default;
+  background: transparent;
+  border-color: transparent;
+  pointer-events: auto;
 }
-.rhk-table .cell-input:focus,
-.rhk-table .cell-textarea:focus,
-.rhk-table .cell-select:focus {
-  outline: none;
-  border-color: var(--primary);
+.rhk-table .cell-textarea[readonly]:hover,
+.rhk-table .cell-input[readonly]:hover,
+.rhk-table .cell-select[disabled]:hover {
+  background: transparent;
+  border-color: transparent;
+}
+
+/* Edit mode: highlight editable cells. */
+.rhk-table tr.row-editing td.cell-wrap,
+.rhk-table tr.row-editing td.cell-id {
+  background: #fffdf3;
+}
+.rhk-table .cell-editable.cell-textarea,
+.rhk-table .cell-editable.cell-input {
+  border: 1px solid var(--border);
   background: #fff;
-  box-shadow: 0 0 0 2px rgba(30,42,90,.12);
+  cursor: text;
+}
+.rhk-table .cell-editable.cell-select {
+  border: 1px solid var(--border);
+  background: #fff;
+  cursor: pointer;
+}
+.rhk-table .cell-editable:hover {
+  border-color: var(--accent) !important;
+}
+.rhk-table .cell-editable:focus {
+  outline: none;
+  border-color: var(--primary) !important;
+  background: #fff !important;
+  box-shadow: 0 0 0 2px rgba(30,42,90,.15);
 }
 .rhk-table .cell-textarea {
   min-height: 32px;

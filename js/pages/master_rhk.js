@@ -44,12 +44,12 @@
                 <th>No</th>
                 <th>TW</th>
                 <th>Jenis</th>
-                <th>Nama Eviden / Bukti Dukung</th>
                 <th>RHK Atasan yang Diintervensi</th>
                 <th>Rencana Hasil Kerja</th>
                 <th>Indikator</th>
                 <th>Target</th>
                 <th>Rencana Aksi</th>
+                <th>Nama Eviden / Bukti Dukung</th>
                 <th>Durasi</th>
                 <th></th>
               </tr>
@@ -60,12 +60,12 @@
                   <td><strong>${r.id}</strong></td>
                   <td><span class="badge ${r.jenis_kinerja === 'Tambahan' ? 'badge-tambahan' : 'badge-tw'}">${r.triwulan === 'TAMBAHAN' ? 'Tmb' : 'TW ' + r.triwulan}</span></td>
                   <td>${r.jenis_kinerja}</td>
-                  <td><a href="#/master-rhk/${encodeURIComponent(r.id)}">${U.escapeHtml(r.nama_eviden)}</a></td>
-                  <td class="small" style="max-width:240px;">${U.escapeHtml((r.rhk_atasan_intervensi || '').slice(0, 140))}${(r.rhk_atasan_intervensi || '').length > 140 ? '…' : ''}</td>
+                  <td class="small" style="max-width:220px;">${U.escapeHtml((r.rhk_atasan_intervensi || '').slice(0, 120))}${(r.rhk_atasan_intervensi || '').length > 120 ? '…' : ''}</td>
                   <td class="small" style="max-width:220px;">${U.escapeHtml((r.rencana_hasil_kerja || '').slice(0, 120))}${(r.rencana_hasil_kerja || '').length > 120 ? '…' : ''}</td>
                   <td class="small" style="max-width:200px;">${U.escapeHtml((r.indikator_kuantitas || '').slice(0, 90))}${(r.indikator_kuantitas || '').length > 90 ? '…' : ''}</td>
                   <td>${U.escapeHtml(r.target_kuantitas || '')}</td>
                   <td class="small" style="max-width:220px;">${U.escapeHtml((r.rencana_aksi || '').slice(0, 120))}${(r.rencana_aksi || '').length > 120 ? '…' : ''}</td>
+                  <td><a href="#/master-rhk/${encodeURIComponent(r.id)}">${U.escapeHtml(r.nama_eviden)}</a></td>
                   <td>${U.escapeHtml(r.target_waktu || '')}</td>
                   <td class="text-end text-nowrap">
                     <a class="btn btn-sm btn-outline-success" href="#/master-rhk/${encodeURIComponent(r.id)}" title="Detail"><i class="bi bi-eye"></i></a>

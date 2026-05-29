@@ -1,4 +1,5 @@
-// Master RHK Pengawas Madrasah 2026 — generated from SKP Excel + bukti dukung default
+// Auto-generated from SKP 2026 Excel
+// Generated 2026-05-29T12:44:42.221Z
 window.MASTER_RHK_DEFAULT = [
   {
     "id": "RHK-1",
@@ -12,7 +13,7 @@ window.MASTER_RHK_DEFAULT = [
     "target_kuantitas": "100%",
     "indikator_waktu": "Ketepatan waktu penyusunan program sesuai awal tahun anggaran.",
     "target_waktu": "1 Bulan",
-    "rencana_aksi": "Menyusun program pendampingan tahunan berbasis hasil pemetaan kebutuhan madrasah binaan dengan prioritas Kurikulum Berbasis Cinta dan Pembelajaran Mendalam.",
+    "rencana_aksi": "Menyusun Program Pendampingan Tahunan",
     "durasi": "1 Bulan",
     "bukti_dukung": [
       "Cover Program Pendampingan Tahunan",
@@ -43,7 +44,7 @@ window.MASTER_RHK_DEFAULT = [
     "target_kuantitas": "82%",
     "indikator_waktu": "Pembinaan, pendampingan, monitoring, dan evaluasi pengembangan perangkat kurikulum dilaksanakan sepanjang tahun dan diselesaikan paling lambat akhir tahun berjalan.",
     "target_waktu": "12 bulan",
-    "rencana_aksi": "Melaksanakan pembinaan, evaluasi, dan pendampingan pengembangan perangkat kurikulum di madrasah binaan secara berkala.",
+    "rencana_aksi": "Melakukan evaluasi awal perangkat kurikulum madrasah binaan (KM, modul ajar, dan perangkat pendukung) untuk memastikan kesesuaian dengan prinsip kurikulum adaptif dan Kurikulum Berbasis Cinta.",
     "durasi": "12 bulan",
     "bukti_dukung": [
       "Cover Dokumen Evaluasi",
@@ -71,7 +72,7 @@ window.MASTER_RHK_DEFAULT = [
     "target_kuantitas": "21%",
     "indikator_waktu": "Pendampingan dan monitoring layanan kesehatan sekolah dilaksanakan secara bertahap dan diselesaikan paling lambat akhir tahun berjala",
     "target_waktu": "12 bulan",
-    "rencana_aksi": "Mengidentifikasi, memetakan, dan memantau penyelenggaraan layanan kesehatan sekolah (UKS) pada madrasah binaan.",
+    "rencana_aksi": "Melakukan identifikasi dan pemetaan kondisi layanan kesehatan sekolah (UKS/layanan sejenis) pada madrasah binaan berdasarkan standar layanan kesehatan sekolah.",
     "durasi": "12 bulan",
     "bukti_dukung": [
       "Cover Identifikasi",
@@ -99,7 +100,7 @@ window.MASTER_RHK_DEFAULT = [
     "target_kuantitas": "59,5%\r\n52%",
     "indikator_waktu": "Pembinaan, monitoring, dan evaluasi implementasi pembelajaran dan penilaian dilakukan sepanjang tahun dan dievaluasi pada akhir tahun berjalan.",
     "target_waktu": "12 bulan",
-    "rencana_aksi": "Mengumpulkan dan menganalisis data hasil asesmen literasi dan numerasi (ANBK) madrasah binaan, lalu menyusun rekomendasi tindak lanjut.",
+    "rencana_aksi": "Melakukan analisis awal data hasil asesmen literasi dan numerasi peserta didik madrasah binaan sebagai dasar perencanaan pembinaan pembelajaran berbasis asesmen kompetensi.",
     "durasi": "12 bulan",
     "bukti_dukung": [
       "Cover Analisis Literasi-Numerasi",
@@ -126,7 +127,7 @@ window.MASTER_RHK_DEFAULT = [
     "target_kuantitas": "92%",
     "indikator_waktu": "Pembinaan dan pendampingan penyusunan rencana kerja dilaksanakan pada semester berjalan dan diselesaikan paling lambat akhir tahun berjalan.",
     "target_waktu": "12 bulan",
-    "rencana_aksi": "Membina dan mendampingi madrasah binaan dalam menyusun Rencana Kerja Tahunan Madrasah (RKTM) berbasis partisipasi komunitas.",
+    "rencana_aksi": "Melaksanakan pembinaan dan pendampingan penyusunan rencana kerja tahunan madrasah berbasis partisipasi komunitas melalui workshop, telaah dokumen, serta konsultasi dengan kepala madrasah dan tim pengembang madrasah.",
     "durasi": "12 bulan",
     "bukti_dukung": [
       "Cover Laporan RKTM",
@@ -155,7 +156,7 @@ window.MASTER_RHK_DEFAULT = [
     "target_kuantitas": "100%",
     "indikator_waktu": "Pendampingan, monitoring, dan evaluasi integrasi pendidikan karakter dilaksanakan sepanjang tahun dan diselesaikan paling lambat akhir tahun berjalan.",
     "target_waktu": "12 bulan",
-    "rencana_aksi": "Mendampingi madrasah binaan dalam mengintegrasikan pendidikan karakter ke dalam pembelajaran serta mengevaluasi implementasinya.",
+    "rencana_aksi": "Melaksanakan pendampingan integrasi pendidikan karakter dalam pembelajaran melalui pembinaan penyusunan modul ajar, supervisi pembelajaran, serta monitoring dan evaluasi implementasi nilai karakter di kelas.",
     "durasi": "12 bulan",
     "bukti_dukung": [
       "Cover Laporan Karakter",
@@ -184,7 +185,7 @@ window.MASTER_RHK_DEFAULT = [
     "target_kuantitas": "26%",
     "indikator_waktu": "Ketepatan jadwal pelaksanaan pertemuan koordinasi antar pemangku kepentingan.",
     "target_waktu": "3 Bulan",
-    "rencana_aksi": "Memfasilitasi pertemuan kolaboratif Kepala Madrasah dan komite untuk membangun ekosistem pendidikan yang empati dan partisipatif.",
+    "rencana_aksi": "Melaksanakan koordinasi dan pendampingan kolaborasi antara madrasah, komite, orang tua, dan masyarakat melalui pertemuan rutin serta penyusunan laporan hasil pendampingan kolaboratif.",
     "durasi": "3 Bulan",
     "bukti_dukung": [
       "Cover Laporan Kolaboratif",
@@ -214,7 +215,7 @@ window.MASTER_RHK_DEFAULT = [
     "target_kuantitas": "100%",
     "indikator_waktu": "Kecepatan diseminasi informasi hasil jejaring ke madrasah binaan.",
     "target_waktu": "6 Bulan",
-    "rencana_aksi": "Aktif dalam organisasi profesi (Pokjawas/APSI), mengikuti kegiatan profesi, lalu mendiseminasikan hasilnya ke madrasah binaan.",
+    "rencana_aksi": "Melaksanakan keaktifan dalam organisasi profesi dan jejaring pengawas serta mendiseminasikan praktik baik pengawasan kepada madrasah binaan melalui forum koordinasi atau media komunikasi resmi.",
     "durasi": "6 Bulan",
     "bukti_dukung": [
       "Cover Keaktifan Organisasi",
@@ -239,7 +240,7 @@ window.MASTER_RHK_DEFAULT = [
     "target_kuantitas": "82%",
     "indikator_waktu": "Ketepatan waktu pelaksanaan pendampingan Madrasah Binaan memiliki Dokumen Kurikulum Madrasah yang relevan",
     "target_waktu": "3 Bulan",
-    "rencana_aksi": "Mendampingi madrasah binaan dalam penyusunan/reviu Kurikulum Madrasah yang mengintegrasikan Pembelajaran Mendalam dan Kurikulum Berbasis Cinta.",
+    "rencana_aksi": "Melaksanakan pendampingan penyusunan dan reviu Kurikulum Madrasah yang mengintegrasikan Pembelajaran Mendalam dan Kurikulum Berbasis Cinta melalui pembinaan teknis, telaah dokumen, dan monitoring implementasi.",
     "durasi": "3 Bulan",
     "bukti_dukung": [
       "Cover Reviu Kurikulum",
@@ -269,7 +270,7 @@ window.MASTER_RHK_DEFAULT = [
     "target_kuantitas": "26%",
     "indikator_waktu": "Ketepatan waktu laporan  prosentase peningkatan nilai karakter siswa melalui kegiatan kepramukaan (disiplin, gotong royong, kepemimpinan, tanggung jawab)",
     "target_waktu": "3 Bulan",
-    "rencana_aksi": "Membina dan mendampingi penguatan pendidikan karakter peserta didik melalui kegiatan kepramukaan dan pembiasaan madrasah.",
+    "rencana_aksi": "Melaksanakan pembinaan dan pendampingan penguatan pendidikan karakter peserta didik melalui integrasi kegiatan kepramukaan, penguatan budaya madrasah, serta monitoring dan evaluasi implementasi penilaian karakter secara berkala.",
     "durasi": "3 Bulan",
     "bukti_dukung": [
       "Cover Laporan Karakter",
@@ -297,7 +298,7 @@ window.MASTER_RHK_DEFAULT = [
     "target_kuantitas": "82%",
     "indikator_waktu": "Pelaksanaan pembinaan, pendampingan, monitoring, dan evaluasi pengembangan perangkat kurikulum dilaksanakan secara bertahap mulai triwulan I sampai triwulan IV dan diselesaikan paling lambat akhir tahun berjalan.",
     "target_waktu": "12 bulan",
-    "rencana_aksi": "Melaksanakan pembinaan, pendampingan, monitoring, dan evaluasi pengembangan perangkat kurikulum madrasah secara bertahap I-IV.",
+    "rencana_aksi": "Melaksanakan pembinaan, pendampingan, monitoring, dan evaluasi pengembangan perangkat kurikulum madrasah berbasis kurikulum adaptif, pembelajaran berbasis cinta kemanusiaan, dan pelestarian lingkungan melalui telaah dokumen dan supervisi implementasi.",
     "durasi": "12 bulan",
     "bukti_dukung": [
       "Cover Laporan Monev Kurikulum",
@@ -325,7 +326,7 @@ window.MASTER_RHK_DEFAULT = [
     "target_kuantitas": "49.20%",
     "indikator_waktu": "Pendampingan pemenuhan standar akreditasi dilaksanakan melalui pembinaan, monitoring, dan evaluasi secara berkelanjutan sepanjang tahun berjalan dan diselesaikan paling lambat akhir tahun berjalan.",
     "target_waktu": "12 Bulan",
-    "rencana_aksi": "Mendampingi madrasah binaan dalam pemenuhan standar akreditasi melalui pembinaan tata kelola, dokumen mutu, dan persiapan visitasi.",
+    "rencana_aksi": "Melaksanakan pendampingan pemenuhan standar akreditasi melalui pembinaan tata kelola madrasah, verifikasi dokumen akreditasi, monitoring capaian standar, serta evaluasi berkelanjutan terhadap kesiapan madrasah binaan.",
     "durasi": "12 Bulan",
     "bukti_dukung": [
       "Cover Laporan Akreditasi",
@@ -353,7 +354,7 @@ window.MASTER_RHK_DEFAULT = [
     "target_kuantitas": "100%",
     "indikator_waktu": "Ketepatan waktu pemberian umpan balik hasil observasi kelas kepada guru.",
     "target_waktu": "3 bulan",
-    "rencana_aksi": "Melakukan supervisi akademik klinis berbasis Pembelajaran Mendalam (Deep Learning) dengan observasi kelas, refleksi, dan umpan balik.",
+    "rencana_aksi": "Melaksanakan pendampingan klinis penerapan Pembelajaran Mendalam melalui supervisi akademik, observasi pembelajaran, pemberian umpan balik reflektif kepada guru, serta tindak lanjut perbaikan pembelajaran berbasis pembelajaran mendalam.",
     "durasi": "3 bulan",
     "bukti_dukung": [
       "Cover Laporan Supervisi Akademik",
@@ -382,7 +383,7 @@ window.MASTER_RHK_DEFAULT = [
     "target_kuantitas": "100%",
     "indikator_waktu": "Ketepatan waktu penyampaian rekomendasi hasil evaluasi kepada instansi terkait.",
     "target_waktu": "3 Bulan",
-    "rencana_aksi": "Mengevaluasi implementasi kebijakan kurikulum di madrasah binaan dan menyusun rekomendasi perbaikan mutu layanan.",
+    "rencana_aksi": "Melaksanakan evaluasi implementasi kebijakan kurikulum pada madrasah binaan melalui pengumpulan data, analisis dokumen, dan refleksi hasil pendampingan untuk menyusun laporan evaluasi dan rekomendasi perbaikan mutu layanan pendidikan.",
     "durasi": "3 Bulan",
     "bukti_dukung": [
       "Cover Laporan Evaluasi Kebijakan",
@@ -409,7 +410,7 @@ window.MASTER_RHK_DEFAULT = [
     "target_kuantitas": "3.50%",
     "indikator_waktu": "Pembinaan, pendampingan, monitoring, dan evaluasi pemenuhan indikator satuan pendidikan unggul dilaksanakan sepanjang tahun berjalan dan diselesaikan paling lambat akhir tahun berjalan.",
     "target_waktu": "12 bulan",
-    "rencana_aksi": "Membina dan mendampingi madrasah binaan untuk memenuhi indikator satuan pendidikan unggul.",
+    "rencana_aksi": "Melaksanakan pembinaan dan pendampingan pemenuhan standar satuan pendidikan unggul melalui penguatan tata kelola madrasah, peningkatan mutu pembelajaran, serta monitoring dan evaluasi capaian indikator keunggulan madrasah.",
     "durasi": "12 bulan",
     "bukti_dukung": [
       "Cover Laporan Pendidikan Unggul",
@@ -437,7 +438,7 @@ window.MASTER_RHK_DEFAULT = [
     "target_kuantitas": "0.42%",
     "indikator_waktu": "Pembinaan dan pendampingan implementasi program pendidikan bilingual dilaksanakan secara bertahap sepanjang tahun berjalan dan diselesaikan paling lambat akhir tahun berjalan.",
     "target_waktu": "12 bulan",
-    "rencana_aksi": "Membina dan mendampingi pengembangan program pendidikan bilingual pada madrasah binaan.",
+    "rencana_aksi": "Melaksanakan pembinaan dan pendampingan pengembangan program pendidikan bilingual melalui peningkatan kapasitas pendidik, pendampingan perencanaan pembelajaran bilingual, serta monitoring implementasi program sesuai standar pembelajaran.",
     "durasi": "12 bulan",
     "bukti_dukung": [
       "Cover Laporan Bilingual",
@@ -464,7 +465,7 @@ window.MASTER_RHK_DEFAULT = [
     "target_kuantitas": "0.55%",
     "indikator_waktu": "Pembinaan program pengembangan prestasi, monitoring, dan evaluasi partisipasi kompetisi dilaksanakan sepanjang tahun berjalan dan direkap paling lambat akhir tahun berjalan.",
     "target_waktu": "12 bulan",
-    "rencana_aksi": "Mendampingi pengembangan prestasi peserta didik melalui pembinaan kompetisi tingkat nasional/internasional.",
+    "rencana_aksi": "Melaksanakan pembinaan dan pendampingan pengembangan prestasi peserta didik melalui penguatan program pembinaan akademik dan nonakademik, monitoring partisipasi kompetisi, serta evaluasi capaian prestasi tingkat nasional dan internasional.",
     "durasi": "12 bulan",
     "bukti_dukung": [
       "Cover Laporan Prestasi",
@@ -492,7 +493,7 @@ window.MASTER_RHK_DEFAULT = [
     "target_kuantitas": "45.50%",
     "indikator_waktu": "Pembinaan, pendampingan, monitoring, dan evaluasi pemenuhan sertifikasi pendidik dilaksanakan sepanjang tahun berjalan dan diselesaikan paling lambat akhir tahun berjalan.",
     "target_waktu": "12 bulan",
-    "rencana_aksi": "Membina dan mendampingi peningkatan profesionalisme guru madrasah binaan, termasuk pemenuhan kualifikasi dan sertifikasi.",
+    "rencana_aksi": "Melaksanakan pembinaan dan pendampingan peningkatan profesionalisme guru melalui fasilitasi pemenuhan kualifikasi dan sertifikasi pendidik, monitoring progres sertifikasi, serta evaluasi capaian pemenuhan sertifikat pendidik.",
     "durasi": "12 bulan",
     "bukti_dukung": [
       "Cover Laporan Profesionalisme Guru",
@@ -520,7 +521,7 @@ window.MASTER_RHK_DEFAULT = [
     "target_kuantitas": "100%",
     "indikator_waktu": "Ketepatan waktu penyelesaian laporan akhir tahunan pengawasan.",
     "target_waktu": "3 bulan",
-    "rencana_aksi": "Mengumpulkan data, menganalisis hasil pendampingan, dan menyusun laporan evaluasi dampak pendampingan tahunan.",
+    "rencana_aksi": "Melaksanakan pengumpulan data, analisis hasil pendampingan, serta refleksi capaian mutu layanan pendidikan berpusat pada peserta didik untuk menyusun laporan evaluasi dampak pendampingan pengawasan secara komprehensif.",
     "durasi": "3 bulan",
     "bukti_dukung": [
       "Cover Dokumen Evaluasi Dampak",
@@ -547,7 +548,7 @@ window.MASTER_RHK_DEFAULT = [
     "target_kuantitas": "100%",
     "indikator_waktu": "Durasi penyusunan karya inovasi mulai dari draf hingga publikasi.",
     "target_waktu": "3 bulan",
-    "rencana_aksi": "Menyusun karya inovasi/best practice kepengawasan bertema kepemimpinan berbasis kasih sayang dan mempublikasikannya.",
+    "rencana_aksi": "Menyusun karya inovasi atau best practice kepengawasan berbasis kepemimpinan kasih sayang melalui dokumentasi praktik baik, analisis hasil pendampingan, penulisan karya, serta publikasi pada media ilmiah atau forum profesi.",
     "durasi": "3 bulan",
     "bukti_dukung": [
       "Cover Karya Inovasi/Best Practice",
@@ -576,7 +577,7 @@ window.MASTER_RHK_DEFAULT = [
     "target_kuantitas": "Rasio 1:12",
     "indikator_waktu": "Pembinaan, monitoring, dan evaluasi pemenuhan rasio guru dilaksanakan sepanjang tahun berjalan dan diselesaikan paling lambat akhir tahun berjalan.",
     "target_waktu": "12 bulan",
-    "rencana_aksi": "Membina perencanaan kebutuhan guru pada madrasah binaan dengan analisis rasio guru-siswa sesuai SNP.",
+    "rencana_aksi": "Melaksanakan pembinaan perencanaan kebutuhan guru, monitoring distribusi guru, serta evaluasi pemenuhan rasio guru terhadap siswa pada madrasah binaan sesuai standar SNP.",
     "durasi": "12 bulan",
     "bukti_dukung": [
       "Cover Laporan Kebutuhan Guru",
@@ -604,7 +605,7 @@ window.MASTER_RHK_DEFAULT = [
     "target_kuantitas": "41.50%",
     "indikator_waktu": "Pembinaan, monitoring, dan evaluasi pemenuhan kualifikasi tenaga kependidikan dilaksanakan sepanjang tahun berjalan dan diselesaikan paling lambat akhir tahun berjalan.",
     "target_waktu": "12 bulan",
-    "rencana_aksi": "Membina, mendampingi, monitoring, dan evaluasi pemenuhan kualifikasi dan kompetensi tenaga kependidikan.",
+    "rencana_aksi": "Melaksanakan pembinaan, pendampingan, monitoring, dan evaluasi pemenuhan kualifikasi dan kompetensi tenaga kependidikan melalui pemetaan kebutuhan kompetensi dan penguatan kapasitas tenaga kependidikan.",
     "durasi": "12 bulan",
     "bukti_dukung": [
       "Cover Laporan Tendik",
@@ -632,7 +633,7 @@ window.MASTER_RHK_DEFAULT = [
     "target_kuantitas": "91%",
     "indikator_waktu": "Pendampingan pemenuhan sertifikasi guru agama dilaksanakan sepanjang tahun berjalan dan diselesaikan paling lambat akhir tahun berjalan.",
     "target_waktu": "12 bulan",
-    "rencana_aksi": "Mendampingi guru agama madrasah binaan untuk pemenuhan sertifikasi pendidik.",
+    "rencana_aksi": "Melaksanakan pendampingan pemenuhan sertifikasi guru agama melalui fasilitasi administrasi, monitoring progres sertifikasi, serta evaluasi capaian pemenuhan sertifikat pendidik pada madrasah binaan.",
     "durasi": "12 bulan",
     "bukti_dukung": [
       "Cover Laporan Sertifikasi Guru Agama",
@@ -659,7 +660,7 @@ window.MASTER_RHK_DEFAULT = [
     "target_kuantitas": "45%",
     "indikator_waktu": "Pendampingan persiapan dan monitoring keikutsertaan PPG dilaksanakan sepanjang tahun berjalan dan direkap paling lambat akhir tahun berjalan.",
     "target_waktu": "12 bulan",
-    "rencana_aksi": "Membina dan mendampingi guru madrasah binaan dalam persiapan Pendidikan Profesi Guru (PPG).",
+    "rencana_aksi": "Melaksanakan pembinaan dan pendampingan persiapan Pendidikan Profesi Guru (PPG) melalui sosialisasi, fasilitasi pemenuhan persyaratan administrasi, serta monitoring keikutsertaan dan kelulusan guru dalam program PPG.",
     "durasi": "12 bulan",
     "bukti_dukung": [
       "Cover Laporan PPG",
@@ -686,7 +687,7 @@ window.MASTER_RHK_DEFAULT = [
     "target_kuantitas": "400 Prestasi",
     "indikator_waktu": "Pembinaan kegiatan ekstrakurikuler dan monitoring capaian prestasi dilaksanakan sepanjang tahun berjalan dan direkap paling lambat akhir tahun berjalan.",
     "target_waktu": "12 bulan",
-    "rencana_aksi": "Membina dan mendampingi pengembangan kegiatan ekstrakurikuler madrasah binaan untuk peningkatan prestasi peserta didik.",
+    "rencana_aksi": "Melaksanakan pembinaan dan pendampingan pengembangan kegiatan ekstrakurikuler melalui penguatan program pembinaan prestasi, monitoring capaian prestasi peserta didik, serta evaluasi hasil kegiatan ekstrakurikuler pada madrasah binaan.",
     "durasi": "12 bulan",
     "bukti_dukung": [
       "Cover Laporan Ekstrakurikuler",
@@ -713,7 +714,7 @@ window.MASTER_RHK_DEFAULT = [
     "target_kuantitas": "51.44%",
     "indikator_waktu": "Penyusunan rekomendasi dilaksanakan berdasarkan hasil monitoring dan analisis kebutuhan sepanjang tahun berjalan dan diselesaikan paling lambat akhir tahun berjalan.",
     "target_waktu": "12 bulan",
-    "rencana_aksi": "Menyusun instrumen monitoring dan menganalisis kebutuhan guru agama pada madrasah binaan, lalu menerbitkan rekomendasi.",
+    "rencana_aksi": "Melaksanakan monitoring dan analisis kebutuhan guru agama pada madrasah binaan sebagai dasar penyusunan rekomendasi pengadaan dan pemerataan guru agama sesuai kebutuhan dan ketentuan yang berlaku.",
     "durasi": "12 bulan",
     "bukti_dukung": [
       "Cover Instrumen Kebutuhan Guru Agama",
@@ -738,7 +739,7 @@ window.MASTER_RHK_DEFAULT = [
     "target_kuantitas": "100%",
     "indikator_waktu": "Tingkat Ketepatan waktu penyelesaian sampai diserahkan ke atasan langsung",
     "target_waktu": "3 bulan",
-    "rencana_aksi": "Mengikuti kegiatan pengembangan diri (diklat/bimtek/seminar/workshop/webinar) sesuai surat tugas dan menyusun laporan.",
+    "rencana_aksi": "Mengikuti  sejumlah  pendidikan dan pelatihan fungsional pengawas madrasah",
     "durasi": "3 bulan",
     "bukti_dukung": [
       "Sertifikat Pengembangan Diri",
@@ -761,7 +762,7 @@ window.MASTER_RHK_DEFAULT = [
     "target_kuantitas": "100%",
     "indikator_waktu": "Tingkat Ketepatan waktu penyelesaian sampai diserahkan ke atasan langsung",
     "target_waktu": "3 bulan",
-    "rencana_aksi": "Menyusun karya inovatif berupa aplikasi pendukung pendampingan kepengawasan beserta laporan pengembangannya.",
+    "rencana_aksi": "Menyusun karya inovatif aplikasi pendampingan",
     "durasi": "3 bulan",
     "bukti_dukung": [
       "Cover Karya Inovatif",
@@ -789,7 +790,7 @@ window.MASTER_RHK_DEFAULT = [
     "target_kuantitas": "100%",
     "indikator_waktu": "Tingkat Ketepatan waktu penyelesaian sampai diserahkan ke atasan langsung",
     "target_waktu": "3 bulan",
-    "rencana_aksi": "Menyusun karya publikasi ilmiah (buku/makalah/jurnal/PTKP) dan mempublikasikannya pada penerbit ber-ISBN/ISSN/HKI.",
+    "rencana_aksi": "Menyusun karya Publikasi Ilmiah buku, makalah, jurnal dan PTKP",
     "durasi": "3 bulan",
     "bukti_dukung": [
       "Cover Karya Publikasi",
@@ -817,7 +818,7 @@ window.MASTER_RHK_DEFAULT = [
     "target_kuantitas": "100%",
     "indikator_waktu": "Tingkat Ketepatan waktu penyelesaian sampai diserahkan ke atasan langsung",
     "target_waktu": "1 Tahun",
-    "rencana_aksi": "Aktif sebagai pengurus Pokjawas/APSI dan/atau organisasi profesi lainnya berdasarkan SK Pengurus.",
+    "rencana_aksi": "Menjadi pengurus aktif dalam organisasi profesi Pokjawas dan APSI",
     "durasi": "1 Tahun",
     "bukti_dukung": [
       "SK Pengurus Pokjawas/APSI",
@@ -830,3 +831,4 @@ window.MASTER_RHK_DEFAULT = [
     "link_bukti_dukung": ""
   }
 ];
+window.MASTER_RHK = window.MASTER_RHK_DEFAULT; // legacy alias

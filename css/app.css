@@ -55,7 +55,7 @@ a:hover { color: var(--kemenag-dark); }
 .table-wide-wrap::-webkit-scrollbar { height: 12px; }
 .table-wide-wrap::-webkit-scrollbar-thumb { background: #b6b6b6; border-radius: 6px; }
 .table-wide-wrap::-webkit-scrollbar-track { background: #f0f0f0; }
-.table-wide-wrap table { min-width: 1800px; }
+.table-wide-wrap table { min-width: 2000px; }
 
 .btn-burger { display: none; }
 

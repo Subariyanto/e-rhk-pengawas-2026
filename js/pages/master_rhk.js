@@ -45,6 +45,7 @@
               <col style="width:90px">
               <col style="width:280px">
               <col style="width:280px">
+              <col style="width:90px">
               <col style="width:220px">
               <col style="width:80px">
               <col style="width:280px">
@@ -59,7 +60,8 @@
                 <th>Jenis</th>
                 <th>RHK Atasan yang Diintervensi</th>
                 <th>Rencana Hasil Kerja</th>
-                <th>Indikator</th>
+                <th>Aspek</th>
+                <th>Indikator Kinerja Individu</th>
                 <th>Target</th>
                 <th>Rencana Aksi</th>
                 <th>Nama Eviden / Bukti Dukung</th>
@@ -68,23 +70,33 @@
               </tr>
             </thead>
             <tbody>
-              ${filtered.map(r => `
+              ${filtered.map(r => {
+                const idEnc = encodeURIComponent(r.id);
+                const tw = `<span class="badge ${r.jenis_kinerja === 'Tambahan' ? 'badge-tambahan' : 'badge-tw'}">${r.triwulan === 'TAMBAHAN' ? 'Tmb' : 'TW ' + r.triwulan}</span>`;
+                return `
                 <tr>
-                  <td><strong>${r.id}</strong></td>
-                  <td><span class="badge ${r.jenis_kinerja === 'Tambahan' ? 'badge-tambahan' : 'badge-tw'}">${r.triwulan === 'TAMBAHAN' ? 'Tmb' : 'TW ' + r.triwulan}</span></td>
-                  <td>${r.jenis_kinerja}</td>
-                  <td class="small" style="white-space:normal;">${U.escapeHtml(r.rhk_atasan_intervensi || '')}</td>
-                  <td class="small" style="white-space:normal;">${U.escapeHtml(r.rencana_hasil_kerja || '')}</td>
+                  <td rowspan="2"><strong>${r.id}</strong></td>
+                  <td rowspan="2">${tw}</td>
+                  <td rowspan="2">${r.jenis_kinerja}</td>
+                  <td rowspan="2" class="small" style="white-space:normal;">${U.escapeHtml(r.rhk_atasan_intervensi || '')}</td>
+                  <td rowspan="2" class="small" style="white-space:normal;">${U.escapeHtml(r.rencana_hasil_kerja || '')}</td>
+                  <td><strong>Kuantitas</strong></td>
                   <td class="small" style="white-space:normal;">${U.escapeHtml(r.indikator_kuantitas || '')}</td>
                   <td>${U.escapeHtml(r.target_kuantitas || '')}</td>
-                  <td class="small" style="white-space:normal;">${U.escapeHtml(r.rencana_aksi || '')}</td>
-                  <td style="white-space:normal;"><a href="#/master-rhk/${encodeURIComponent(r.id)}">${U.escapeHtml(r.nama_eviden)}</a></td>
-                  <td>${U.escapeHtml(r.target_waktu || '')}</td>
-                  <td class="text-end text-nowrap">
-                    <a class="btn btn-sm btn-outline-success" href="#/master-rhk/${encodeURIComponent(r.id)}" title="Detail"><i class="bi bi-eye"></i></a>
-                    <a class="btn btn-sm btn-outline-success" href="#/eviden/${encodeURIComponent(r.id)}" title="Generate Eviden"><i class="bi bi-file-earmark-plus"></i></a>
+                  <td rowspan="2" class="small" style="white-space:normal;">${U.escapeHtml(r.rencana_aksi || '')}</td>
+                  <td rowspan="2" style="white-space:normal;"><a href="#/master-rhk/${idEnc}">${U.escapeHtml(r.nama_eviden)}</a></td>
+                  <td rowspan="2">${U.escapeHtml(r.target_waktu || '')}</td>
+                  <td rowspan="2" class="text-end text-nowrap">
+                    <a class="btn btn-sm btn-outline-success" href="#/master-rhk/${idEnc}" title="Detail"><i class="bi bi-eye"></i></a>
+                    <a class="btn btn-sm btn-outline-success" href="#/eviden/${idEnc}" title="Generate Eviden"><i class="bi bi-file-earmark-plus"></i></a>
                   </td>
-                </tr>`).join('') || `<tr><td colspan="11" class="text-center text-muted p-4">Tidak ada RHK yang cocok.</td></tr>`}
+                </tr>
+                <tr>
+                  <td><strong>Waktu</strong></td>
+                  <td class="small" style="white-space:normal;">${U.escapeHtml(r.indikator_waktu || '')}</td>
+                  <td>${U.escapeHtml(r.target_waktu || '')}</td>
+                </tr>`;
+              }).join('') || `<tr><td colspan="12" class="text-center text-muted p-4">Tidak ada RHK yang cocok.</td></tr>`}
             </tbody>
           </table>
         </div>

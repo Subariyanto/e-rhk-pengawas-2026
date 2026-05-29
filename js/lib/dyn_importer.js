@@ -144,7 +144,8 @@
     return css.length ? ` style="${css.join(';')}"` : '';
   }
 
-  function renderSheetTable(sheet) {
+  function renderSheetTable(sheet, opts = {}) {
+    const editable = !!opts.editable;
     const merges = sheet.merges || [];
     const skip = new Set();
     const mergeMap = new Map();
@@ -169,14 +170,15 @@
         const styleAttr = cellStyle(cell);
         const rs = span?.rowspan && span.rowspan > 1 ? ` rowspan="${span.rowspan}"` : '';
         const cs = span?.colspan && span.colspan > 1 ? ` colspan="${span.colspan}"` : '';
-        tds.push(`<td${rs}${cs}${styleAttr}>${U.escapeHtml(String(v)).replace(/\n/g, '<br>')}</td>`);
+        const editAttr = editable ? ` contenteditable="true" data-r="${r}" data-c="${c}"` : '';
+        tds.push(`<td${rs}${cs}${styleAttr}${editAttr}>${U.escapeHtml(String(v)).replace(/\n/g, '<br>')}</td>`);
       }
       return `<tr>${tds.join('')}</tr>`;
     }).join('');
     return `<table class="skp-excel-table">${trs}</table>`;
   }
 
-  function renderExcel(payload) {
+  function renderExcel(payload, opts = {}) {
     const sheets = payload.sheets || [];
     const uid = 'imp' + Math.random().toString(36).slice(2, 8);
     const tabs = sheets.map((s, i) => `
@@ -184,18 +186,38 @@
         <button class="nav-link ${i === 0 ? 'active' : ''}" data-bs-toggle="tab" data-bs-target="#${uid}-${i}" type="button">${U.escapeHtml(s.name)}</button>
       </li>`).join('');
     const panes = sheets.map((s, i) => `
-      <div class="tab-pane fade ${i === 0 ? 'show active' : ''}" id="${uid}-${i}">
+      <div class="tab-pane fade ${i === 0 ? 'show active' : ''}" id="${uid}-${i}" data-sheet-idx="${i}">
         <div class="table-wide-wrap" style="max-height: calc(100vh - 220px);">
-          ${renderSheetTable(s)}
+          ${renderSheetTable(s, opts)}
         </div>
       </div>`).join('');
     return `
-      <div class="card">
+      <div class="card" id="${uid}-host">
         <div class="card-header p-0">
           <ul class="nav nav-tabs">${tabs}</ul>
         </div>
         <div class="tab-content">${panes}</div>
       </div>`;
+  }
+
+  function renderDoc(doc, opts = {}) {
+    const meta = `
+      <div class="card mb-3">
+        <div class="card-body py-2 small d-flex flex-wrap gap-3 align-items-center">
+          <div><i class="bi bi-file-earmark"></i> <strong>${U.escapeHtml(doc.fileName || '-')}</strong></div>
+          <div class="text-muted">Tipe: ${doc.kind?.toUpperCase() || '-'}</div>
+          <div class="text-muted">Diimport: ${new Date(doc.importedAt).toLocaleString('id-ID')}</div>
+        </div>
+      </div>`;
+    let body = '';
+    if (doc.kind === 'excel') body = renderExcel(doc.payload, opts);
+    else if (doc.kind === 'docx') {
+      const editAttr = opts.editable ? ' contenteditable="true" id="docxEdit"' : '';
+      body = `<div class="card"><div class="card-body skp-doc"${editAttr}>${doc.payload.html}</div></div>`;
+    }
+    else if (doc.kind === 'pdf') body = renderPDF(doc.payload);
+    else body = '<div class="alert alert-warning">Format tidak dikenali.</div>';
+    return meta + body;
   }
 
   function renderPDF(payload) {
@@ -236,15 +258,19 @@
    */
   function mountImporter({ title, storeKey, onRefresh, emptyHint }) {
     const doc = Store.get(storeKey, null);
+    const editing = !!Store.get(storeKey + '__editing', false);
     UI.shell(title, `
       <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
         <input type="file" id="impFile" accept=".xlsx,.xls,.xlsm,.xlsb,.docx,.docm,.pdf" class="form-control" style="max-width:380px;" />
         <button class="btn btn-success" id="btnImport"><i class="bi bi-upload"></i> Import</button>
-        ${doc ? '<button class="btn btn-outline-danger ms-auto" id="btnClear"><i class="bi bi-trash"></i> Hapus</button>' : ''}
+        ${doc && doc.kind !== 'pdf' ? (editing
+          ? '<button class="btn btn-success ms-auto" id="btnSave"><i class="bi bi-save"></i> Simpan</button><button class="btn btn-outline-secondary" id="btnCancel"><i class="bi bi-x"></i> Batal</button>'
+          : '<button class="btn btn-outline-primary ms-auto" id="btnEdit"><i class="bi bi-pencil"></i> Edit</button>') : ''}
+        ${doc ? '<button class="btn btn-outline-danger" id="btnClear"><i class="bi bi-trash"></i> Hapus</button>' : ''}
         <div class="text-muted small ms-2">Format: Excel (.xlsx/.xls/.xlsm/.xlsb), Word (.docx/.docm), PDF</div>
       </div>
 
-      ${doc ? renderDoc(doc) : `
+      ${doc ? renderDoc(doc, { editable: editing }) : `
         <div class="card">
           <div class="card-body text-center text-muted py-5">
             <div style="font-size:48px;opacity:.3">📄</div>
@@ -262,6 +288,7 @@
         UI.toast('Membaca file…', 'info');
         const result = await importFile(f);
         Store.set(storeKey, result);
+        Store.set(storeKey + '__editing', false);
         UI.toast('Import berhasil.', 'success');
         onRefresh();
       } catch (e) {
@@ -270,10 +297,48 @@
       }
     });
     if (doc) {
-      const btn = document.getElementById('btnClear');
-      if (btn) btn.addEventListener('click', async () => {
+      const btnEdit = document.getElementById('btnEdit');
+      if (btnEdit) btnEdit.addEventListener('click', () => {
+        Store.set(storeKey + '__editing', true);
+        onRefresh();
+      });
+      const btnSave = document.getElementById('btnSave');
+      if (btnSave) btnSave.addEventListener('click', () => {
+        const cur = Store.get(storeKey, null);
+        if (!cur) return;
+        if (cur.kind === 'excel') {
+          // collect each sheet pane
+          document.querySelectorAll('[data-sheet-idx]').forEach(pane => {
+            const idx = parseInt(pane.dataset.sheetIdx);
+            const sheet = cur.payload.sheets[idx];
+            if (!sheet) return;
+            pane.querySelectorAll('td[contenteditable]').forEach(td => {
+              const r = parseInt(td.dataset.r);
+              const c = parseInt(td.dataset.c);
+              if (Number.isFinite(r) && Number.isFinite(c) && sheet.rows[r] && sheet.rows[r][c]) {
+                sheet.rows[r][c].v = td.innerText;
+              }
+            });
+          });
+        } else if (cur.kind === 'docx') {
+          const ed = document.getElementById('docxEdit');
+          if (ed) cur.payload.html = ed.innerHTML;
+        }
+        Store.set(storeKey, cur);
+        Store.set(storeKey + '__editing', false);
+        UI.toast('Perubahan disimpan.', 'success');
+        onRefresh();
+      });
+      const btnCancel = document.getElementById('btnCancel');
+      if (btnCancel) btnCancel.addEventListener('click', () => {
+        Store.set(storeKey + '__editing', false);
+        onRefresh();
+      });
+      const btnClear = document.getElementById('btnClear');
+      if (btnClear) btnClear.addEventListener('click', async () => {
         if (await UI.confirmDialog('Hapus dokumen yang sudah diimport?')) {
           Store.set(storeKey, null);
+          Store.set(storeKey + '__editing', false);
           onRefresh();
         }
       });

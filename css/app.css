@@ -54,7 +54,7 @@ a:hover { color: var(--kemenag-dark); }
 .table-wide-wrap {
   overflow-x: scroll;
   overflow-y: auto;
-  max-height: calc(100vh - 90px);
+  max-height: calc(100vh - 130px);
 }
 .table-wide-wrap::-webkit-scrollbar { height: 12px; width: 10px; }
 .table-wide-wrap::-webkit-scrollbar-thumb { background: #b6b6b6; border-radius: 6px; }

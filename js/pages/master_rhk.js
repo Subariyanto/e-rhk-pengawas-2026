@@ -66,7 +66,7 @@
                 <th>Rencana Aksi</th>
                 <th>Nama Eviden / Bukti Dukung</th>
                 <th>Durasi</th>
-                <th></th>
+                <th>Aksi</th>
               </tr>
             </thead>
             <tbody>

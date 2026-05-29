@@ -30,7 +30,7 @@ a:hover { color: var(--kemenag-dark); }
 .app-sidebar {
   background: linear-gradient(180deg, var(--kemenag-dark), var(--kemenag));
   color: #fff;
-  padding: 16px 0 24px;
+  padding: 12px 0 0;
   width: 240px; flex: 0 0 240px;
   position: sticky; top: 0; align-self: flex-start;
   height: 100vh; overflow-y: auto;
@@ -39,11 +39,11 @@ a:hover { color: var(--kemenag-dark); }
 }
 .app-sidebar nav { flex: 0 0 auto; }
 .sidebar-credit {
-  padding: 8px 4px;
+  padding: 6px 4px;
   text-align: center;
   color: rgba(255,255,255,.85);
   font-size: 8.5px;
-  line-height: 1.35;
+  line-height: 1.3;
   white-space: nowrap;
   border-top: 1px solid rgba(255,255,255,.15);
   flex: 0 0 auto;
@@ -53,11 +53,11 @@ a:hover { color: var(--kemenag-dark); }
 .app-sidebar .brand .logo { width: 36px; height: 36px; background: #fff; border-radius: 8px; display: grid; place-items: center; color: var(--kemenag); font-weight: 800; }
 .app-sidebar .brand .title { font-weight: 700; line-height: 1.1; }
 .app-sidebar .brand .subtitle { font-size: 11px; opacity: .8; }
-.app-sidebar nav a { display: flex; gap: 10px; align-items: center; padding: 10px 16px; color: rgba(255,255,255,.9); text-decoration: none; font-size: 14px; }
+.app-sidebar nav a { display: flex; gap: 10px; align-items: center; padding: 8px 16px; color: rgba(255,255,255,.9); text-decoration: none; font-size: 14px; }
 .app-sidebar nav a:hover { background: rgba(255,255,255,.08); color: #fff; }
 .app-sidebar nav a.active { background: rgba(255,255,255,.18); color: #fff; font-weight: 600; }
 .app-sidebar nav .section-label { padding: 14px 16px 4px; font-size: 11px; opacity: .65; text-transform: uppercase; letter-spacing: .5px; }
-.app-sidebar .userbox { margin-top: auto; padding: 10px 16px; border-top: 1px solid rgba(255,255,255,.15); font-size: 12px; opacity: .9; }
+.app-sidebar .userbox { margin-top: auto; padding: 8px 12px; border-top: 1px solid rgba(255,255,255,.15); font-size: 12px; opacity: .9; }
 
 .app-main { flex: 1 1 auto; min-width: 0; }
 .app-topbar { background: #fff; border-bottom: 1px solid #e7eee9; padding: 10px 16px; display: flex; align-items: center; gap: 10px; position: sticky; top: 0; z-index: 5; }

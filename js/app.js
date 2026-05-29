@@ -21,10 +21,15 @@
   }
 
   async function boot() {
-    await Auth.ensureAdminSeeded();
-    bootRoutes();
-    document.getElementById('app-loading').classList.add('d-none');
-    document.getElementById('app').classList.remove('d-none');
+    try {
+      await Auth.ensureAdminSeeded();
+      bootRoutes();
+    } catch (e) {
+      console.error('boot error:', e);
+    }
+    // Always reveal app, even if init had warnings
+    const ld = document.getElementById('app-loading'); if (ld) ld.classList.add('d-none');
+    const ap = document.getElementById('app'); if (ap) ap.classList.remove('d-none');
     if (!location.hash) location.hash = '#/';
     Router.dispatch();
   }

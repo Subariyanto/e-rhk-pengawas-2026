@@ -189,10 +189,10 @@
         <td rowspan="2" class="cell-wrap"><textarea class="cell-textarea" data-field="rencana_hasil_kerja" rows="1">${U.escapeHtml(r.rencana_hasil_kerja || '')}</textarea></td>
         <td class="cell-aspek"><strong>Kuantitas</strong></td>
         <td class="cell-wrap"><textarea class="cell-textarea" data-field="indikator_kuantitas" rows="1">${U.escapeHtml(r.indikator_kuantitas || '')}</textarea></td>
-        <td class="cell-wrap"><input class="cell-input" data-field="target_kuantitas" value="${attr(r.target_kuantitas)}" /></td>
+        <td class="cell-wrap"><textarea class="cell-textarea" data-field="target_kuantitas" rows="1">${U.escapeHtml(r.target_kuantitas || '')}</textarea></td>
         <td rowspan="2" class="cell-wrap"><textarea class="cell-textarea" data-field="rencana_aksi" rows="1">${U.escapeHtml(r.rencana_aksi || '')}</textarea></td>
-        <td rowspan="2" class="cell-wrap"><input class="cell-input" data-field="nama_eviden" value="${attr(r.nama_eviden)}" /></td>
-        <td rowspan="2" class="cell-wrap"><input class="cell-input" data-field="target_waktu" value="${attr(r.target_waktu)}" title="Durasi (sama dengan target waktu)" /></td>
+        <td rowspan="2" class="cell-wrap"><textarea class="cell-textarea" data-field="nama_eviden" rows="1">${U.escapeHtml(r.nama_eviden || '')}</textarea></td>
+        <td rowspan="2" class="cell-wrap"><textarea class="cell-textarea" data-field="target_waktu" rows="1" title="Durasi (sama dengan target waktu)">${U.escapeHtml(r.target_waktu || '')}</textarea></td>
         <td rowspan="2" class="text-center text-nowrap" style="vertical-align:middle;">
           <a class="btn btn-sm btn-outline-success" href="#/master-rhk/${idEnc}" title="Detail"><i class="bi bi-eye"></i></a>
           <a class="btn btn-sm btn-outline-success" href="#/eviden/${idEnc}" title="Generate Eviden"><i class="bi bi-file-earmark-plus"></i></a>
@@ -202,7 +202,7 @@
       <tr data-rhk-id="${attr(r.id)}">
         <td class="cell-aspek"><strong>Waktu</strong></td>
         <td class="cell-wrap"><textarea class="cell-textarea" data-field="indikator_waktu" rows="1">${U.escapeHtml(r.indikator_waktu || '')}</textarea></td>
-        <td class="cell-wrap"><input class="cell-input" data-field="target_waktu" value="${attr(r.target_waktu)}" /></td>
+        <td class="cell-wrap"><textarea class="cell-textarea" data-field="target_waktu" rows="1">${U.escapeHtml(r.target_waktu || '')}</textarea></td>
       </tr>`;
   }
 
@@ -231,6 +231,8 @@
           let total = 0;
           cols.forEach(c => { total += parseInt(c.style.width, 10) || 0; });
           table.style.width = total + 'px';
+          // Re-grow textareas in this column so wrap stays correct
+          regrowColumn(idx);
         };
         const onUp = () => {
           document.removeEventListener('mousemove', onMove);
@@ -239,6 +241,7 @@
           document.body.style.userSelect = '';
           const widths = Array.from(cols).map(c => parseInt(c.style.width, 10) || 0);
           saveColWidths(widths);
+          regrowColumn(idx);
         };
         document.addEventListener('mousemove', onMove);
         document.addEventListener('mouseup', onUp);
@@ -246,19 +249,32 @@
     });
   }
 
+  function regrowColumn(colIdx) {
+    const tbody = document.getElementById('rhkTbody');
+    if (!tbody) return;
+    tbody.querySelectorAll('tr').forEach(tr => {
+      // walk cells, accounting for rowspan from sibling rows above
+      const cells = tr.querySelectorAll('td');
+      // We can't easily track rowspan offsets across rows, so just re-grow ALL textareas in the row.
+      // Cheaper: just re-grow every textarea in the table (still cheap for ~30 rows).
+    });
+    tbody.querySelectorAll('textarea.cell-textarea').forEach(growTextarea);
+  }
+
+  function growTextarea(el) {
+    if (!el || el.tagName !== 'TEXTAREA') return;
+    el.style.height = 'auto';
+    el.style.height = Math.max(28, el.scrollHeight) + 'px';
+  }
+
   function setupInlineEdit() {
     const tbody = document.getElementById('rhkTbody');
     if (!tbody) return;
 
-    const grow = (el) => {
-      if (!el || el.tagName !== 'TEXTAREA') return;
-      el.style.height = 'auto';
-      el.style.height = Math.max(28, el.scrollHeight) + 'px';
-    };
-    tbody.querySelectorAll('textarea.cell-textarea').forEach(grow);
+    tbody.querySelectorAll('textarea.cell-textarea').forEach(growTextarea);
 
     tbody.addEventListener('input', (e) => {
-      if (e.target.matches('textarea.cell-textarea')) grow(e.target);
+      if (e.target.matches('textarea.cell-textarea')) growTextarea(e.target);
     });
 
     tbody.addEventListener('change', (e) => {
@@ -277,6 +293,11 @@
         e.target.blur();
       }
     });
+
+    // Re-grow textareas on window resize so wrap follows viewport too
+    window.addEventListener('resize', U.debounce(() => {
+      tbody.querySelectorAll('textarea.cell-textarea').forEach(growTextarea);
+    }, 100));
 
     // Delete custom
     tbody.addEventListener('click', async (e) => {

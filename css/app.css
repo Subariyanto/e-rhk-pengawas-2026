@@ -496,12 +496,19 @@ a:hover { color: var(--primary-dark); }
 }
 .rhk-table td.cell-wrap,
 .rhk-table td.cell-aspek,
-.rhk-table td.cell-id { padding: 4px 6px; vertical-align: top; }
+.rhk-table td.cell-id {
+  padding: 4px 6px;
+  vertical-align: top;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
 .rhk-table .cell-aspek { background: var(--primary-soft); color: var(--primary-dark); text-align: center; }
 .rhk-table .cell-input,
 .rhk-table .cell-textarea,
 .rhk-table .cell-select {
   width: 100%;
+  max-width: 100%;
   border: 1px solid transparent;
   background: transparent;
   padding: 4px 6px;
@@ -532,7 +539,8 @@ a:hover { color: var(--primary-dark); }
   min-height: 32px;
   overflow: hidden;
   white-space: pre-wrap;
-  word-wrap: break-word;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 .rhk-table .cell-saved {
   animation: cellSavedFlash .8s ease;

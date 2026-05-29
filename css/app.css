@@ -39,15 +39,14 @@ a:hover { color: var(--kemenag-dark); }
 }
 .app-sidebar nav { flex: 0 0 auto; }
 .sidebar-credit {
-  margin-top: auto;
-  padding: 10px 6px 0;
+  padding: 8px 4px;
   text-align: center;
   color: rgba(255,255,255,.85);
-  font-size: 9.5px;
+  font-size: 8.5px;
   line-height: 1.35;
   white-space: nowrap;
-  overflow: hidden;
   border-top: 1px solid rgba(255,255,255,.15);
+  flex: 0 0 auto;
 }
 .sidebar-credit div + div { margin-top: 2px; }
 .app-sidebar .brand { padding: 8px 16px 16px; display: flex; gap: 10px; align-items: center; }

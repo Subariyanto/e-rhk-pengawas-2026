@@ -34,6 +34,7 @@ a:hover { color: var(--kemenag-dark); }
   width: 240px; flex: 0 0 240px;
   position: sticky; top: 0; align-self: flex-start;
   height: 100vh; overflow-y: auto;
+  overscroll-behavior: contain;
   display: flex; flex-direction: column;
 }
 .app-sidebar nav { flex: 0 0 auto; }

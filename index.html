@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#3949ab" />
+  <meta name="theme-color" content="#1E2A5A" />
   <title>E-RHK Pengawas Madrasah 2026</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" href="icons/icon-192.png" />
@@ -34,7 +34,7 @@
        Runs once per browser; safe no-op afterwards. -->
   <script>
   (function(){
-    var KEY='erhk2026_cleanup_v3';
+    var KEY='erhk2026_cleanup_v4';
     if(localStorage.getItem(KEY)==='done') return;
     var didWork=false;
     if('serviceWorker' in navigator){
@@ -45,7 +45,7 @@
     if(window.caches){
       caches.keys().then(function(keys){
         return Promise.all(keys.map(function(k){
-          if(k && k.indexOf('erhk-2026-v3')<0){ didWork=true; return caches.delete(k); }
+          if(k && k.indexOf('erhk-2026-v4')<0){ didWork=true; return caches.delete(k); }
         }));
       }).then(function(){
         localStorage.setItem(KEY,'done');

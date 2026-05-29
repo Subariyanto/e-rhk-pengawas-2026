@@ -5,7 +5,7 @@
       <div class="auth-wrap">
         <div class="auth-card">
           <div class="text-center mb-3">
-            <div style="width:64px;height:64px;background:#0e7a3a;color:#fff;border-radius:14px;display:inline-grid;place-items:center;font-size:30px;">📋</div>
+            <div class="auth-logo">📋</div>
             <h1 class="mt-3 mb-0">E-RHK Pengawas Madrasah 2026</h1>
             <div class="small text-muted">Otomatisasi Eviden RHK</div>
           </div>

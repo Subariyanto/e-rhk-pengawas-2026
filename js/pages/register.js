@@ -5,6 +5,7 @@
       <div class="auth-wrap">
         <div class="auth-card">
           <div class="text-center mb-3">
+            <div class="auth-logo mb-2">📋</div>
             <h1 class="mb-0">Daftar Akun Pengawas</h1>
             <div class="small text-muted">Pendaftaran langsung aktif tanpa persetujuan admin.</div>
           </div>

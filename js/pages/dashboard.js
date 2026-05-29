@@ -90,8 +90,8 @@
         data: {
           labels: ['Triwulan I', 'Triwulan II', 'Triwulan III', 'Triwulan IV', 'Tambahan'],
           datasets: [
-            { label: 'Sudah Ada Eviden', data: [perTW.I, perTW.II, perTW.III, perTW.IV, perTW.TAMBAHAN], backgroundColor: '#0e7a3a' },
-            { label: 'Belum', data: [totTW.I - perTW.I, totTW.II - perTW.II, totTW.III - perTW.III, totTW.IV - perTW.IV, totTW.TAMBAHAN - perTW.TAMBAHAN], backgroundColor: '#cdd6cf' },
+            { label: 'Sudah Ada Eviden', data: [perTW.I, perTW.II, perTW.III, perTW.IV, perTW.TAMBAHAN], backgroundColor: '#1E2A5A' },
+            { label: 'Belum', data: [totTW.I - perTW.I, totTW.II - perTW.II, totTW.III - perTW.III, totTW.IV - perTW.IV, totTW.TAMBAHAN - perTW.TAMBAHAN], backgroundColor: '#E5E7EB' },
           ],
         },
         options: { responsive: true, plugins: { legend: { position: 'bottom' } }, scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } } }
@@ -99,7 +99,7 @@
       const ctxS = document.getElementById('chStatus').getContext('2d');
       new Chart(ctxS, {
         type: 'doughnut',
-        data: { labels: ['Final', 'Draft', 'Belum dibuat'], datasets: [{ data: [evidenSelesai, evidenDraft, Math.max(0, totalRHK - rhkSudah)], backgroundColor: ['#0e7a3a', '#d4af37', '#cdd6cf'] }] },
+        data: { labels: ['Final', 'Draft', 'Belum dibuat'], datasets: [{ data: [evidenSelesai, evidenDraft, Math.max(0, totalRHK - rhkSudah)], backgroundColor: ['#1E2A5A', '#D4AF37', '#E5E7EB'] }] },
         options: { responsive: true, plugins: { legend: { position: 'bottom' } } },
       });
     } catch (e) {

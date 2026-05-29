@@ -32,7 +32,7 @@
        Runs once per browser; safe no-op afterwards. -->
   <script>
   (function(){
-    var KEY='erhk2026_cleanup_v2';
+    var KEY='erhk2026_cleanup_v3';
     if(localStorage.getItem(KEY)==='done') return;
     var didWork=false;
     if('serviceWorker' in navigator){
@@ -43,7 +43,7 @@
     if(window.caches){
       caches.keys().then(function(keys){
         return Promise.all(keys.map(function(k){
-          if(k && k.indexOf('erhk-2026-v2')<0){ didWork=true; return caches.delete(k); }
+          if(k && k.indexOf('erhk-2026-v3')<0){ didWork=true; return caches.delete(k); }
         }));
       }).then(function(){
         localStorage.setItem(KEY,'done');

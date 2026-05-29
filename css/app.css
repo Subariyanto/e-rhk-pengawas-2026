@@ -1,0 +1,115 @@
+/* E-RHK Pengawas Madrasah 2026 — App theme (Hijau Kemenag) */
+:root {
+  --kemenag: #0e7a3a;
+  --kemenag-2: #15a04d;
+  --kemenag-dark: #0a5a2a;
+  --kemenag-soft: #e6f5ec;
+  --gold: #d4af37;
+  --bg: #f5f8f6;
+  --text: #1f2d24;
+  --muted: #6b7d72;
+}
+
+html, body { height: 100%; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: var(--bg); color: var(--text); }
+
+a { color: var(--kemenag); }
+a:hover { color: var(--kemenag-dark); }
+
+.btn-success, .bg-success { background-color: var(--kemenag) !important; border-color: var(--kemenag) !important; }
+.btn-success:hover, .btn-success:focus { background-color: var(--kemenag-dark) !important; border-color: var(--kemenag-dark) !important; }
+.text-success { color: var(--kemenag) !important; }
+
+/* Layout */
+.app-shell { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+.app-shell.no-sidebar { grid-template-columns: 1fr; }
+
+.app-sidebar {
+  background: linear-gradient(180deg, var(--kemenag-dark), var(--kemenag));
+  color: #fff;
+  padding: 16px 0 24px;
+  position: sticky; top: 0; align-self: start;
+  height: 100vh; overflow-y: auto;
+}
+.app-sidebar .brand { padding: 8px 16px 16px; display: flex; gap: 10px; align-items: center; }
+.app-sidebar .brand .logo { width: 36px; height: 36px; background: #fff; border-radius: 8px; display: grid; place-items: center; color: var(--kemenag); font-weight: 800; }
+.app-sidebar .brand .title { font-weight: 700; line-height: 1.1; }
+.app-sidebar .brand .subtitle { font-size: 11px; opacity: .8; }
+.app-sidebar nav a { display: flex; gap: 10px; align-items: center; padding: 10px 16px; color: rgba(255,255,255,.9); text-decoration: none; font-size: 14px; }
+.app-sidebar nav a:hover { background: rgba(255,255,255,.08); color: #fff; }
+.app-sidebar nav a.active { background: rgba(255,255,255,.18); color: #fff; font-weight: 600; }
+.app-sidebar nav .section-label { padding: 14px 16px 4px; font-size: 11px; opacity: .65; text-transform: uppercase; letter-spacing: .5px; }
+.app-sidebar .userbox { margin-top: auto; padding: 10px 16px; border-top: 1px solid rgba(255,255,255,.15); font-size: 12px; opacity: .9; }
+
+.app-main { min-width: 0; }
+.app-topbar { background: #fff; border-bottom: 1px solid #e7eee9; padding: 10px 16px; display: flex; align-items: center; gap: 10px; position: sticky; top: 0; z-index: 5; }
+.app-topbar .page-title { font-weight: 700; font-size: 18px; }
+.app-content { padding: 16px; max-width: 1400px; margin: 0 auto; }
+
+.btn-burger { display: none; }
+
+/* Cards & stats */
+.stat-card { border: 0; border-radius: 14px; box-shadow: 0 6px 16px rgba(14, 122, 58, .08); }
+.stat-card .stat-num { font-size: 28px; font-weight: 800; color: var(--kemenag-dark); }
+.stat-card .stat-label { color: var(--muted); font-size: 13px; }
+.stat-card .icon { width: 44px; height: 44px; border-radius: 10px; display: grid; place-items: center; background: var(--kemenag-soft); color: var(--kemenag); font-size: 22px; }
+
+.card { border: 0; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,.04); }
+.card .card-header { background: #fff; border-bottom: 1px solid #eef2ee; font-weight: 600; }
+
+.table thead th { background: var(--kemenag-soft); color: var(--kemenag-dark); font-weight: 700; }
+.table-sm td, .table-sm th { font-size: 13px; }
+
+.badge-tw { background: var(--kemenag-soft); color: var(--kemenag-dark); font-weight: 600; }
+.badge-tambahan { background: #fff7d6; color: #8a6d00; font-weight: 600; }
+
+/* Auth pages */
+.auth-wrap { min-height: 100vh; display: grid; place-items: center; background: linear-gradient(135deg, #e6f5ec, #f5f8f6); }
+.auth-card { width: 100%; max-width: 420px; background: #fff; border-radius: 14px; box-shadow: 0 8px 28px rgba(0,0,0,.08); padding: 28px; }
+.auth-card h1 { font-size: 18px; color: var(--kemenag-dark); }
+
+/* Mobile */
+@media (max-width: 900px) {
+  .app-shell { grid-template-columns: 1fr; }
+  .app-sidebar { position: fixed; top: 0; left: -260px; width: 260px; transition: left .2s ease; z-index: 20; }
+  .app-sidebar.open { left: 0; }
+  .btn-burger { display: inline-flex; }
+  .app-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 15; }
+  .app-overlay.show { display: block; }
+}
+
+/* Print formatting */
+@media print {
+  .app-sidebar, .app-topbar, .no-print { display: none !important; }
+  .app-shell { grid-template-columns: 1fr; }
+  .app-content { padding: 0; }
+  .doc-page { page-break-after: always; }
+}
+
+/* Document preview */
+.doc-page {
+  background: #fff; padding: 30mm 25mm; max-width: 210mm; min-height: 297mm; margin: 16px auto;
+  box-shadow: 0 4px 14px rgba(0,0,0,.06); font-family: "Times New Roman", serif; font-size: 12pt; line-height: 1.5;
+}
+.doc-page h1, .doc-page h2, .doc-page h3 { font-family: "Times New Roman", serif; }
+.doc-page .kop { display: flex; align-items: center; gap: 12px; border-bottom: 3px double #000; padding-bottom: 8px; margin-bottom: 16px; }
+.doc-page .kop .logo { width: 80px; height: 80px; }
+.doc-page .kop .text { flex: 1; text-align: center; }
+.doc-page .kop .text .l1 { font-size: 11pt; }
+.doc-page .kop .text .l2 { font-size: 16pt; font-weight: 700; }
+.doc-page .kop .text .l3 { font-size: 14pt; font-weight: 700; }
+.doc-page .kop .text .l4 { font-size: 10pt; }
+.doc-page .ttd { display: flex; justify-content: space-between; margin-top: 36px; }
+.doc-page .ttd .ttd-block { width: 45%; text-align: center; }
+.doc-page .ttd .signature-img { max-height: 80px; }
+.doc-page table.fmt { width: 100%; border-collapse: collapse; }
+.doc-page table.fmt th, .doc-page table.fmt td { border: 1px solid #000; padding: 4px 6px; }
+
+.cover-title { text-align: center; margin: 40px 0 8px; font-size: 18pt; font-weight: 700; }
+.cover-sub { text-align: center; font-size: 14pt; margin-bottom: 80px; }
+.cover-id { text-align: center; line-height: 1.8; margin-top: 60px; }
+.cover-foot { text-align: center; margin-top: 80px; font-weight: 700; }
+
+/* Form */
+.required::after { content: " *"; color: #c0392b; }
+.form-section-title { color: var(--kemenag-dark); font-weight: 700; margin: 16px 0 8px; padding-bottom: 4px; border-bottom: 1px solid var(--kemenag-soft); }

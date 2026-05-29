@@ -1,0 +1,15 @@
+{
+  "name": "E-RHK Pengawas Madrasah 2026",
+  "short_name": "E-RHK 2026",
+  "description": "Aplikasi Otomatisasi Eviden RHK Pengawas Madrasah Tahun 2026",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f5f8f6",
+  "theme_color": "#0e7a3a",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

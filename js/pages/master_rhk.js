@@ -88,6 +88,7 @@
                   <td rowspan="2">${U.escapeHtml(r.target_waktu || '')}</td>
                   <td rowspan="2" class="text-end text-nowrap">
                     <a class="btn btn-sm btn-outline-success" href="#/master-rhk/${idEnc}" title="Detail"><i class="bi bi-eye"></i></a>
+                    <button class="btn btn-sm btn-outline-primary btn-edit-rhk" data-rhk-id="${U.escapeHtml(r.id)}" title="Edit RHK"><i class="bi bi-pencil"></i></button>
                     <a class="btn btn-sm btn-outline-success" href="#/eviden/${idEnc}" title="Generate Eviden"><i class="bi bi-file-earmark-plus"></i></a>
                   </td>
                 </tr>
@@ -124,6 +125,13 @@
       }
     });
     document.getElementById('btnAdd').addEventListener('click', () => editForm(null));
+    document.querySelectorAll('.btn-edit-rhk').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const id = btn.dataset.rhkId;
+        const rec = getMaster().find(x => x.id === id);
+        if (rec) editForm(rec);
+      });
+    });
   };
 
   Page.MasterRHKDetail = function (id) {

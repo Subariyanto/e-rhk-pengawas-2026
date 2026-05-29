@@ -57,6 +57,25 @@ a:hover { color: var(--kemenag-dark); }
 .table-wide-wrap::-webkit-scrollbar-track { background: #f0f0f0; }
 .table-wide-wrap table { min-width: 2000px; }
 
+/* Crisp borders for the master-rhk wide table */
+.table-wide-wrap .table {
+  border-collapse: collapse;
+}
+.table-wide-wrap .table thead th {
+  border: 1px solid #6b6b6b !important;
+  background: var(--kemenag-soft);
+  color: var(--kemenag-dark);
+  font-weight: 700;
+  vertical-align: middle;
+}
+.table-wide-wrap .table tbody td {
+  border: 1px solid #b0b0b0 !important;
+  vertical-align: top;
+}
+.table-wide-wrap .table tbody tr:hover td {
+  background-color: #f3faf4;
+}
+
 .btn-burger { display: none; }
 
 /* Cards & stats */

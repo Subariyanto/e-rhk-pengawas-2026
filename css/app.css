@@ -34,7 +34,21 @@ a:hover { color: var(--kemenag-dark); }
   width: 240px; flex: 0 0 240px;
   position: sticky; top: 0; align-self: flex-start;
   height: 100vh; overflow-y: auto;
+  display: flex; flex-direction: column;
 }
+.app-sidebar nav { flex: 0 0 auto; }
+.sidebar-credit {
+  margin-top: auto;
+  padding: 10px 6px 0;
+  text-align: center;
+  color: rgba(255,255,255,.85);
+  font-size: 9.5px;
+  line-height: 1.35;
+  white-space: nowrap;
+  overflow: hidden;
+  border-top: 1px solid rgba(255,255,255,.15);
+}
+.sidebar-credit div + div { margin-top: 2px; }
 .app-sidebar .brand { padding: 8px 16px 16px; display: flex; gap: 10px; align-items: center; }
 .app-sidebar .brand .logo { width: 36px; height: 36px; background: #fff; border-radius: 8px; display: grid; place-items: center; color: var(--kemenag); font-weight: 800; }
 .app-sidebar .brand .title { font-weight: 700; line-height: 1.1; }

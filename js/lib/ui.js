@@ -50,6 +50,10 @@
               <button class="btn btn-sm btn-outline-light" id="btnLogout" title="Logout"><i class="bi bi-box-arrow-right"></i></button>
             </div>
           </div>
+          <div class="sidebar-credit">
+            <div>Aplikasi ini dibuat oleh : Subariyanto, S.Pd, M.Pd.I.</div>
+            <div>Ketua Pokjawas Madrasah Kabupaten Jember</div>
+          </div>
         </aside>
         <div class="app-overlay" id="appOverlay"></div>
         <main class="app-main">

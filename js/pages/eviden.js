@@ -121,7 +121,7 @@
     const rhk = masterRhk.find(r => r.id === ev.rhk_id);
     const kegList = Store.get('kegiatan', []) || [];
     const keg = ev.kegiatan_id ? kegList.find(k => k.id === ev.kegiatan_id) : null;
-    const types = ev.tipe_dokumen || GenHTML.defaultTypesFor(rhk);
+    const types = (ev.tipe_dokumen || GenHTML.defaultTypesFor(rhk)).filter(t => GenHTML.TYPES[t]);
     const idn = Page.Identitas.get();
     const parts = types.map(t => ({ id: t, label: GenHTML.TYPES[t].label, html: GenHTML.TYPES[t].gen(rhk, keg, idn) }));
 

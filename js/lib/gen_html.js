@@ -262,6 +262,91 @@
     `;
   }
 
+  // Laporan Singkat per RHK — ringkas, berbasis hasil pendampingan/pengawasan
+  function genLaporanSingkat(rhk, keg, idn) {
+    const i = idn || Page.Identitas.get();
+    const N = getNarasi(rhk.id);
+    const v = varsFor(rhk, keg, idn);
+    const periode = rhk.triwulan === 'TAMBAHAN' ? 'Kinerja Tambahan' : 'Triwulan ' + rhk.triwulan + ' Tahun 2026';
+
+    const uraian = keg ? (keg.uraian || '') : '';
+    const hasil  = keg ? (keg.hasil || '') : '';
+    const kendala = keg ? (keg.kendala || '') : '';
+    const solusi  = keg ? (keg.solusi || '') : '';
+    const tindak  = keg ? (keg.tindak_lanjut || '') : '';
+    const rekom   = keg ? (keg.rekomendasi || '') : '';
+
+    const ringkasPelaksanaan = uraian || U.fillTemplate(N.langkah || '', v) || '-';
+    const ringkasHasil       = hasil  || U.fillTemplate(N.hasil || '', v) || '-';
+    const ringkasAnalisis    = U.fillTemplate(N.analisis || '', v) || '-';
+    const ringkasRekom       = rekom  || U.fillTemplate(N.rekomendasi || '', v) || '-';
+
+    return `
+      <div class="doc-page">
+        ${header(i)}
+        <h3 style="text-align:center;text-decoration:underline;margin:8px 0 4px;">LAPORAN SINGKAT HASIL PENGAWASAN / PENDAMPINGAN</h3>
+        <p style="text-align:center;margin:0 0 16px;"><strong>${U.escapeHtml(rhk.nama_eviden)}</strong><br/><em>${U.escapeHtml(rhk.id)} · ${U.escapeHtml(periode)} · ${U.escapeHtml(rhk.jenis_kinerja || '')}</em></p>
+
+        <table class="fmt" style="width:100%;margin-bottom:10px;">
+          <tr><td style="width:30%">Pengawas Madrasah</td><td>${U.escapeHtml(i.pegawai.nama)} (NIP. ${U.escapeHtml(i.pegawai.nip)})</td></tr>
+          <tr><td>Jabatan</td><td>${U.escapeHtml(i.pegawai.jabatan)}</td></tr>
+          <tr><td>Unit Kerja</td><td>${U.escapeHtml(i.pegawai.unit_kerja)}</td></tr>
+          <tr><td>Wilayah Binaan</td><td>${U.escapeHtml(i.pegawai.kabupaten || '-')}</td></tr>
+        </table>
+
+        <table class="fmt" style="width:100%;margin-bottom:10px;">
+          <tr><td style="width:30%"><strong>RHK Atasan yang Diintervensi</strong></td><td>${U.nl2br(rhk.rhk_atasan_intervensi || '-')}</td></tr>
+          <tr><td><strong>Rencana Hasil Kerja</strong></td><td>${U.nl2br(rhk.rencana_hasil_kerja || '-')}</td></tr>
+          <tr><td><strong>Indikator (Kuantitas)</strong></td><td>${U.escapeHtml(rhk.indikator_kuantitas || '-')} <em>(Target: ${U.escapeHtml(rhk.target_kuantitas || '-')})</em></td></tr>
+          <tr><td><strong>Indikator (Waktu)</strong></td><td>${U.escapeHtml(rhk.indikator_waktu || '-')} <em>(Durasi: ${U.escapeHtml(rhk.target_waktu || '-')})</em></td></tr>
+          <tr><td><strong>Rencana Aksi</strong></td><td>${U.nl2br(rhk.rencana_aksi || '-')}</td></tr>
+        </table>
+
+        ${keg ? `
+        <table class="fmt" style="width:100%;margin-bottom:10px;">
+          <tr><td style="width:30%"><strong>Kegiatan Pendampingan</strong></td><td>${U.escapeHtml(keg.nama_kegiatan || '-')}</td></tr>
+          <tr><td><strong>Hari/Tanggal</strong></td><td>${U.escapeHtml(U.fmtTanggal(keg.tanggal) || '-')}</td></tr>
+          <tr><td><strong>Tempat</strong></td><td>${U.escapeHtml(keg.tempat || '-')}</td></tr>
+          <tr><td><strong>Sasaran/Peserta</strong></td><td>${U.escapeHtml(keg.sasaran || keg.peserta || '-')}</td></tr>
+        </table>
+        ` : `<p class="text-muted"><em>Catatan: laporan ini disusun tanpa data kegiatan terkait. Tambahkan kegiatan pada menu Data Kegiatan agar uraian pelaksanaan terisi otomatis.</em></p>`}
+
+        <h4 style="margin-top:14px;">A. Uraian Pelaksanaan</h4>
+        <p style="text-align:justify;">${U.nl2br(ringkasPelaksanaan)}</p>
+
+        <h4>B. Hasil yang Dicapai</h4>
+        <p style="text-align:justify;">${U.nl2br(ringkasHasil)}</p>
+
+        <h4>C. Analisis Singkat</h4>
+        <p style="text-align:justify;">${U.nl2br(ringkasAnalisis)}</p>
+
+        ${(kendala || solusi) ? `
+        <h4>D. Permasalahan dan Solusi</h4>
+        <table class="fmt" style="width:100%;">
+          <tr><td style="width:50%;vertical-align:top;"><strong>Permasalahan</strong><br/>${U.nl2br(kendala || '-')}</td>
+              <td style="vertical-align:top;"><strong>Solusi</strong><br/>${U.nl2br(solusi || '-')}</td></tr>
+        </table>` : ''}
+
+        <h4>${(kendala || solusi) ? 'E' : 'D'}. Tindak Lanjut</h4>
+        <p style="text-align:justify;">${U.nl2br(tindak || '-')}</p>
+
+        <h4>${(kendala || solusi) ? 'F' : 'E'}. Rekomendasi</h4>
+        <p style="text-align:justify;">${U.nl2br(ringkasRekom)}</p>
+
+        <p style="text-align:right;margin-top:24px;">${tanggalKota(i)}</p>
+        <div class="ttd" style="margin-top:8px;">
+          <div class="ttd-block"></div>
+          <div class="ttd-block">
+            <div>${U.escapeHtml(i.pegawai.jabatan)},</div>
+            <div style="height:80px;display:grid;place-items:center;">${i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : ''}</div>
+            <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
+            <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
   function genSuratTugas(rhk, keg, idn) {
     const i = idn || Page.Identitas.get();
     const noSurat = `B-${(rhk.nomor_rhk || '00')}/${(i.pegawai.kabupaten || 'JBR').toString().slice(0,3).toUpperCase()}/${new Date().getFullYear()}`;
@@ -566,14 +651,7 @@
 
   // Document type catalog: id -> { label, gen }
   const TYPES = {
-    cover: { label: 'Cover Laporan', gen: genCover },
-    pengesahan: { label: 'Lembar Pengesahan', gen: genPengesahan },
-    kata_pengantar: { label: 'Kata Pengantar', gen: genKataPengantar },
-    daftar_isi: { label: 'Daftar Isi', gen: genDaftarIsi },
-    bab1: { label: 'BAB I Pendahuluan', gen: genBabI },
-    bab2: { label: 'BAB II Pelaksanaan', gen: genBabII },
-    bab3: { label: 'BAB III Hasil dan Pembahasan', gen: genBabIII },
-    bab4: { label: 'BAB IV Penutup', gen: genBabIV },
+    laporan_singkat: { label: 'Laporan Singkat Hasil Pendampingan', gen: genLaporanSingkat },
     surat_tugas: { label: 'Surat Tugas', gen: genSuratTugas },
     undangan: { label: 'Undangan Kegiatan', gen: genUndangan },
     daftar_hadir: { label: 'Daftar Hadir', gen: genDaftarHadir },
@@ -588,7 +666,7 @@
   };
 
   function defaultTypesFor(rhk) {
-    return ['cover','pengesahan','kata_pengantar','daftar_isi','bab1','bab2','bab3','bab4','surat_tugas','undangan','daftar_hadir','notulen','berita_acara','instrumen','rekap','analisis','rekomendasi','foto','link'];
+    return ['laporan_singkat','surat_tugas','undangan','daftar_hadir','notulen','berita_acara','instrumen','rekap','analisis','rekomendasi','foto','link'];
   }
 
   // Plain text version (for DOCX & PDF fallback) — strip HTML

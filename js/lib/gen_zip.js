@@ -2,7 +2,9 @@
 (function () {
   // Build all docs HTML for a given evidenItem (rhk, keg, types)
   function buildAllHTML(rhk, keg, types) {
-    return types.map(t => ({ id: t, label: GenHTML.TYPES[t].label, html: GenHTML.TYPES[t].gen(rhk, keg) }));
+    return types
+      .filter(t => GenHTML.TYPES[t] && typeof GenHTML.TYPES[t].gen === 'function')
+      .map(t => ({ id: t, label: GenHTML.TYPES[t].label, html: GenHTML.TYPES[t].gen(rhk, keg) }));
   }
 
   function combinedHTML(parts) {

@@ -37,8 +37,21 @@
       </div>
 
       <div class="card">
-        <div class="table-responsive">
-          <table class="table table-hover table-sm align-middle mb-0">
+        <div class="table-wide-wrap">
+          <table class="table table-hover table-sm align-middle mb-0" style="table-layout:fixed;">
+            <colgroup>
+              <col style="width:80px">
+              <col style="width:60px">
+              <col style="width:90px">
+              <col style="width:280px">
+              <col style="width:280px">
+              <col style="width:220px">
+              <col style="width:80px">
+              <col style="width:280px">
+              <col style="width:240px">
+              <col style="width:90px">
+              <col style="width:120px">
+            </colgroup>
             <thead>
               <tr>
                 <th>No</th>
@@ -60,12 +73,12 @@
                   <td><strong>${r.id}</strong></td>
                   <td><span class="badge ${r.jenis_kinerja === 'Tambahan' ? 'badge-tambahan' : 'badge-tw'}">${r.triwulan === 'TAMBAHAN' ? 'Tmb' : 'TW ' + r.triwulan}</span></td>
                   <td>${r.jenis_kinerja}</td>
-                  <td class="small" style="max-width:220px;">${U.escapeHtml((r.rhk_atasan_intervensi || '').slice(0, 120))}${(r.rhk_atasan_intervensi || '').length > 120 ? '…' : ''}</td>
-                  <td class="small" style="max-width:220px;">${U.escapeHtml((r.rencana_hasil_kerja || '').slice(0, 120))}${(r.rencana_hasil_kerja || '').length > 120 ? '…' : ''}</td>
-                  <td class="small" style="max-width:200px;">${U.escapeHtml((r.indikator_kuantitas || '').slice(0, 90))}${(r.indikator_kuantitas || '').length > 90 ? '…' : ''}</td>
+                  <td class="small" style="white-space:normal;">${U.escapeHtml(r.rhk_atasan_intervensi || '')}</td>
+                  <td class="small" style="white-space:normal;">${U.escapeHtml(r.rencana_hasil_kerja || '')}</td>
+                  <td class="small" style="white-space:normal;">${U.escapeHtml(r.indikator_kuantitas || '')}</td>
                   <td>${U.escapeHtml(r.target_kuantitas || '')}</td>
-                  <td class="small" style="max-width:220px;">${U.escapeHtml((r.rencana_aksi || '').slice(0, 120))}${(r.rencana_aksi || '').length > 120 ? '…' : ''}</td>
-                  <td><a href="#/master-rhk/${encodeURIComponent(r.id)}">${U.escapeHtml(r.nama_eviden)}</a></td>
+                  <td class="small" style="white-space:normal;">${U.escapeHtml(r.rencana_aksi || '')}</td>
+                  <td style="white-space:normal;"><a href="#/master-rhk/${encodeURIComponent(r.id)}">${U.escapeHtml(r.nama_eviden)}</a></td>
                   <td>${U.escapeHtml(r.target_waktu || '')}</td>
                   <td class="text-end text-nowrap">
                     <a class="btn btn-sm btn-outline-success" href="#/master-rhk/${encodeURIComponent(r.id)}" title="Detail"><i class="bi bi-eye"></i></a>

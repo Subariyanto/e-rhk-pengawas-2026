@@ -48,7 +48,14 @@ a:hover { color: var(--kemenag-dark); }
 .app-main { flex: 1 1 auto; min-width: 0; }
 .app-topbar { background: #fff; border-bottom: 1px solid #e7eee9; padding: 10px 16px; display: flex; align-items: center; gap: 10px; position: sticky; top: 0; z-index: 5; }
 .app-topbar .page-title { font-weight: 700; font-size: 18px; }
-.app-content { padding: 16px; max-width: 1400px; margin: 0 auto; }
+.app-content { padding: 16px; max-width: 100%; margin: 0; }
+
+/* Wide tables: always show horizontal scrollbar (not just on overflow) */
+.table-wide-wrap { overflow-x: scroll; overflow-y: hidden; }
+.table-wide-wrap::-webkit-scrollbar { height: 12px; }
+.table-wide-wrap::-webkit-scrollbar-thumb { background: #b6b6b6; border-radius: 6px; }
+.table-wide-wrap::-webkit-scrollbar-track { background: #f0f0f0; }
+.table-wide-wrap table { min-width: 1800px; }
 
 .btn-burger { display: none; }
 

@@ -68,12 +68,23 @@ a:hover { color: var(--kemenag-dark); }
 .table-wide-wrap {
   overflow-x: scroll;
   overflow-y: auto;
-  max-height: calc(100vh - 130px);
+  max-height: calc(100dvh - 130px);
 }
 .table-wide-wrap::-webkit-scrollbar { height: 12px; width: 10px; }
 .table-wide-wrap::-webkit-scrollbar-thumb { background: #b6b6b6; border-radius: 6px; }
 .table-wide-wrap::-webkit-scrollbar-track { background: #f0f0f0; }
 .table-wide-wrap table { min-width: 2000px; }
+
+/* On mobile / touch: don't trap scroll inside the wrap, let page scroll naturally */
+@media (max-width: 900px) {
+  .table-wide-wrap {
+    max-height: none;
+    overflow-y: visible;
+  }
+  .table-wide-wrap .table thead th {
+    position: static;
+  }
+}
 
 /* Crisp borders + sticky header for the master-rhk wide table */
 .table-wide-wrap .table {

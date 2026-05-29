@@ -65,6 +65,20 @@
       }
       const rowCount = ws.rowCount || 0;
       const colCount = ws.columnCount || 0;
+      // Column widths in Excel character units (default ~8.43). Convert to px (~7px/unit).
+      const colWidths = [];
+      for (let c = 1; c <= colCount; c++) {
+        const col = ws.getColumn(c);
+        const w = col && col.width ? col.width : 8.43;
+        colWidths.push(Math.round(w * 7));
+      }
+      // Row heights in points; default 15. Convert to px (~1.333px/pt).
+      const rowHeights = [];
+      for (let r = 1; r <= rowCount; r++) {
+        const rw = ws.getRow(r);
+        const h = rw && rw.height ? rw.height : null;
+        rowHeights.push(h ? Math.round(h * 1.333) : null);
+      }
       for (let r = 1; r <= rowCount; r++) {
         const row = ws.getRow(r);
         const arr = [];
@@ -74,7 +88,7 @@
         }
         rows.push(arr);
       }
-      sheets.push({ name: ws.name, rows, merges });
+      sheets.push({ name: ws.name, rows, merges, colWidths, rowHeights });
     });
     return { sheets };
   }
@@ -128,19 +142,26 @@
     throw new Error('Format tidak didukung: ' + ext);
   }
 
-  function cellStyle(cell) {
-    if (!cell || !cell.s) return '';
-    const s = cell.s;
+  function cellStyle(cell, opts = {}) {
     const css = [];
-    if (s.bold) css.push('font-weight:700');
-    if (s.italic) css.push('font-style:italic');
-    if (s.underline) css.push('text-decoration:underline');
-    if (s.align) css.push('text-align:' + s.align);
-    if (s.valign) css.push('vertical-align:' + (s.valign === 'middle' ? 'middle' : s.valign));
-    if (s.bg) css.push('background-color:' + s.bg);
-    if (s.color) css.push('color:' + s.color);
-    if (s.fontSize) css.push('font-size:' + s.fontSize + 'pt');
-    if (s.wrap) css.push('white-space:normal');
+    if (cell && cell.s) {
+      const s = cell.s;
+      if (s.bold) css.push('font-weight:700');
+      if (s.italic) css.push('font-style:italic');
+      if (s.underline) css.push('text-decoration:underline');
+      if (s.align) css.push('text-align:' + s.align);
+      if (s.valign) css.push('vertical-align:' + (s.valign === 'middle' ? 'middle' : s.valign));
+      if (s.bg) css.push('background-color:' + s.bg);
+      if (s.color) css.push('color:' + s.color);
+      if (s.fontSize) css.push('font-size:' + s.fontSize + 'pt');
+      if (s.wrap) css.push('white-space:normal');
+    }
+    if (opts.wrapAll) {
+      // Force wrap-text + word-wrap so cells respect column width instead of expanding.
+      css.push('white-space:normal');
+      css.push('word-wrap:break-word');
+      css.push('overflow-wrap:break-word');
+    }
     return css.length ? ` style="${css.join(';')}"` : '';
   }
 
@@ -160,6 +181,13 @@
     }
     const rows = sheet.rows || [];
     const maxCols = Math.max(0, ...rows.map(r => r.length));
+    const colWidths = sheet.colWidths || [];
+    const rowHeights = sheet.rowHeights || [];
+    // Build colgroup with original column widths so wrapping works against the real width
+    const colgroup = '<colgroup>' + Array.from({length: maxCols}, (_, i) => {
+      const w = colWidths[i];
+      return `<col${w ? ` style="width:${w}px"` : ''}>`;
+    }).join('') + '</colgroup>';
     const trs = rows.map((row, r) => {
       const tds = [];
       for (let c = 0; c < maxCols; c++) {
@@ -167,15 +195,17 @@
         const span = mergeMap.get(`${r},${c}`);
         const cell = row[c];
         const v = (cell && (cell.v ?? '')) ?? '';
-        const styleAttr = cellStyle(cell);
+        const styleAttr = cellStyle(cell, { wrapAll: true });
         const rs = span?.rowspan && span.rowspan > 1 ? ` rowspan="${span.rowspan}"` : '';
         const cs = span?.colspan && span.colspan > 1 ? ` colspan="${span.colspan}"` : '';
         const editAttr = editable ? ` contenteditable="true" data-r="${r}" data-c="${c}"` : '';
         tds.push(`<td${rs}${cs}${styleAttr}${editAttr}>${U.escapeHtml(String(v)).replace(/\n/g, '<br>')}</td>`);
       }
-      return `<tr>${tds.join('')}</tr>`;
+      const rowH = rowHeights[r];
+      const trStyle = rowH ? ` style="height:${rowH}px"` : '';
+      return `<tr${trStyle}>${tds.join('')}</tr>`;
     }).join('');
-    return `<table class="skp-excel-table">${trs}</table>`;
+    return `<table class="skp-excel-table">${colgroup}${trs}</table>`;
   }
 
   function renderExcel(payload, opts = {}) {

@@ -87,12 +87,14 @@ a:hover { color: var(--kemenag-dark); }
 }
 
 /* SKP Atasan import — Excel cells preserve borders & alignment */
-.skp-excel-table { border-collapse: collapse; width: max-content; min-width: 100%; font-size: 12px; }
+.skp-excel-table { border-collapse: collapse; table-layout: fixed; font-size: 12px; }
 .skp-excel-table td {
   border: 1px solid #888;
   padding: 4px 6px;
   vertical-align: top;
-  min-width: 60px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
 }
 .skp-doc { line-height: 1.55; }
 .skp-doc h1, .skp-doc h2, .skp-doc h3 { color: var(--kemenag-dark); }

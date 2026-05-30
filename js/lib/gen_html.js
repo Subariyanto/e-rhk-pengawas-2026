@@ -19,6 +19,59 @@
     return `${i.pegawai.kabupaten || 'Jember'}, ${U.fmtTanggal(new Date())}`;
   }
 
+  // ===== TTD Layout standar (Kanan: Pengawas, Kiri: Ketua Pokjawas, Bawah: Kepala Kankemenag) =====
+  // Default Ketua Pokjawas Kab Jember (sesuai MEMORY): SUBARIYANTO, S.Pd, M.Pd.I (NIP 197002122005011004)
+  function ttdBlokStandar(idn) {
+    const i = idn || Page.Identitas.get();
+    const kota = i.pegawai.kabupaten || 'Jember';
+    const ketuaPokjawasNama = (i.ketua_pokjawas && i.ketua_pokjawas.nama) || 'SUBARIYANTO, S.Pd, M.Pd.I';
+    const ketuaPokjawasNIP  = (i.ketua_pokjawas && i.ketua_pokjawas.nip) || '197002122005011004';
+    const sigImg = i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : '';
+    return `
+      <div class="ttd" style="margin-top:24px;">
+        <div class="ttd-block">
+          <div>Ketua Pokjawas Madrasah,</div>
+          <div style="height:80px;"></div>
+          <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(ketuaPokjawasNama)}</div>
+          <div>NIP. ${U.escapeHtml(ketuaPokjawasNIP)}</div>
+        </div>
+        <div class="ttd-block">
+          <div>${U.escapeHtml(kota)}, ${U.fmtTanggal(new Date())}</div>
+          <div>Pengawas Madrasah,</div>
+          <div style="height:80px;display:grid;place-items:center;">${sigImg}</div>
+          <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
+          <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:30px;">
+        <div>Mengetahui,</div>
+        <div>${U.escapeHtml(i.pejabat_penilai.jabatan || 'Kepala Kantor Kementerian Agama Kabupaten Jember')},</div>
+        <div style="height:80px;"></div>
+        <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pejabat_penilai.nama)}</div>
+        <div>NIP. ${U.escapeHtml(i.pejabat_penilai.nip)}</div>
+      </div>
+    `;
+  }
+
+  // TTD versi sederhana (cuma pengawas, untuk dokumen yang tidak butuh pengesahan kepala)
+  function ttdPengawas(idn) {
+    const i = idn || Page.Identitas.get();
+    const kota = i.pegawai.kabupaten || 'Jember';
+    const sigImg = i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : '';
+    return `
+      <div class="ttd" style="margin-top:24px;">
+        <div class="ttd-block"></div>
+        <div class="ttd-block">
+          <div>${U.escapeHtml(kota)}, ${U.fmtTanggal(new Date())}</div>
+          <div>Pengawas Madrasah,</div>
+          <div style="height:80px;display:grid;place-items:center;">${sigImg}</div>
+          <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
+          <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
+        </div>
+      </div>
+    `;
+  }
+
   // Variables for narasi templates
   function varsFor(rhk, keg, idn) {
     const i = idn || Page.Identitas.get();
@@ -105,22 +158,7 @@
         </table>
         ${keg ? `<p>Berkenaan dengan kegiatan: <strong>${U.escapeHtml(keg.nama_kegiatan)}</strong> yang dilaksanakan pada ${U.escapeHtml(U.fmtTanggal(keg.tanggal))} bertempat di ${U.escapeHtml(keg.tempat || '-')}.</p>` : ''}
         <p>Dokumen ini menjadi bagian dari Sasaran Kinerja Pegawai (SKP) Tahun 2026 sesuai Perdirjen GTK Nomor 7328 Tahun 2023.</p>
-        <div style="text-align:right;margin-top:30px">${tanggalKota(i)}</div>
-
-        <div class="ttd">
-          <div class="ttd-block">
-            <div>Pegawai yang Dinilai,</div>
-            <div style="height:80px"></div>
-            <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
-            <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
-          </div>
-          <div class="ttd-block">
-            <div>Mengetahui,<br />Pejabat Penilai Kinerja,</div>
-            <div style="height:80px"></div>
-            <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pejabat_penilai.nama)}</div>
-            <div>NIP. ${U.escapeHtml(i.pejabat_penilai.nip)}</div>
-          </div>
-        </div>
+        ${ttdBlokStandar(i)}
       </div>
     `;
   }
@@ -687,7 +725,6 @@
     // Pengesahan
     const pPengesahan = `
       <div class="doc-page">
-        ${header(i)}
         <h2 style="text-align:center;text-decoration:underline;">LEMBAR PENGESAHAN</h2>
         <p style="text-align:justify;">Yang bertanda tangan di bawah ini, mengesahkan dokumen <strong>Program Pendampingan Tahunan ${tahun}</strong> yang disusun oleh:</p>
         <table class="fmt" style="width:90%;margin:8px auto;">
@@ -698,21 +735,7 @@
           <tr><td>Unit Kerja</td><td>${U.escapeHtml(i.pegawai.unit_kerja)}</td></tr>
         </table>
         <p style="text-align:justify;">Dokumen ini menjadi acuan pelaksanaan tugas pokok dan fungsi Pengawas Madrasah pada ${U.escapeHtml(i.pegawai.unit_kerja)} Tahun ${tahun}, sebagai bagian dari Sasaran Kinerja Pegawai (SKP) sesuai Perdirjen GTK Nomor 7328 Tahun 2023.</p>
-        <div style="text-align:right;margin-top:30px">${tanggalKota(i)}</div>
-        <div class="ttd">
-          <div class="ttd-block">
-            <div>Pengawas Madrasah,</div>
-            <div style="height:80px"></div>
-            <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
-            <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
-          </div>
-          <div class="ttd-block">
-            <div>Mengetahui,<br/>${U.escapeHtml(i.pejabat_penilai.jabatan)},</div>
-            <div style="height:80px"></div>
-            <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pejabat_penilai.nama)}</div>
-            <div>NIP. ${U.escapeHtml(i.pejabat_penilai.nip)}</div>
-          </div>
-        </div>
+        ${ttdBlokStandar(i)}
       </div>`;
 
     // Kata Pengantar
@@ -952,16 +975,7 @@
         <p style="text-align:justify;">Demikian Program Pendampingan Tahunan ini disusun sebagai pedoman pelaksanaan tugas Pengawas Madrasah pada ${U.escapeHtml(i.pegawai.unit_kerja)} Tahun ${tahun}. Dokumen ini bersifat dinamis dan dapat dilakukan penyesuaian sesuai kebutuhan dan dinamika lapangan dengan tetap mengacu pada peraturan perundang-undangan yang berlaku.</p>
         <p style="text-align:justify;">Kelancaran pelaksanaan program ini sangat bergantung pada dukungan dan kerja sama yang baik antara Pengawas Madrasah, Kepala ${U.escapeHtml(i.pejabat_penilai.unit_kerja)}, Ketua Pokjawas, Kepala Madrasah, dewan guru, dan seluruh pemangku kepentingan pendidikan.</p>
         <p style="text-align:justify;">Atas perhatian dan dukungan semua pihak, kami sampaikan terima kasih.</p>
-        <div style="text-align:right;margin-top:30px">${tanggalKota(i)}</div>
-        <div class="ttd">
-          <div class="ttd-block"></div>
-          <div class="ttd-block">
-            <div>${U.escapeHtml(i.pegawai.jabatan)},</div>
-            <div style="height:80px;display:grid;place-items:center;">${i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : ''}</div>
-            <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
-            <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
-          </div>
-        </div>
+        ${ttdBlokStandar(i)}
       </div>`;
 
     // Lampiran
@@ -1040,5 +1054,5 @@
                .replace(/\n{3,}/g, '\n\n').trim();
   }
 
-  window.GenHTML = { TYPES, defaultTypesFor, htmlToPlain, header, varsFor, getNarasi, tanggalKota };
+  window.GenHTML = { TYPES, defaultTypesFor, htmlToPlain, header, varsFor, getNarasi, tanggalKota, ttdBlokStandar, ttdPengawas };
 })();

@@ -220,21 +220,7 @@
           <tr><td>Periode</td><td>${labelTW(tw)} Tahun ${tahun}</td></tr>
         </table>
         <p style="text-align:justify;">Laporan ini menjadi bukti pelaksanaan Sasaran Kinerja Pegawai (SKP) Pengawas Madrasah pada ${U.escapeHtml(i.pegawai.unit_kerja)} sesuai dengan Perdirjen GTK Nomor 7328 Tahun 2023 tentang Petunjuk Teknis Pengelolaan Kinerja Pengawas Madrasah.</p>
-        <p style="text-align:right;margin-top:30px;">${tanggalKota(i)}</p>
-        <div class="ttd">
-          <div class="ttd-block">
-            <div>Pengawas Madrasah,</div>
-            <div style="height:80px;display:grid;place-items:center;">${i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : ''}</div>
-            <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
-            <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
-          </div>
-          <div class="ttd-block">
-            <div>Mengetahui,<br/>${U.escapeHtml(i.pejabat_penilai.jabatan)},</div>
-            <div style="height:80px"></div>
-            <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pejabat_penilai.nama)}</div>
-            <div>NIP. ${U.escapeHtml(i.pejabat_penilai.nip)}</div>
-          </div>
-        </div>
+        ${GenHTML.ttdBlokStandar(i)}
       </div>
     `;
 
@@ -468,16 +454,7 @@
         </ol>
 
         <p style="text-align:justify;margin-top:14px;">Demikian Laporan ${labelTW(tw)} Tahun ${tahun} ini disusun. Atas perhatian dan dukungan semua pihak, kami sampaikan terima kasih.</p>
-        <p style="text-align:right;margin-top:30px;">${tanggalKota(i)}</p>
-        <div class="ttd" style="margin-top:8px;">
-          <div class="ttd-block"></div>
-          <div class="ttd-block">
-            <div>${U.escapeHtml(i.pegawai.jabatan)},</div>
-            <div style="height:80px;display:grid;place-items:center;">${i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : ''}</div>
-            <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
-            <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
-          </div>
-        </div>
+        ${GenHTML.ttdBlokStandar(i)}
       </div>
     `;
 

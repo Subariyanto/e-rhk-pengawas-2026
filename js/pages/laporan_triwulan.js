@@ -233,11 +233,7 @@
         <p style="text-align:justify;">Penyusunan laporan ini mengacu pada Sasaran Kinerja Pegawai (SKP) Pengawas Madrasah Tahun ${tahun} dan Perdirjen GTK Nomor 7328 Tahun 2023 tentang Petunjuk Teknis Pengelolaan Kinerja Pengawas Madrasah, serta berorientasi pada peningkatan mutu layanan pendidikan berbasis Kurikulum Berbasis Cinta dan profil Pelajar Pancasila Rahmatan lil 'Alamin.</p>
         <p style="text-align:justify;">Kami mengucapkan terima kasih kepada Kepala ${U.escapeHtml(i.pejabat_penilai.unit_kerja)}, Ketua Pokjawas, Kepala Madrasah, dewan guru, tenaga kependidikan, komite madrasah, serta seluruh pemangku kepentingan yang telah memberikan dukungan dalam pelaksanaan tugas kepengawasan ini.</p>
         <p style="text-align:justify;">Kami menyadari masih terdapat kekurangan dalam penyusunan laporan ini. Oleh karena itu, kritik dan saran yang konstruktif sangat kami harapkan demi penyempurnaan di masa mendatang. Semoga laporan ini bermanfaat bagi peningkatan mutu pendidikan madrasah.</p>
-        <p style="text-align:right;margin-top:30px;">${tanggalKota(i)}<br/>Penyusun,</p>
-        <div style="text-align:right;margin-top:60px">
-          <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
-          <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
-        </div>
+        ${GenHTML.ttdBlokPenutup(i)}
       </div>
     `;
 

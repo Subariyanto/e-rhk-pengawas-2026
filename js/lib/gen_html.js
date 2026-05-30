@@ -72,22 +72,14 @@
     `;
   }
 
-  // TTD untuk halaman Penutup: Kiri Ketua Pokjawas, Kanan Pengawas (TANPA kepala kemenag)
+  // TTD untuk halaman Penutup / Kata Pengantar: hanya Pengawas, posisi center agak ke kanan
   function ttdBlokPenutup(idn) {
     const i = idn || Page.Identitas.get();
     const kota = i.pegawai.kabupaten || 'Jember';
-    const ketuaPokjawasNama = (i.ketua_pokjawas && i.ketua_pokjawas.nama) || 'SUBARIYANTO, S.Pd, M.Pd.I';
-    const ketuaPokjawasNIP  = (i.ketua_pokjawas && i.ketua_pokjawas.nip) || '197002122005011004';
     const sigImg = i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : '';
     return `
-      <div class="ttd" style="margin-top:24px;">
-        <div class="ttd-block">
-          <div>Ketua Pokjawas Madrasah,</div>
-          <div style="height:80px;"></div>
-          <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(ketuaPokjawasNama)}</div>
-          <div>NIP. ${U.escapeHtml(ketuaPokjawasNIP)}</div>
-        </div>
-        <div class="ttd-block">
+      <div style="margin-top:30px;display:flex;justify-content:flex-end;">
+        <div style="width:50%;text-align:center;padding-right:6%;">
           <div>${U.escapeHtml(kota)}, ${U.fmtTanggal(new Date())}</div>
           <div>Pengawas Madrasah,</div>
           <div style="height:80px;display:grid;place-items:center;">${sigImg}</div>
@@ -198,11 +190,7 @@
         <p style="text-align:justify;">Dokumen ini disusun sebagai bagian dari Sasaran Kinerja Pegawai (SKP) ${U.escapeHtml(i.pegawai.nama)} Tahun 2026, dalam rangka pelaksanaan tugas pokok dan fungsi Pengawas Madrasah pada ${U.escapeHtml(i.pegawai.unit_kerja)}.</p>
         <p style="text-align:justify;">Kami mengucapkan terima kasih kepada Kepala ${U.escapeHtml(i.pejabat_penilai.unit_kerja)}, Kepala Madrasah, dewan guru, dan seluruh pemangku kepentingan yang telah memberikan dukungan dalam pelaksanaan kegiatan ini.</p>
         <p style="text-align:justify;">Kami menyadari masih terdapat kekurangan dalam penyusunan dokumen ini, sehingga masukan dan saran yang konstruktif sangat kami harapkan demi perbaikan di masa mendatang.</p>
-        <div style="text-align:right;margin-top:30px">${tanggalKota(i)}<br />Penyusun,</div>
-        <div style="text-align:right;margin-top:60px">
-          <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
-          <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
-        </div>
+        ${ttdBlokPenutup(i)}
       </div>
     `;
   }
@@ -763,11 +751,7 @@
         <p style="text-align:justify;">Program Pendampingan Tahunan ini disusun sebagai pedoman pelaksanaan tugas Pengawas Madrasah dalam melakukan supervisi akademik dan manajerial pada madrasah binaan selama satu tahun pelajaran. Program ini memuat rencana kegiatan, jadwal pelaksanaan, sasaran, indikator keberhasilan, dan strategi pendampingan yang berorientasi pada peningkatan mutu layanan pendidikan berbasis Kurikulum Berbasis Cinta dan kompetensi peserta didik.</p>
         <p style="text-align:justify;">Kami mengucapkan terima kasih kepada Kepala ${U.escapeHtml(i.pejabat_penilai.unit_kerja)}, Ketua Pokjawas, Kepala Madrasah, dewan guru, dan seluruh pemangku kepentingan yang telah memberikan dukungan dalam penyusunan program ini.</p>
         <p style="text-align:justify;">Kami menyadari masih terdapat kekurangan dalam penyusunan program ini, sehingga masukan dan saran yang konstruktif sangat kami harapkan demi penyempurnaan di masa mendatang.</p>
-        <div style="text-align:right;margin-top:30px">${tanggalKota(i)}<br/>Penyusun,</div>
-        <div style="text-align:right;margin-top:60px">
-          <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
-          <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
-        </div>
+        ${ttdBlokPenutup(i)}
       </div>`;
 
     // Daftar Isi

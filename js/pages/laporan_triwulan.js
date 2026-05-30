@@ -184,17 +184,13 @@
     const labelLower = labelTW(tw).toLowerCase();
     const periodeBulan = (tw === 'I' ? 'Januari–Maret' : tw === 'II' ? 'April–Juni' : tw === 'III' ? 'Juli–September' : tw === 'IV' ? 'Oktober–Desember' : 'sepanjang Tahun');
 
-    // ===== HALAMAN 1: COVER (tanpa kop) =====
+    // ===== HALAMAN 1: COVER (tanpa kop & logo) =====
     const cover = `
       <div class="doc-page doc-cover">
         <div class="cover-title">LAPORAN ${labelTW(tw).toUpperCase()}</div>
         <div class="cover-sub">PELAKSANAAN TUGAS POKOK PENGAWAS MADRASAH<br/>TAHUN ${tahun}</div>
 
-        <div style="text-align:center;margin:60px auto;">
-          ${i.logo ? `<img src="${i.logo}" style="width:160px" />` : '<div style="height:160px;display:grid;place-items:center;color:#888">— LOGO KEMENAG —</div>'}
-        </div>
-
-        <div class="cover-id">
+        <div class="cover-id" style="margin-top:120px;">
           <div>Disusun oleh:</div>
           <div style="font-weight:700;">${U.escapeHtml(i.pegawai.nama)}</div>
           <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
@@ -202,7 +198,7 @@
           <div>${U.escapeHtml(i.pegawai.unit_kerja)}</div>
         </div>
 
-        <div class="cover-foot">
+        <div class="cover-foot" style="margin-top:120px;">
           <div>${U.escapeHtml(i.kop_l3 || 'POKJAWAS KEMENAG')}</div>
           <div>${U.escapeHtml(i.kop_l2 || 'KEMENAG KAB. JEMBER')}</div>
           <div>TAHUN ${tahun}</div>
@@ -577,7 +573,6 @@
 
     return `
       <div class="doc-page">
-        ${header(idn)}
         <h4 style="margin:8px 0 4px;color:#1E2A5A;">${idx}. ${U.escapeHtml(rhk.id)} — ${U.escapeHtml(rhk.nama_eviden)}</h4>
         <div class="text-muted small" style="margin-bottom:10px;font-size:11pt;">${rhk.jenis_kinerja || 'Utama'} · ${kegList.length} kegiatan terkait</div>
 

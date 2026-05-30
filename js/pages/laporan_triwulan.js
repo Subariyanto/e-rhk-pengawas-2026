@@ -286,14 +286,9 @@
         <h3>B. Dasar Hukum</h3>
         <ol style="text-align:justify;">
           <li>Undang-Undang Nomor 20 Tahun 2003 tentang Sistem Pendidikan Nasional;</li>
-          <li>Undang-Undang Nomor 14 Tahun 2005 tentang Guru dan Dosen;</li>
-          <li>Peraturan Pemerintah Nomor 19 Tahun 2017 tentang Perubahan atas PP Nomor 74 Tahun 2008 tentang Guru;</li>
-          <li>Peraturan Menteri PAN-RB Nomor 21 Tahun 2010 tentang Jabatan Fungsional Pengawas Sekolah dan Angka Kreditnya;</li>
-          <li>Peraturan Menteri Agama Nomor 31 Tahun 2013 tentang Pengawas Madrasah dan Pengawas Pendidikan Agama Islam;</li>
           <li>Peraturan Menteri PAN-RB Nomor 6 Tahun 2022 tentang Pengelolaan Kinerja Pegawai ASN;</li>
           <li>Peraturan Direktur Jenderal Pendidikan Islam (Perdirjen GTK) Nomor 7328 Tahun 2023 tentang Petunjuk Teknis Pengelolaan Kinerja Pengawas Madrasah;</li>
-          <li>Sasaran Kinerja Pegawai (SKP) ${U.escapeHtml(i.pegawai.nama)} Tahun ${tahun};</li>
-          <li>Surat Keputusan Kepala ${U.escapeHtml(i.pejabat_penilai.unit_kerja)} tentang Pembagian Tugas Pengawas Madrasah Tahun ${tahun}.</li>
+          <li>Peraturan BKN Nomor 2 Tahun 2026 tentang Layanan e-Kinerja Badan Kepegawaian Negara.</li>
         </ol>
 
         <h3>C. Tujuan</h3>

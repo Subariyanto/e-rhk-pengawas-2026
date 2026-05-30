@@ -12,17 +12,17 @@
         .kop{display:flex;align-items:center;gap:12px;border-bottom:3px double #000;padding-bottom:8px;margin-bottom:16px}
         .kop .logo{width:80px;height:80px}
         .kop .text{flex:1;text-align:center}
-        .kop .text .l1{font-size:11pt}
-        .kop .text .l2{font-size:16pt;font-weight:700}
-        .kop .text .l3{font-size:14pt;font-weight:700}
-        .kop .text .l4{font-size:10pt}
+        .kop .text .l1{font-size:13pt}
+        .kop .text .l2{font-size:13pt;font-weight:700}
+        .kop .text .l3{font-size:13pt;font-weight:700}
+        .kop .text .l4{font-size:13pt}
         .ttd{display:flex;justify-content:space-between;margin-top:36px}
         .ttd .ttd-block{width:45%;text-align:center;position:relative}
         .ttd .signature-img{max-height:80px}
         table.fmt{width:100%;border-collapse:collapse}
         table.fmt th,table.fmt td{border:1px solid #000;padding:4px 6px}
-        .cover-title{text-align:center;margin:40px 0 8px;font-size:18pt;font-weight:700}
-        .cover-sub{text-align:center;font-size:14pt;margin-bottom:80px}
+        .cover-title{text-align:center;margin:40px 0 8px;font-size:13pt;font-weight:700}
+        .cover-sub{text-align:center;font-size:13pt;margin-bottom:80px}
         .cover-id{text-align:center;line-height:1.8;margin-top:60px}
         .cover-foot{text-align:center;margin-top:80px;font-weight:700}
       </style>

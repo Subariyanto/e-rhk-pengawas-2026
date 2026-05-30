@@ -178,12 +178,17 @@
     const totalKegiatan = countKegiatan(rhks, allKegiatan);
     const rhkTerlaksana = rhks.filter(r => (kegByRhk[r.id] || []).length).length;
     const rhkBelum = rhks.length - rhkTerlaksana;
+    const tahun = 2026;
+    const madrasahList = Store.get('madrasah', []) || [];
+    const persentase = rhks.length ? Math.round(rhkTerlaksana / rhks.length * 100) : 0;
+    const labelLower = labelTW(tw).toLowerCase();
+    const periodeBulan = (tw === 'I' ? 'Januari–Maret' : tw === 'II' ? 'April–Juni' : tw === 'III' ? 'Juli–September' : tw === 'IV' ? 'Oktober–Desember' : 'sepanjang Tahun');
 
-    // Halaman 1: Cover (TANPA kop kemenag)
+    // ===== HALAMAN 1: COVER (tanpa kop) =====
     const cover = `
       <div class="doc-page doc-cover">
         <div class="cover-title">LAPORAN ${labelTW(tw).toUpperCase()}</div>
-        <div class="cover-sub">PELAKSANAAN TUGAS POKOK PENGAWAS MADRASAH<br/>TAHUN 2026</div>
+        <div class="cover-sub">PELAKSANAAN TUGAS POKOK PENGAWAS MADRASAH<br/>TAHUN ${tahun}</div>
 
         <div style="text-align:center;margin:60px auto;">
           ${i.logo ? `<img src="${i.logo}" style="width:160px" />` : '<div style="height:160px;display:grid;place-items:center;color:#888">— LOGO KEMENAG —</div>'}
@@ -200,43 +205,178 @@
         <div class="cover-foot">
           <div>${U.escapeHtml(i.kop_l3 || 'POKJAWAS KEMENAG')}</div>
           <div>${U.escapeHtml(i.kop_l2 || 'KEMENAG KAB. JEMBER')}</div>
-          <div>TAHUN 2026</div>
+          <div>TAHUN ${tahun}</div>
         </div>
       </div>
     `;
 
-    // Halaman 2: Ringkasan Eksekutif
-    const ringkasan = `
+    // ===== HALAMAN 2: LEMBAR PENGESAHAN =====
+    const pengesahan = `
       <div class="doc-page">
-        ${header(i)}
-        <h3 style="text-align:center;text-decoration:underline;margin-top:8px;">RINGKASAN PELAKSANAAN ${labelTW(tw).toUpperCase()} 2026</h3>
+        <h2 style="text-align:center;text-decoration:underline;">LEMBAR PENGESAHAN</h2>
+        <p style="text-align:justify;">Yang bertanda tangan di bawah ini, mengesahkan dokumen <strong>Laporan ${labelTW(tw)} Tahun ${tahun}</strong> tentang Pelaksanaan Tugas Pokok Pengawas Madrasah, yang disusun oleh:</p>
+        <table class="fmt" style="width:90%;margin:8px auto;">
+          <tr><td style="width:30%">Nama</td><td>${U.escapeHtml(i.pegawai.nama)}</td></tr>
+          <tr><td>NIP</td><td>${U.escapeHtml(i.pegawai.nip)}</td></tr>
+          <tr><td>Pangkat/Gol</td><td>${U.escapeHtml(i.pegawai.pangkat_golongan)}</td></tr>
+          <tr><td>Jabatan</td><td>${U.escapeHtml(i.pegawai.jabatan)}</td></tr>
+          <tr><td>Unit Kerja</td><td>${U.escapeHtml(i.pegawai.unit_kerja)}</td></tr>
+          <tr><td>Periode</td><td>${labelTW(tw)} Tahun ${tahun}</td></tr>
+        </table>
+        <p style="text-align:justify;">Laporan ini menjadi bukti pelaksanaan Sasaran Kinerja Pegawai (SKP) Pengawas Madrasah pada ${U.escapeHtml(i.pegawai.unit_kerja)} sesuai dengan Perdirjen GTK Nomor 7328 Tahun 2023 tentang Petunjuk Teknis Pengelolaan Kinerja Pengawas Madrasah.</p>
+        <p style="text-align:right;margin-top:30px;">${tanggalKota(i)}</p>
+        <div class="ttd">
+          <div class="ttd-block">
+            <div>Pengawas Madrasah,</div>
+            <div style="height:80px;display:grid;place-items:center;">${i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : ''}</div>
+            <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
+            <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
+          </div>
+          <div class="ttd-block">
+            <div>Mengetahui,<br/>${U.escapeHtml(i.pejabat_penilai.jabatan)},</div>
+            <div style="height:80px"></div>
+            <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pejabat_penilai.nama)}</div>
+            <div>NIP. ${U.escapeHtml(i.pejabat_penilai.nip)}</div>
+          </div>
+        </div>
+      </div>
+    `;
 
-        <table class="fmt" style="width:100%;margin:10px 0;">
-          <tr><td style="width:30%">Pengawas Madrasah</td><td>${U.escapeHtml(i.pegawai.nama)} (NIP. ${U.escapeHtml(i.pegawai.nip)})</td></tr>
+    // ===== HALAMAN 3: KATA PENGANTAR =====
+    const kataPengantar = `
+      <div class="doc-page">
+        <h2 style="text-align:center;text-decoration:underline;">KATA PENGANTAR</h2>
+        <p style="text-align:justify;">Puji syukur kami panjatkan kehadirat Allah SWT atas limpahan rahmat, taufik, dan hidayah-Nya, sehingga penyusunan <strong>Laporan ${labelTW(tw)} Tahun ${tahun}</strong> tentang Pelaksanaan Tugas Pokok Pengawas Madrasah dapat diselesaikan tepat waktu. Shalawat dan salam senantiasa tercurah kepada junjungan kita Nabi Muhammad SAW beserta keluarga, sahabat, dan pengikutnya.</p>
+        <p style="text-align:justify;">Laporan ini disusun sebagai bentuk pertanggungjawaban pelaksanaan tugas pokok dan fungsi Pengawas Madrasah pada ${labelTW(tw)} (${periodeBulan}) Tahun ${tahun}. Dokumen ini memuat hasil pelaksanaan supervisi akademik dan manajerial pada madrasah binaan, capaian Rencana Hasil Kerja (RHK), kegiatan pendampingan, kendala yang dihadapi, serta rekomendasi tindak lanjut sebagai bahan refleksi dan perbaikan pada periode berikutnya.</p>
+        <p style="text-align:justify;">Penyusunan laporan ini mengacu pada Sasaran Kinerja Pegawai (SKP) Pengawas Madrasah Tahun ${tahun} dan Perdirjen GTK Nomor 7328 Tahun 2023 tentang Petunjuk Teknis Pengelolaan Kinerja Pengawas Madrasah, serta berorientasi pada peningkatan mutu layanan pendidikan berbasis Kurikulum Berbasis Cinta dan profil Pelajar Pancasila Rahmatan lil 'Alamin.</p>
+        <p style="text-align:justify;">Kami mengucapkan terima kasih kepada Kepala ${U.escapeHtml(i.pejabat_penilai.unit_kerja)}, Ketua Pokjawas, Kepala Madrasah, dewan guru, tenaga kependidikan, komite madrasah, serta seluruh pemangku kepentingan yang telah memberikan dukungan dalam pelaksanaan tugas kepengawasan ini.</p>
+        <p style="text-align:justify;">Kami menyadari masih terdapat kekurangan dalam penyusunan laporan ini. Oleh karena itu, kritik dan saran yang konstruktif sangat kami harapkan demi penyempurnaan di masa mendatang. Semoga laporan ini bermanfaat bagi peningkatan mutu pendidikan madrasah.</p>
+        <p style="text-align:right;margin-top:30px;">${tanggalKota(i)}<br/>Penyusun,</p>
+        <div style="text-align:right;margin-top:60px">
+          <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
+          <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
+        </div>
+      </div>
+    `;
+
+    // ===== HALAMAN 4: DAFTAR ISI =====
+    const items = [
+      ['HALAMAN JUDUL', 'i'],
+      ['LEMBAR PENGESAHAN', 'ii'],
+      ['KATA PENGANTAR', 'iii'],
+      ['DAFTAR ISI', 'iv'],
+      ['BAB I PENDAHULUAN', '1'],
+      ['  A. Latar Belakang', '1'],
+      ['  B. Dasar Hukum', '2'],
+      ['  C. Tujuan', '3'],
+      ['  D. Sasaran', '3'],
+      ['  E. Ruang Lingkup', '4'],
+      ['BAB II PELAKSANAAN KEGIATAN', '5'],
+      ['  A. Identitas Pengawas', '5'],
+      ['  B. Statistik Pelaksanaan', '5'],
+      ['  C. Daftar RHK ' + labelTW(tw), '6'],
+      ['BAB III HASIL DAN URAIAN PER-RHK', '7'],
+      ['BAB IV ANALISIS, PERMASALAHAN DAN SOLUSI', String(7 + rhks.length)],
+      ['  A. Analisis Capaian', String(7 + rhks.length)],
+      ['  B. Permasalahan', String(7 + rhks.length + 1)],
+      ['  C. Solusi', String(7 + rhks.length + 1)],
+      ['  D. Tindak Lanjut', String(7 + rhks.length + 1)],
+      ['BAB V PENUTUP', String(7 + rhks.length + 2)],
+      ['  A. Simpulan', String(7 + rhks.length + 2)],
+      ['  B. Saran', String(7 + rhks.length + 2)],
+      ['LAMPIRAN', String(7 + rhks.length + 3)],
+    ];
+    const daftarIsi = `
+      <div class="doc-page">
+        <h2 style="text-align:center;text-decoration:underline;">DAFTAR ISI</h2>
+        <table style="width:100%;border-collapse:collapse;">
+          ${items.map(([t, p]) => `<tr><td style="padding:4px 0;border-bottom:1px dotted #888;">${U.escapeHtml(t)}</td><td style="padding:4px 0;text-align:right;border-bottom:1px dotted #888;">${p}</td></tr>`).join('')}
+        </table>
+      </div>
+    `;
+
+    // ===== HALAMAN 5: BAB I PENDAHULUAN =====
+    const bab1 = `
+      <div class="doc-page">
+        <h2 style="text-align:center;">BAB I<br/>PENDAHULUAN</h2>
+
+        <h3>A. Latar Belakang</h3>
+        <p style="text-align:justify;">Pengawas Madrasah merupakan tenaga kependidikan yang memiliki tugas pokok melaksanakan supervisi akademik dan manajerial pada madrasah binaan. Sesuai dengan Perdirjen GTK Nomor 7328 Tahun 2023, Pengawas Madrasah dituntut untuk menyusun Sasaran Kinerja Pegawai (SKP) yang memuat Rencana Hasil Kerja (RHK), indikator kinerja, target, serta menyusun laporan pelaksanaan kinerja secara periodik (triwulanan dan tahunan).</p>
+        <p style="text-align:justify;">Laporan ${labelTW(tw)} Tahun ${tahun} ini disusun sebagai bentuk akuntabilitas dan pertanggungjawaban atas pelaksanaan tugas Pengawas Madrasah pada periode ${periodeBulan} ${tahun}. Pada ${labelTW(tw)} ini direncanakan ${rhks.length} Rencana Hasil Kerja yang menjadi fokus pelaksanaan supervisi dan pendampingan.</p>
+        <p style="text-align:justify;">Pelaksanaan tugas kepengawasan diorientasikan pada peningkatan mutu layanan pendidikan berbasis Kurikulum Berbasis Cinta, penguatan profil Pelajar Pancasila Rahmatan lil 'Alamin (P3RA), pemenuhan 8 Standar Nasional Pendidikan, dan peningkatan profesionalisme guru serta tenaga kependidikan pada ${madrasahList.length} madrasah binaan di wilayah ${U.escapeHtml(i.pegawai.kabupaten || 'Jember')}.</p>
+
+        <h3>B. Dasar Hukum</h3>
+        <ol style="text-align:justify;">
+          <li>Undang-Undang Nomor 20 Tahun 2003 tentang Sistem Pendidikan Nasional;</li>
+          <li>Undang-Undang Nomor 14 Tahun 2005 tentang Guru dan Dosen;</li>
+          <li>Peraturan Pemerintah Nomor 19 Tahun 2017 tentang Perubahan atas PP Nomor 74 Tahun 2008 tentang Guru;</li>
+          <li>Peraturan Menteri PAN-RB Nomor 21 Tahun 2010 tentang Jabatan Fungsional Pengawas Sekolah dan Angka Kreditnya;</li>
+          <li>Peraturan Menteri Agama Nomor 31 Tahun 2013 tentang Pengawas Madrasah dan Pengawas Pendidikan Agama Islam;</li>
+          <li>Peraturan Menteri PAN-RB Nomor 6 Tahun 2022 tentang Pengelolaan Kinerja Pegawai ASN;</li>
+          <li>Peraturan Direktur Jenderal Pendidikan Islam (Perdirjen GTK) Nomor 7328 Tahun 2023 tentang Petunjuk Teknis Pengelolaan Kinerja Pengawas Madrasah;</li>
+          <li>Sasaran Kinerja Pegawai (SKP) ${U.escapeHtml(i.pegawai.nama)} Tahun ${tahun};</li>
+          <li>Surat Keputusan Kepala ${U.escapeHtml(i.pejabat_penilai.unit_kerja)} tentang Pembagian Tugas Pengawas Madrasah Tahun ${tahun}.</li>
+        </ol>
+
+        <h3>C. Tujuan</h3>
+        <p style="text-align:justify;">Penyusunan Laporan ${labelTW(tw)} Tahun ${tahun} bertujuan:</p>
+        <ol style="text-align:justify;">
+          <li>Memberikan laporan akuntabilitas pelaksanaan tugas Pengawas Madrasah pada ${labelTW(tw)} (${periodeBulan}) Tahun ${tahun};</li>
+          <li>Mendokumentasikan capaian Rencana Hasil Kerja, indikator kinerja, dan target yang telah ditetapkan;</li>
+          <li>Menjadi bahan evaluasi dan refleksi pelaksanaan tugas guna perbaikan kinerja pada periode berikutnya;</li>
+          <li>Memberikan rekomendasi tindak lanjut yang konstruktif kepada Kepala ${U.escapeHtml(i.pejabat_penilai.unit_kerja)}, Kepala Madrasah, dan pemangku kepentingan lainnya;</li>
+          <li>Memenuhi ketentuan pelaporan kinerja sesuai Perdirjen GTK 7328/2023.</li>
+        </ol>
+
+        <h3>D. Sasaran</h3>
+        <p style="text-align:justify;">Sasaran kegiatan pada ${labelTW(tw)} Tahun ${tahun} meliputi ${madrasahList.length} madrasah binaan di wilayah ${U.escapeHtml(i.pegawai.kabupaten || 'Jember')} yang menjadi tanggung jawab Pengawas Madrasah ${U.escapeHtml(i.pegawai.nama)}. Sasaran ini mencakup Kepala Madrasah, dewan guru, tenaga kependidikan, peserta didik, dan komite madrasah dalam rangka peningkatan mutu pendidikan secara holistik.</p>
+
+        <h3>E. Ruang Lingkup</h3>
+        <p style="text-align:justify;">Ruang lingkup pelaporan ${labelTW(tw)} ini meliputi:</p>
+        <ol style="text-align:justify;">
+          <li><strong>Supervisi Akademik:</strong> pendampingan implementasi kurikulum, perangkat pembelajaran, evaluasi pembelajaran, dan peningkatan kompetensi profesional guru;</li>
+          <li><strong>Supervisi Manajerial:</strong> pendampingan tata kelola madrasah, manajemen mutu, kepemimpinan kepala madrasah, dan pelayanan publik;</li>
+          <li><strong>Pembinaan Karakter:</strong> penguatan P3RA, karakter siswa, dan pendidikan inklusif;</li>
+          <li><strong>Penilaian Kinerja:</strong> Penilaian Kinerja Guru (PKG) dan Penilaian Kinerja Kepala Madrasah (PKKM);</li>
+          <li><strong>Tindak Lanjut:</strong> rekomendasi perbaikan, monitoring, evaluasi, dan pelaporan periodik.</li>
+        </ol>
+      </div>
+    `;
+
+    // ===== HALAMAN: BAB II PELAKSANAAN =====
+    const bab2 = `
+      <div class="doc-page">
+        <h2 style="text-align:center;">BAB II<br/>PELAKSANAAN KEGIATAN</h2>
+
+        <h3>A. Identitas Pengawas</h3>
+        <table class="fmt" style="width:100%;margin:8px 0;">
+          <tr><td style="width:30%">Nama</td><td>${U.escapeHtml(i.pegawai.nama)}</td></tr>
+          <tr><td>NIP</td><td>${U.escapeHtml(i.pegawai.nip)}</td></tr>
           <tr><td>Pangkat/Gol</td><td>${U.escapeHtml(i.pegawai.pangkat_golongan)}</td></tr>
           <tr><td>Jabatan</td><td>${U.escapeHtml(i.pegawai.jabatan)}</td></tr>
           <tr><td>Unit Kerja</td><td>${U.escapeHtml(i.pegawai.unit_kerja)}</td></tr>
           <tr><td>Wilayah Binaan</td><td>${U.escapeHtml(i.pegawai.kabupaten || '-')}</td></tr>
-          <tr><td>Periode</td><td>${labelTW(tw)} Tahun 2026</td></tr>
+          <tr><td>Periode Pelaporan</td><td>${labelTW(tw)} Tahun ${tahun} (${periodeBulan})</td></tr>
+          <tr><td>Jumlah Madrasah Binaan</td><td>${madrasahList.length} madrasah</td></tr>
         </table>
 
-        <h4 style="margin-top:14px;">A. Statistik Pelaksanaan</h4>
+        <h3>B. Statistik Pelaksanaan</h3>
         <table class="fmt" style="width:100%;">
           <tr><td style="width:60%">Jumlah RHK pada ${labelTW(tw)}</td><td style="text-align:center;">${rhks.length} RHK</td></tr>
           <tr><td>Jumlah RHK yang sudah dilaksanakan</td><td style="text-align:center;">${rhkTerlaksana} RHK</td></tr>
           <tr><td>Jumlah RHK yang belum dilaksanakan</td><td style="text-align:center;">${rhkBelum} RHK</td></tr>
           <tr><td>Jumlah kegiatan pendampingan/pengawasan terkait</td><td style="text-align:center;">${totalKegiatan} kegiatan</td></tr>
-          <tr><td>Persentase capaian RHK</td><td style="text-align:center;"><strong>${rhks.length ? Math.round(rhkTerlaksana / rhks.length * 100) : 0}%</strong></td></tr>
+          <tr><td>Persentase capaian RHK</td><td style="text-align:center;"><strong>${persentase}%</strong></td></tr>
         </table>
 
-        <h4 style="margin-top:14px;">B. Daftar RHK ${labelTW(tw)}</h4>
+        <h3>C. Daftar RHK ${labelTW(tw)}</h3>
         <table class="fmt" style="width:100%;font-size:11pt;">
           <thead>
             <tr style="background:#f0f0f0;">
-              <th style="width:50px;">No</th>
-              <th style="width:90px;">Kode</th>
+              <th style="width:40px;">No</th>
+              <th style="width:80px;">Kode</th>
               <th>Nama Eviden</th>
-              <th style="width:80px;">Kegiatan</th>
+              <th style="width:60px;">Kegiatan</th>
               <th style="width:80px;">Status</th>
             </tr>
           </thead>
@@ -257,22 +397,81 @@
       </div>
     `;
 
-    // Halaman 3+: Per-RHK report
+    // ===== BAB III: PER-RHK =====
+    const bab3Header = `
+      <div class="doc-page">
+        <h2 style="text-align:center;">BAB III<br/>HASIL DAN URAIAN PER-RHK</h2>
+        <p style="text-align:justify;">Bab ini memuat uraian rinci pelaksanaan setiap Rencana Hasil Kerja (RHK) pada ${labelTW(tw)} Tahun ${tahun}, beserta data kegiatan terkait, hasil yang dicapai, dan rekomendasi tindak lanjut. Setiap RHK disajikan dalam halaman tersendiri untuk memudahkan referensi.</p>
+      </div>
+    `;
     const perRhkPages = rhks.map((r, idx) => buildRhkPage(r, kegByRhk[r.id] || [], i, idx + 1)).join('\n');
 
-    // Halaman penutup
-    const penutup = `
+    // Agregasi kendala/solusi/tindak lanjut dari semua kegiatan untuk BAB IV
+    const aggregateField = (field) => {
+      const list = [];
+      rhks.forEach(r => {
+        const kgs = kegByRhk[r.id] || [];
+        kgs.forEach(k => { if (k[field]) list.push({ rhk: r, val: k[field] }); });
+      });
+      return list;
+    };
+    const allKendala = aggregateField('kendala');
+    const allSolusi = aggregateField('solusi');
+    const allTindak = aggregateField('tindak_lanjut');
+
+    // ===== BAB IV: ANALISIS =====
+    const bab4 = `
       <div class="doc-page">
-        ${header(i)}
-        <h3 style="text-align:center;text-decoration:underline;margin-top:8px;">PENUTUP</h3>
-        <p style="text-align:justify;">Demikian Laporan ${labelTW(tw)} Tahun 2026 ini disusun sebagai bentuk pertanggungjawaban pelaksanaan tugas pokok dan fungsi Pengawas Madrasah pada ${U.escapeHtml(i.pegawai.unit_kerja)}.</p>
+        <h2 style="text-align:center;">BAB IV<br/>ANALISIS, PERMASALAHAN DAN SOLUSI</h2>
 
-        <p style="text-align:justify;">Pada ${labelTW(tw)} ini telah dilaksanakan <strong>${rhkTerlaksana} RHK</strong> dari total <strong>${rhks.length} RHK</strong> yang direncanakan, dengan total <strong>${totalKegiatan} kegiatan</strong> pendampingan/pengawasan pada madrasah binaan. Hasil pelaksanaan secara umum telah mencapai sasaran yang ditetapkan dalam Sasaran Kinerja Pegawai (SKP) Tahun 2026.</p>
+        <h3>A. Analisis Capaian</h3>
+        <p style="text-align:justify;">Pada ${labelTW(tw)} Tahun ${tahun}, dari total <strong>${rhks.length} RHK</strong> yang direncanakan, telah dilaksanakan sebanyak <strong>${rhkTerlaksana} RHK</strong> (${persentase}%) dengan total <strong>${totalKegiatan} kegiatan</strong> pendampingan/pengawasan pada madrasah binaan. ${persentase >= 80 ? 'Capaian ini menunjukkan tingkat realisasi yang baik dan sesuai dengan rencana yang ditetapkan.' : persentase >= 50 ? 'Capaian ini menunjukkan tingkat realisasi yang cukup memadai, namun masih perlu peningkatan pada periode berikutnya.' : 'Capaian ini masih perlu ditingkatkan secara signifikan pada periode berikutnya.'}</p>
+        <p style="text-align:justify;">Pelaksanaan kegiatan dilakukan secara terpadu dan terkoordinasi dengan Kepala Madrasah, dewan guru, tenaga kependidikan, dan komite madrasah pada setiap madrasah binaan. Setiap kegiatan didokumentasikan dalam bentuk laporan, foto kegiatan, daftar hadir, dan berita acara sebagaimana terlampir.</p>
+        ${rhkBelum > 0 ? `<p style="text-align:justify;">Adapun ${rhkBelum} RHK yang belum terlaksana akan menjadi prioritas pelaksanaan pada periode berikutnya, dengan mempertimbangkan jadwal kalender pendidikan, ketersediaan waktu, dan kesiapan madrasah binaan.</p>` : ''}
 
-        <p style="text-align:justify;">Kekurangan dan kendala yang ditemukan dalam pelaksanaan akan menjadi bahan refleksi untuk perbaikan pada periode berikutnya. Koordinasi dengan Kepala ${U.escapeHtml(i.pejabat_penilai.unit_kerja)}, Kepala Madrasah, dewan guru, dan seluruh pemangku kepentingan akan terus ditingkatkan.</p>
+        <h3>B. Permasalahan</h3>
+        ${allKendala.length ? `<p style="text-align:justify;">Beberapa permasalahan yang ditemukan selama pelaksanaan ${labelTW(tw)} antara lain:</p>
+        <ol style="text-align:justify;">
+          ${allKendala.slice(0, 10).map(x => `<li><strong>${U.escapeHtml(x.rhk.id)}:</strong> ${U.nl2br(x.val)}</li>`).join('')}
+        </ol>` : `<p style="text-align:justify;">Pada ${labelTW(tw)} ini secara umum tidak ditemukan permasalahan signifikan yang menghambat pelaksanaan tugas kepengawasan. Beberapa kondisi minor di lapangan dapat ditangani dengan koordinasi yang baik.</p>`}
 
-        <p style="text-align:justify;">Atas perhatian dan dukungan semua pihak, kami sampaikan terima kasih.</p>
+        <h3>C. Solusi</h3>
+        ${allSolusi.length ? `<p style="text-align:justify;">Beberapa solusi yang telah ditempuh untuk menangani permasalahan tersebut:</p>
+        <ol style="text-align:justify;">
+          ${allSolusi.slice(0, 10).map(x => `<li><strong>${U.escapeHtml(x.rhk.id)}:</strong> ${U.nl2br(x.val)}</li>`).join('')}
+        </ol>` : `<p style="text-align:justify;">Solusi yang ditempuh secara umum berupa penguatan koordinasi, pendampingan intensif, dan pemanfaatan teknologi komunikasi untuk efisiensi pelaksanaan tugas.</p>`}
 
+        <h3>D. Tindak Lanjut</h3>
+        ${allTindak.length ? `<p style="text-align:justify;">Tindak lanjut atas pelaksanaan kegiatan ${labelTW(tw)} antara lain:</p>
+        <ol style="text-align:justify;">
+          ${allTindak.slice(0, 10).map(x => `<li><strong>${U.escapeHtml(x.rhk.id)}:</strong> ${U.nl2br(x.val)}</li>`).join('')}
+        </ol>` : `<p style="text-align:justify;">Tindak lanjut yang akan dilaksanakan pada periode berikutnya meliputi: (1) pemantauan implementasi rekomendasi pada madrasah binaan; (2) pendampingan berkelanjutan; (3) penyusunan laporan periodik; dan (4) koordinasi dengan stakeholder terkait.</p>`}
+      </div>
+    `;
+
+    // ===== BAB V: PENUTUP =====
+    const bab5 = `
+      <div class="doc-page">
+        <h2 style="text-align:center;">BAB V<br/>PENUTUP</h2>
+
+        <h3>A. Simpulan</h3>
+        <ol style="text-align:justify;">
+          <li>Pelaksanaan tugas Pengawas Madrasah pada ${labelTW(tw)} Tahun ${tahun} telah dilaksanakan sesuai dengan rencana yang ditetapkan dalam Sasaran Kinerja Pegawai (SKP) Tahun ${tahun}.</li>
+          <li>Dari ${rhks.length} RHK yang direncanakan, telah terealisasi sebanyak ${rhkTerlaksana} RHK (${persentase}%) dengan total ${totalKegiatan} kegiatan pendampingan/pengawasan pada ${madrasahList.length} madrasah binaan.</li>
+          <li>Hasil pelaksanaan secara umum telah mencapai sasaran yang ditetapkan dan memberikan kontribusi positif terhadap peningkatan mutu pendidikan madrasah.</li>
+          <li>Kendala yang dihadapi telah diupayakan penanganannya melalui solusi yang konstruktif, dan menjadi bahan refleksi untuk perbaikan pada periode berikutnya.</li>
+        </ol>
+
+        <h3>B. Saran</h3>
+        <ol style="text-align:justify;">
+          <li>Kepada Kepala ${U.escapeHtml(i.pejabat_penilai.unit_kerja)}, agar terus memberikan dukungan kebijakan, fasilitasi pelatihan, dan alokasi anggaran yang memadai untuk kelancaran tugas kepengawasan.</li>
+          <li>Kepada Kepala Madrasah binaan, agar mengoptimalkan tindak lanjut hasil pendampingan dan menjadikan rekomendasi pengawas sebagai bagian dari budaya peningkatan mutu madrasah.</li>
+          <li>Kepada dewan guru dan tenaga kependidikan, agar konsisten dalam mengimplementasikan Kurikulum Berbasis Cinta dan profil P3RA dalam pembelajaran dan budaya madrasah.</li>
+          <li>Kepada Pokjawas, agar terus memperkuat koordinasi antar pengawas dan memfasilitasi sharing praktik baik kepengawasan.</li>
+          <li>Kepada Pengawas Madrasah, agar konsisten meningkatkan kapasitas profesional melalui PKB dan publikasi karya ilmiah.</li>
+        </ol>
+
+        <p style="text-align:justify;margin-top:14px;">Demikian Laporan ${labelTW(tw)} Tahun ${tahun} ini disusun. Atas perhatian dan dukungan semua pihak, kami sampaikan terima kasih.</p>
         <p style="text-align:right;margin-top:30px;">${tanggalKota(i)}</p>
         <div class="ttd" style="margin-top:8px;">
           <div class="ttd-block"></div>
@@ -286,7 +485,46 @@
       </div>
     `;
 
-    return cover + ringkasan + perRhkPages + penutup;
+    // ===== LAMPIRAN =====
+    const lampiran = `
+      <div class="doc-page">
+        <h2 style="text-align:center;">LAMPIRAN</h2>
+
+        <h3>1. Daftar Madrasah Binaan</h3>
+        ${madrasahList.length ? `<table class="fmt" style="width:100%;font-size:11pt;">
+          <thead><tr style="background:#f0f0f0;"><th style="width:40px;">No</th><th>Nama Madrasah</th><th style="width:80px;">Jenjang</th><th>Alamat</th></tr></thead>
+          <tbody>${madrasahList.map((m, idx) => `<tr><td style="text-align:center;">${idx+1}</td><td>${U.escapeHtml(m.nama_madrasah || '-')}</td><td style="text-align:center;">${U.escapeHtml(m.jenjang || '-')}</td><td>${U.escapeHtml(m.alamat || '-')}</td></tr>`).join('')}</tbody>
+        </table>` : `<p><em>Daftar madrasah binaan belum diisi pada menu Madrasah Binaan.</em></p>`}
+
+        <h3 style="margin-top:20px;">2. Matriks RHK ${labelTW(tw)}</h3>
+        <table class="fmt" style="width:100%;font-size:10pt;">
+          <thead>
+            <tr style="background:#f0f0f0;">
+              <th style="width:40px;">No</th>
+              <th style="width:70px;">Kode</th>
+              <th>Rencana Hasil Kerja</th>
+              <th style="width:80px;">Target</th>
+              <th style="width:60px;">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rhks.map((r, idx) => `<tr>
+              <td style="text-align:center;">${idx+1}</td>
+              <td>${U.escapeHtml(r.id)}</td>
+              <td>${U.escapeHtml(r.rencana_hasil_kerja || r.nama_eviden || '-')}</td>
+              <td style="text-align:center;">${U.escapeHtml(r.target_kuantitas || '-')}</td>
+              <td style="text-align:center;">${(kegByRhk[r.id] || []).length ? '✓' : '—'}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+
+        <h3 style="margin-top:20px;">3. Dokumentasi Kegiatan</h3>
+        <p style="font-style:italic;color:#888;">[Lampirkan dokumentasi foto kegiatan, daftar hadir, notulen, dan berita acara sebagaimana terlampir pada masing-masing eviden RHK.]</p>
+      </div>
+    `;
+
+    return cover + pengesahan + kataPengantar + daftarIsi + bab1 + bab2 + bab3Header + perRhkPages + bab4 + bab5 + lampiran;
+  }
   }
 
   function buildRhkPage(rhk, kegList, idn, idx) {

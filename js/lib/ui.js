@@ -5,6 +5,7 @@
     const role = u?.role || 'pengawas';
     const menus = [
       { href: '#/', icon: 'speedometer2', label: 'Dashboard', section: 'Utama' },
+      { href: '#/periode', icon: 'calendar3', label: 'Periode SKP' },
       { href: '#/identitas', icon: 'person-badge', label: 'Identitas Pengawas' },
       { href: '#/master-rhk', icon: 'list-check', label: 'Master RHK' },
       { href: '#/skp-atasan', icon: 'person-workspace', label: 'SKP Atasan Langsung' },
@@ -63,6 +64,7 @@
           <div class="app-topbar">
             <button class="btn btn-burger btn-sm btn-outline-success" id="btnBurger"><i class="bi bi-list"></i></button>
             <div class="page-title flex-grow-1">${U.escapeHtml(title)}</div>
+            <a href="#/periode" class="badge bg-success text-decoration-none me-2" title="Klik untuk ganti periode"><i class="bi bi-calendar3"></i> SKP ${U.escapeHtml(Store.activePeriode())}</a>
             <div class="text-muted small d-none d-md-block">${U.escapeHtml((u?.email || ''))}</div>
           </div>
           <div class="app-content" id="appContent">${contentHTML || ''}</div>

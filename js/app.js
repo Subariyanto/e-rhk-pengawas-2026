@@ -20,12 +20,15 @@
     Router.on('/arsip', () => Page.Arsip(), { requireAuth: true });
     Router.on('/rekap', () => Page.Rekap(), { requireAuth: true });
     Router.on('/laporan-triwulan', () => Page.LaporanTriwulan(), { requireAuth: true });
+    Router.on('/periode', () => Page.Periode(), { requireAuth: true });
     Router.on('/admin/users', () => Page.AdminUsers(), { requireAuth: true, role: 'admin' });
   }
 
   async function boot() {
     try {
       await Auth.ensureAdminSeeded();
+      // Migrasi data lama ke periode tahun aktif (master_rhk, kegiatan, eviden)
+      try { Store.migrateLegacy && Store.migrateLegacy(); } catch (e) { console.warn('migrate legacy:', e); }
       bootRoutes();
     } catch (e) {
       console.error('boot error:', e);

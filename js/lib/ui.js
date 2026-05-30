@@ -14,6 +14,7 @@
       { href: '#/eviden', icon: 'file-earmark-text', label: 'Generator Eviden' },
       { href: '#/arsip', icon: 'archive', label: 'Arsip Eviden' },
       { href: '#/rekap', icon: 'bar-chart', label: 'Rekapitulasi' },
+      { href: '#/laporan-triwulan', icon: 'journal-richtext', label: 'Laporan Triwulan' },
     ];
     if (role === 'admin') {
       menus.push({ href: '#/admin/users', icon: 'people', label: 'Kelola User', section: 'Admin' });

@@ -19,6 +19,7 @@
     Router.on('/eviden/preview/:id', (p) => Page.EvidenPreview(p.id), { requireAuth: true });
     Router.on('/arsip', () => Page.Arsip(), { requireAuth: true });
     Router.on('/rekap', () => Page.Rekap(), { requireAuth: true });
+    Router.on('/laporan-triwulan', () => Page.LaporanTriwulan(), { requireAuth: true });
     Router.on('/admin/users', () => Page.AdminUsers(), { requireAuth: true, role: 'admin' });
   }
 

@@ -16,6 +16,7 @@
       { href: '#/arsip', icon: 'archive', label: 'Arsip Eviden' },
       { href: '#/rekap', icon: 'bar-chart', label: 'Rekapitulasi' },
       { href: '#/laporan-triwulan', icon: 'journal-richtext', label: 'Laporan Triwulan' },
+      { href: '#/backup', icon: 'cloud-arrow-up', label: 'Backup & Restore', section: 'Pengaturan' },
     ];
     if (role === 'admin') {
       menus.push({ href: '#/admin/users', icon: 'people', label: 'Kelola User', section: 'Admin' });

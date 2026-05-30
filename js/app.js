@@ -21,6 +21,7 @@
     Router.on('/rekap', () => Page.Rekap(), { requireAuth: true });
     Router.on('/laporan-triwulan', () => Page.LaporanTriwulan(), { requireAuth: true });
     Router.on('/periode', () => Page.Periode(), { requireAuth: true });
+    Router.on('/backup', () => Page.Backup(), { requireAuth: true });
     Router.on('/admin/users', () => Page.AdminUsers(), { requireAuth: true, role: 'admin' });
   }
 

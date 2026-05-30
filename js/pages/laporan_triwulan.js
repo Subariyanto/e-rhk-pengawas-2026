@@ -138,10 +138,9 @@
     const rhkTerlaksana = rhks.filter(r => (kegByRhk[r.id] || []).length).length;
     const rhkBelum = rhks.length - rhkTerlaksana;
 
-    // Halaman 1: Cover
+    // Halaman 1: Cover (TANPA kop kemenag)
     const cover = `
-      <div class="doc-page">
-        ${header(i)}
+      <div class="doc-page doc-cover">
         <div class="cover-title">LAPORAN ${labelTW(tw).toUpperCase()}</div>
         <div class="cover-sub">PELAKSANAAN TUGAS POKOK PENGAWAS MADRASAH<br/>TAHUN 2026</div>
 
@@ -151,7 +150,7 @@
 
         <div class="cover-id">
           <div>Disusun oleh:</div>
-          <div style="font-weight:700; font-size:14pt;">${U.escapeHtml(i.pegawai.nama)}</div>
+          <div style="font-weight:700;">${U.escapeHtml(i.pegawai.nama)}</div>
           <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
           <div>${U.escapeHtml(i.pegawai.jabatan)}</div>
           <div>${U.escapeHtml(i.pegawai.unit_kerja)}</div>

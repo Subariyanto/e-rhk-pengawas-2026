@@ -58,15 +58,14 @@
     return { ...def, ...ovr };
   }
 
-  // Cover document
+  // Cover document (tanpa kop)
   function genCover(rhk, keg, idn) {
     const i = idn || Page.Identitas.get();
     return `
-      <div class="doc-page">
-        ${header(i)}
+      <div class="doc-page doc-cover">
         <div class="cover-title">LAPORAN EVIDEN<br />${U.escapeHtml(rhk.id)}</div>
         <div class="cover-sub">${U.escapeHtml(rhk.nama_eviden)}</div>
-        <div class="cover-sub" style="font-size:12pt;font-style:italic;">${rhk.triwulan === 'TAMBAHAN' ? 'Kinerja Tambahan' : 'Triwulan ' + rhk.triwulan + ' Tahun 2026'}${keg && keg.nama_kegiatan ? '<br />Kegiatan: ' + U.escapeHtml(keg.nama_kegiatan) : ''}</div>
+        <div class="cover-sub" style="font-style:italic;">${rhk.triwulan === 'TAMBAHAN' ? 'Kinerja Tambahan' : 'Triwulan ' + rhk.triwulan + ' Tahun 2026'}${keg && keg.nama_kegiatan ? '<br />Kegiatan: ' + U.escapeHtml(keg.nama_kegiatan) : ''}</div>
 
         <div style="text-align:center;margin:60px auto;">
           ${i.logo ? `<img src="${i.logo}" style="width:160px" />` : '<div style="height:160px;display:grid;place-items:center;color:#888">— LOGO KEMENAG —</div>'}
@@ -74,7 +73,7 @@
 
         <div class="cover-id">
           <div>Disusun oleh:</div>
-          <div style="font-weight:700; font-size:14pt;">${U.escapeHtml(i.pegawai.nama)}</div>
+          <div style="font-weight:700;">${U.escapeHtml(i.pegawai.nama)}</div>
           <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
           <div>${U.escapeHtml(i.pegawai.jabatan)}</div>
           <div>${U.escapeHtml(i.pegawai.unit_kerja)}</div>
@@ -663,10 +662,9 @@
     const kegiatan = (Store && typeof Store.get === 'function') ? (Store.get('kegiatan', []) || []) : [];
     const allRhk = (Page && Page.MasterRHK && Page.MasterRHK.get) ? Page.MasterRHK.get() : [rhk];
 
-    // Cover
+    // Cover (TANPA kop kemenag)
     const pCover = `
-      <div class="doc-page">
-        ${header(i)}
+      <div class="doc-page doc-cover">
         <div class="cover-title">PROGRAM PENDAMPINGAN TAHUNAN</div>
         <div class="cover-sub">PENGAWAS MADRASAH<br/>TAHUN ${tahun}</div>
         <div style="text-align:center;margin:60px auto;">
@@ -674,7 +672,7 @@
         </div>
         <div class="cover-id">
           <div>Disusun oleh:</div>
-          <div style="font-weight:700; font-size:14pt;">${U.escapeHtml(i.pegawai.nama)}</div>
+          <div style="font-weight:700;">${U.escapeHtml(i.pegawai.nama)}</div>
           <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
           <div>${U.escapeHtml(i.pegawai.jabatan)}</div>
           <div>${U.escapeHtml(i.pegawai.unit_kerja)}</div>

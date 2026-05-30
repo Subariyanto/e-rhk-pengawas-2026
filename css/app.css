@@ -434,13 +434,18 @@ a:hover { color: var(--primary-dark); }
   .app-sidebar, .app-topbar, .no-print { display: none !important; }
   .app-shell { display: block; }
   .app-content { padding: 0; }
+  body { background: #fff; }
   .doc-page {
     page-break-after: always;
-    padding: 1in 1in 1in 1.2in;
-    margin: 0 auto;
+    padding: 0;
+    margin: 0;
     box-shadow: none;
+    max-width: none;
+    min-height: 0;
   }
-  @page { margin: 0; size: A4; }
+  .doc-cover { padding: 0; }
+  /* Browser yang handle margin halaman supaya tidak terpotong di break */
+  @page { size: A4; margin: 1in 1in 1in 1.2in; }
 }
 
 /* ===== Document preview ===== */
@@ -467,20 +472,23 @@ a:hover { color: var(--primary-dark); }
   white-space: nowrap;
   overflow: hidden;
 }
-.doc-page .kop .text .l1 { font-size: 13pt; }
-.doc-page .kop .text .l2 { font-size: 13pt; font-weight: 700; }
-.doc-page .kop .text .l3 { font-size: 13pt; font-weight: 700; }
-.doc-page .kop .text .l4 { font-size: 13pt; }
+.doc-page .kop .text .l1 { font-size: 12pt; }
+.doc-page .kop .text .l2 { font-size: 12pt; font-weight: 700; }
+.doc-page .kop .text .l3 { font-size: 12pt; font-weight: 700; }
+.doc-page .kop .text .l4 { font-size: 12pt; }
 .doc-page .ttd { display: flex; justify-content: space-between; margin-top: 36px; }
 .doc-page .ttd .ttd-block { width: 45%; text-align: center; }
 .doc-page .ttd .signature-img { max-height: 80px; }
 .doc-page table.fmt { width: 100%; border-collapse: collapse; }
 .doc-page table.fmt th, .doc-page table.fmt td { border: 1px solid #000; padding: 4px 6px; }
 
-.cover-title { text-align: center; margin: 40px 0 8px; font-size: 13pt; font-weight: 700; }
-.cover-sub { text-align: center; font-size: 13pt; margin-bottom: 80px; }
-.cover-id { text-align: center; line-height: 1.8; margin-top: 60px; }
-.cover-foot { text-align: center; margin-top: 80px; font-weight: 700; }
+/* Cover khusus: tanpa kop, padding sama */
+.doc-cover { padding: 1in 1in 1in 1.2in; }
+
+.cover-title { text-align: center; margin: 40px 0 8px; font-size: 12pt; font-weight: 700; }
+.cover-sub { text-align: center; font-size: 12pt; margin-bottom: 80px; }
+.cover-id { text-align: center; line-height: 1.8; margin-top: 60px; font-size: 12pt; }
+.cover-foot { text-align: center; margin-top: 80px; font-weight: 700; font-size: 12pt; }
 
 /* ===== Master RHK: resizable columns + inline edit ===== */
 .table-wide-wrap .rhk-table { min-width: 0; }

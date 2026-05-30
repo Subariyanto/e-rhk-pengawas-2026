@@ -454,7 +454,7 @@
         </ol>
 
         <p style="text-align:justify;margin-top:14px;">Demikian Laporan ${labelTW(tw)} Tahun ${tahun} ini disusun. Atas perhatian dan dukungan semua pihak, kami sampaikan terima kasih.</p>
-        ${GenHTML.ttdBlokStandar(i)}
+        ${GenHTML.ttdBlokPenutup(i)}
       </div>
     `;
 

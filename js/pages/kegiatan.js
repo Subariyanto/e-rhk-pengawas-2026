@@ -102,6 +102,18 @@
       created_at: new Date().toISOString(),
     };
 
+    // Helper: render satu textarea + tombol pilih contoh
+    const field = (name, label, rows, value, colMd) => {
+      const col = colMd || 12;
+      return `<div class="col-md-${col}">
+        <div class="d-flex justify-content-between align-items-center">
+          <label class="form-label mb-1">${U.escapeHtml(label)}</label>
+          <button type="button" class="btn btn-sm btn-link p-0 text-decoration-none btn-pick-tpl" data-field="${name}" title="Pilih contoh dari template"><i class="bi bi-clipboard-check"></i> Pilih Contoh</button>
+        </div>
+        <textarea class="form-control" rows="${rows}" name="${name}" data-field="${name}">${U.escapeHtml(value || '')}</textarea>
+      </div>`;
+    };
+
     UI.shell((isNew ? 'Tambah' : 'Edit') + ' Kegiatan', `
       <form id="frmKeg">
         <div class="card mb-3">
@@ -131,15 +143,23 @@
         </div>
 
         <div class="card mb-3">
-          <div class="card-header"><i class="bi bi-list-task"></i> Uraian Kegiatan</div>
+          <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <span><i class="bi bi-list-task"></i> Uraian Kegiatan</span>
+            <div class="btn-group btn-group-sm">
+              <button type="button" class="btn btn-outline-success" id="btnGenAll" title="Auto-fill 7 field di bawah dengan template sesuai RHK"><i class="bi bi-magic"></i> Generate Semua</button>
+              <button type="button" class="btn btn-outline-secondary" id="btnGenAllVar2" title="Generate dengan varian ke-2 jika tersedia"><i class="bi bi-shuffle"></i> Varian Lain</button>
+              <button type="button" class="btn btn-outline-warning" id="btnClearAll" title="Kosongkan 7 field"><i class="bi bi-eraser"></i> Kosongkan</button>
+            </div>
+          </div>
           <div class="card-body row g-3">
-            <div class="col-md-12"><label class="form-label">Tujuan</label><textarea class="form-control" rows="3" name="tujuan">${U.escapeHtml(k.tujuan || '')}</textarea></div>
-            <div class="col-md-12"><label class="form-label">Uraian/Langkah Kegiatan</label><textarea class="form-control" rows="4" name="uraian">${U.escapeHtml(k.uraian || '')}</textarea></div>
-            <div class="col-md-12"><label class="form-label">Hasil Kegiatan</label><textarea class="form-control" rows="4" name="hasil">${U.escapeHtml(k.hasil || '')}</textarea></div>
-            <div class="col-md-6"><label class="form-label">Kendala</label><textarea class="form-control" rows="3" name="kendala">${U.escapeHtml(k.kendala || '')}</textarea></div>
-            <div class="col-md-6"><label class="form-label">Solusi</label><textarea class="form-control" rows="3" name="solusi">${U.escapeHtml(k.solusi || '')}</textarea></div>
-            <div class="col-md-6"><label class="form-label">Tindak Lanjut</label><textarea class="form-control" rows="3" name="tindak_lanjut">${U.escapeHtml(k.tindak_lanjut || '')}</textarea></div>
-            <div class="col-md-6"><label class="form-label">Rekomendasi</label><textarea class="form-control" rows="3" name="rekomendasi">${U.escapeHtml(k.rekomendasi || '')}</textarea></div>
+            <div class="col-12"><div class="alert alert-info py-2 px-3 mb-0" style="font-size:13px;"><i class="bi bi-info-circle"></i> Klik <strong>Generate Semua</strong> untuk mengisi otomatis 7 field di bawah berdasarkan RHK terpilih. Klik <strong>icon 📋</strong> di sebelah kanan label tiap field untuk melihat varian alternatif. Anda bebas mengedit setelahnya.</div></div>
+            ${field('tujuan', 'Tujuan', 3, k.tujuan)}
+            ${field('uraian', 'Uraian/Langkah Kegiatan', 4, k.uraian)}
+            ${field('hasil', 'Hasil Kegiatan', 4, k.hasil)}
+            ${field('kendala', 'Kendala', 3, k.kendala, 6)}
+            ${field('solusi', 'Solusi', 3, k.solusi, 6)}
+            ${field('tindak_lanjut', 'Tindak Lanjut', 3, k.tindak_lanjut, 6)}
+            ${field('rekomendasi', 'Rekomendasi', 3, k.rekomendasi, 6)}
           </div>
         </div>
 
@@ -208,6 +228,133 @@
       }
       renderLmp();
       e.target.value = '';
+    });
+
+    // ===== Auto-fill Template Kegiatan =====
+    const TPL = window.TemplateKegiatan;
+    const FIELDS_TPL = ['tujuan', 'uraian', 'hasil', 'kendala', 'solusi', 'tindak_lanjut', 'rekomendasi'];
+
+    function getCurrentRhk() {
+      const sel = document.querySelector('select[name="rhk_id"]');
+      const id = sel ? sel.value : '';
+      return masterRhk.find(r => r.id === id) || null;
+    }
+
+    function setField(name, val, force) {
+      const ta = document.querySelector(`textarea[name="${name}"]`);
+      if (!ta) return;
+      if (!force && ta.value && ta.value.trim()) {
+        if (!confirm(`Field "${name}" sudah terisi. Timpa dengan template?`)) return;
+      }
+      ta.value = val;
+      ta.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
+    function genAll(varianIdx) {
+      const rhk = getCurrentRhk();
+      if (!rhk) { UI.toast('Pilih RHK terlebih dahulu untuk generate template.'); return; }
+      if (!TPL) { UI.toast('Library template belum dimuat.'); return; }
+
+      const filled = FIELDS_TPL.filter(f => {
+        const ta = document.querySelector(`textarea[name="${f}"]`);
+        return ta && ta.value && ta.value.trim();
+      });
+      if (filled.length > 0) {
+        if (!confirm(`${filled.length} field sudah terisi (${filled.join(', ')}). Timpa semua dengan template?`)) return;
+      }
+
+      const out = TPL.generateAll(rhk, varianIdx || 0);
+      FIELDS_TPL.forEach(f => {
+        const ta = document.querySelector(`textarea[name="${f}"]`);
+        if (ta) {
+          ta.value = out[f] || '';
+          ta.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      });
+      UI.toast(`Template diisi (kategori: ${TPL.getKategori(rhk)}, varian ${(varianIdx || 0) + 1}). Silakan edit sesuai kebutuhan.`);
+    }
+
+    function clearAll() {
+      if (!confirm('Yakin mengosongkan 7 field Uraian Kegiatan?')) return;
+      FIELDS_TPL.forEach(f => {
+        const ta = document.querySelector(`textarea[name="${f}"]`);
+        if (ta) { ta.value = ''; ta.dispatchEvent(new Event('input', { bubbles: true })); }
+      });
+      UI.toast('Field Uraian Kegiatan dikosongkan.');
+    }
+
+    function showPickModal(fieldName) {
+      const rhk = getCurrentRhk();
+      if (!rhk) { UI.toast('Pilih RHK terlebih dahulu.'); return; }
+      if (!TPL) { UI.toast('Library template belum dimuat.'); return; }
+
+      const varians = TPL.getAllVarians(rhk, fieldName);
+      const labelMap = {
+        tujuan: 'Tujuan', uraian: 'Uraian/Langkah Kegiatan', hasil: 'Hasil Kegiatan',
+        kendala: 'Kendala', solusi: 'Solusi', tindak_lanjut: 'Tindak Lanjut', rekomendasi: 'Rekomendasi',
+      };
+      const label = labelMap[fieldName] || fieldName;
+
+      let oldModal = document.getElementById('mdlPickTpl');
+      if (oldModal) oldModal.remove();
+
+      const modalHtml = `
+        <div class="modal fade" id="mdlPickTpl" tabindex="-1">
+          <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-clipboard-check"></i> Pilih Contoh: ${U.escapeHtml(label)}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body">
+                <div class="alert alert-info py-2 px-3 mb-3" style="font-size:13px;">
+                  <i class="bi bi-info-circle"></i> Kategori: <strong>${TPL.getKategori(rhk)}</strong> — ${U.escapeHtml(rhk.nama_eviden || '')}<br/>
+                  Klik tombol <strong>Pakai</strong> pada salah satu contoh untuk memilihnya.
+                </div>
+                ${varians.map((v, idx) => `
+                  <div class="card mb-2">
+                    <div class="card-body py-2 px-3">
+                      <div class="d-flex justify-content-between align-items-start gap-2">
+                        <div class="flex-grow-1">
+                          <div class="small text-muted mb-1">Varian ${idx + 1}</div>
+                          <div style="white-space:pre-wrap;font-size:13px;">${U.escapeHtml(v)}</div>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-success btn-use-tpl flex-shrink-0" data-tpl-idx="${idx}"><i class="bi bi-check-lg"></i> Pakai</button>
+                      </div>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+              </div>
+            </div>
+          </div>
+        </div>`;
+      document.body.insertAdjacentHTML('beforeend', modalHtml);
+      const modalEl = document.getElementById('mdlPickTpl');
+      const modal = new bootstrap.Modal(modalEl);
+      modal.show();
+
+      modalEl.querySelectorAll('.btn-use-tpl').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const idx = parseInt(btn.dataset.tplIdx);
+          setField(fieldName, varians[idx], false);
+          modal.hide();
+          UI.toast(`Contoh "${label}" varian ${idx + 1} diterapkan.`);
+        });
+      });
+      modalEl.addEventListener('hidden.bs.modal', () => modalEl.remove(), { once: true });
+    }
+
+    const btnGenAll = document.getElementById('btnGenAll');
+    if (btnGenAll) btnGenAll.addEventListener('click', () => genAll(0));
+    const btnGenAllVar2 = document.getElementById('btnGenAllVar2');
+    if (btnGenAllVar2) btnGenAllVar2.addEventListener('click', () => genAll(1));
+    const btnClearAll = document.getElementById('btnClearAll');
+    if (btnClearAll) btnClearAll.addEventListener('click', clearAll);
+    document.querySelectorAll('.btn-pick-tpl').forEach(btn => {
+      btn.addEventListener('click', () => showPickModal(btn.dataset.field));
     });
 
     document.getElementById('frmKeg').addEventListener('submit', (e) => {

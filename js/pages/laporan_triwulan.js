@@ -525,7 +525,6 @@
 
     return cover + pengesahan + kataPengantar + daftarIsi + bab1 + bab2 + bab3Header + perRhkPages + bab4 + bab5 + lampiran;
   }
-  }
 
   function buildRhkPage(rhk, kegList, idn, idx) {
     const N = window.NARASI_RHK ? { ...(window.NARASI_RHK.default || {}), ...(window.NARASI_RHK[rhk.id] || {}) } : {};

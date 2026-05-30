@@ -392,6 +392,59 @@
     },
   };
 
+  // ===== Generic fallback varians (cadangan kalau kategori belum punya 5 varian) =====
+  const GENERIC_PADDING = {
+    tujuan: [
+      'Melaksanakan {RHK_NAMA} sebagai bagian dari tugas pokok Pengawas Madrasah dalam meningkatkan mutu layanan pendidikan pada madrasah binaan, sesuai indikator kinerja Perdirjen GTK Nomor 7328 Tahun 2023.',
+      'Memberikan pendampingan teknis dan substantif terkait {RHK_NAMA} kepada Kepala Madrasah, guru, dan tenaga kependidikan madrasah binaan agar tercapai standar mutu yang diharapkan.',
+      'Menjamin keterlaksanaan {RHK_NAMA} dengan baik melalui kegiatan supervisi, monitoring, dan evaluasi yang sistematis serta berkelanjutan.',
+      'Mendorong implementasi {RHK_NAMA} pada madrasah binaan secara terintegrasi dengan Kurikulum Berbasis Cinta dan Profil Pelajar Pancasila Rahmatan lil Alamin.',
+      'Membangun budaya kerja kolaboratif antara pengawas, kepala madrasah, dan guru dalam pelaksanaan {RHK_NAMA} demi peningkatan mutu pendidikan madrasah.',
+    ],
+    uraian: [
+      'Kegiatan dilaksanakan dalam beberapa tahap: (1) persiapan dan koordinasi awal; (2) penyiapan instrumen dan bahan kerja; (3) pelaksanaan teknis di madrasah binaan; (4) pengumpulan data dan dokumentasi; (5) analisis dan refleksi; (6) penyusunan laporan dan tindak lanjut.',
+      'Pelaksanaan kegiatan menggunakan pendekatan blended (luring + daring), meliputi: rapat koordinasi awal, kunjungan lapangan ke madrasah binaan, observasi langsung, wawancara dengan stakeholder, studi dokumentasi, FGD, dan penyusunan rekomendasi.',
+      'Tahapan kegiatan: (a) studi pendahuluan terhadap regulasi dan kebijakan terkait; (b) penyiapan instrumen kerja; (c) sosialisasi dan koordinasi dengan kepala madrasah; (d) pelaksanaan teknis sesuai jadwal; (e) monitoring dan supervisi proses; (f) evaluasi capaian; (g) penyusunan laporan final.',
+      'Kegiatan dimulai dengan pemetaan kondisi awal madrasah binaan, dilanjutkan penyusunan instrumen, kunjungan lapangan untuk pengumpulan data primer, FGD bersama Kepala Madrasah dan tim, analisis hasil, hingga finalisasi dan diseminasi laporan.',
+      'Pendekatan pelaksanaan: (1) preparasi (penyiapan instrumen, agenda, surat tugas); (2) eksekusi (pertemuan, observasi, wawancara, studi dokumen); (3) elaborasi (analisis, FGD, refleksi); (4) konsolidasi (penyusunan laporan dan rekomendasi); (5) diseminasi (sosialisasi hasil ke stakeholder terkait).',
+    ],
+    hasil: [
+      'Kegiatan {RHK_NAMA} terlaksana sesuai rencana dengan capaian yang memadai. Tersusun dokumen/laporan yang menjadi bukti pelaksanaan dan dasar tindak lanjut pada periode berikutnya.',
+      'Madrasah binaan memperoleh pendampingan dan masukan substantif terkait {RHK_NAMA}. Tersusun laporan kegiatan yang memuat temuan, rekomendasi, dan rencana tindak lanjut.',
+      'Tercapainya output kegiatan berupa dokumen pelaksanaan, dokumentasi proses, dan rumusan rekomendasi tindak lanjut yang dapat menjadi acuan perbaikan berkelanjutan di madrasah binaan.',
+      'Pelaksanaan {RHK_NAMA} menghasilkan peningkatan pemahaman dan kapasitas Kepala Madrasah, guru, dan tenaga kependidikan, serta tersedianya dokumen administratif kegiatan secara lengkap.',
+      'Tersusun laporan komprehensif {RHK_NAMA} yang memuat: (1) latar belakang dan tujuan; (2) deskripsi pelaksanaan; (3) capaian dan indikator keberhasilan; (4) kendala dan solusi; (5) rekomendasi tindak lanjut; (6) lampiran dokumentasi.',
+    ],
+    kendala: [
+      'Keterbatasan waktu dan jadwal yang berhimpitan dengan agenda madrasah maupun agenda dinas lainnya.',
+      'Geografis madrasah binaan yang tersebar memerlukan mobilitas tinggi dan biaya perjalanan yang tidak sedikit.',
+      'Variasi kondisi awal antar madrasah memerlukan pendekatan diferensial yang berbeda-beda.',
+      'Dukungan sarana prasarana dan SDM pada beberapa madrasah masih perlu ditingkatkan.',
+      'Pemahaman dan komitmen sebagian stakeholder terhadap {RHK_NAMA} masih perlu diperkuat melalui sosialisasi yang berkelanjutan.',
+    ],
+    solusi: [
+      'Mengoptimalkan komunikasi daring (grup WhatsApp/Zoom) untuk koordinasi rutin sehingga efisiensi waktu meningkat.',
+      'Menyusun jadwal kunjungan yang efisien dengan pengelompokan madrasah berdasarkan kedekatan geografis.',
+      'Menerapkan pendekatan diferensial sesuai karakteristik dan kebutuhan masing-masing madrasah.',
+      'Memfasilitasi sharing praktik baik antar madrasah binaan agar madrasah dengan kondisi terbatas dapat belajar dari yang sudah maju.',
+      'Melakukan sosialisasi berjenjang dan berulang sehingga pemahaman seluruh stakeholder meningkat secara bertahap.',
+    ],
+    tindak_lanjut: [
+      'Menyusun rencana aksi tindak lanjut bersama Kepala Madrasah berdasarkan rekomendasi yang dihasilkan.',
+      'Pengawas akan memantau implementasi rekomendasi melalui supervisi dan monev pada periode berikutnya.',
+      'Menjadwalkan pertemuan koordinasi lanjutan untuk memastikan keberlanjutan kegiatan.',
+      'Mendiseminasikan hasil kegiatan kepada Kankemenag dan stakeholder terkait sebagai bahan pertimbangan kebijakan.',
+      'Mendokumentasikan seluruh proses dan hasil sebagai bahan refleksi dan acuan penyusunan program tahun berikutnya.',
+    ],
+    rekomendasi: [
+      'Madrasah binaan agar konsisten mengimplementasikan hasil kegiatan dan menjadikannya bagian dari budaya kerja sehari-hari.',
+      'Kepala Madrasah perlu mengoptimalkan peran tim kerja dan memberdayakan seluruh sumber daya yang ada untuk mendukung keberlanjutan program.',
+      'Kankemenag perlu memberikan dukungan kebijakan, fasilitasi pelatihan, dan alokasi anggaran yang memadai untuk mendukung pelaksanaan {RHK_NAMA}.',
+      'Pengawas Madrasah agar konsisten melakukan pembinaan dan pendampingan secara berkala dengan pendekatan yang reflektif dan berorientasi pada peningkatan mutu.',
+      'Perlu sinergi yang lebih kuat antara madrasah, komite, orang tua siswa, dan masyarakat dalam mendukung keberlanjutan dan peningkatan mutu {RHK_NAMA}.',
+    ],
+  };
+
   // ===== Public API =====
   function fillPlaceholders(text, rhk) {
     return text
@@ -401,18 +454,31 @@
   }
 
   function getTemplate(rhk, field, varianIdx) {
-    const kat = detectKategori(rhk);
-    const lib = LIB[kat] || LIB.umum;
-    const arr = lib[field] || LIB.umum[field] || [''];
+    const arr = getAllVarians(rhk, field);
     const idx = Math.max(0, Math.min(arr.length - 1, varianIdx || 0));
-    return fillPlaceholders(arr[idx], rhk);
+    return arr[idx] || '';
   }
 
   function getAllVarians(rhk, field) {
     const kat = detectKategori(rhk);
     const lib = LIB[kat] || LIB.umum;
-    const arr = (lib[field] && lib[field].length ? lib[field] : LIB.umum[field]) || [''];
-    return arr.map(v => fillPlaceholders(v, rhk));
+    const specific = (lib[field] && lib[field].length ? lib[field] : []);
+    const generic = GENERIC_PADDING[field] || [];
+    // Gabung: specific dulu, lalu generic untuk pad sampai minimal 5 varian.
+    // Hindari duplikat persis.
+    const out = [...specific];
+    for (const g of generic) {
+      if (out.length >= 5 && out.length >= specific.length + 2) break;
+      if (!out.includes(g)) out.push(g);
+      if (out.length >= 5) break;
+    }
+    // Final pad jika masih kurang dari 5 (kalau generic juga sedikit, ulangi LIB.umum)
+    const fallback = (LIB.umum[field] || []);
+    for (const f of fallback) {
+      if (out.length >= 5) break;
+      if (!out.includes(f)) out.push(f);
+    }
+    return out.map(v => fillPlaceholders(v, rhk));
   }
 
   function getKategori(rhk) { return detectKategori(rhk); }

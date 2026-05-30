@@ -462,6 +462,11 @@ a:hover { color: var(--primary-dark); }
   line-height: 1.5;
 }
 .doc-page h1, .doc-page h2, .doc-page h3 { font-family: "Times New Roman", serif; }
+.doc-page h1 { font-size: 13pt; font-weight: 700; }
+.doc-page h2 { font-size: 13pt; font-weight: 700; }
+.doc-page h3 { font-size: 13pt; font-weight: 700; }
+.doc-page h4 { font-size: 12pt; font-weight: 700; }
+.doc-page h5 { font-size: 12pt; font-weight: 700; }
 .doc-page .kop { display: flex; align-items: center; gap: 12px; border-bottom: 3px double #000; padding-bottom: 8px; margin-bottom: 16px; }
 .doc-page .kop .logo { width: 80px; height: 80px; flex-shrink: 0; }
 .doc-page .kop .text { flex: 1; text-align: center; min-width: 0; }

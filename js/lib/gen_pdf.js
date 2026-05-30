@@ -7,6 +7,8 @@
     return `<!doctype html><html><head><meta charset="utf-8">${bs}${css}<title>Eviden</title>
       <style>
         body{font-family:"Times New Roman",serif;font-size:12pt;line-height:1.5;background:#fff}
+        h1,h2,h3{font-family:"Times New Roman",serif;font-size:13pt;font-weight:700}
+        h4,h5{font-family:"Times New Roman",serif;font-size:12pt;font-weight:700}
         .doc-page{padding:1in 1in 1in 1.2in;max-width:210mm;min-height:297mm;page-break-after:always;}
         @media print {
           body{background:#fff}

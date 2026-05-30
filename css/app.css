@@ -440,7 +440,7 @@ a:hover { color: var(--primary-dark); }
 /* ===== Document preview ===== */
 .doc-page {
   background: #fff;
-  padding: 30mm 25mm;
+  padding: 25mm 15mm 25mm 20mm;
   max-width: 210mm;
   min-height: 297mm;
   margin: 16px auto;
@@ -451,8 +451,15 @@ a:hover { color: var(--primary-dark); }
 }
 .doc-page h1, .doc-page h2, .doc-page h3 { font-family: "Times New Roman", serif; }
 .doc-page .kop { display: flex; align-items: center; gap: 12px; border-bottom: 3px double #000; padding-bottom: 8px; margin-bottom: 16px; }
-.doc-page .kop .logo { width: 80px; height: 80px; }
-.doc-page .kop .text { flex: 1; text-align: center; }
+.doc-page .kop .logo { width: 80px; height: 80px; flex-shrink: 0; }
+.doc-page .kop .text { flex: 1; text-align: center; min-width: 0; }
+.doc-page .kop .text .l1,
+.doc-page .kop .text .l2,
+.doc-page .kop .text .l3,
+.doc-page .kop .text .l4 {
+  white-space: nowrap;
+  overflow: hidden;
+}
 .doc-page .kop .text .l1 { font-size: 13pt; }
 .doc-page .kop .text .l2 { font-size: 13pt; font-weight: 700; }
 .doc-page .kop .text .l3 { font-size: 13pt; font-weight: 700; }

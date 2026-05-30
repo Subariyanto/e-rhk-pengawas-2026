@@ -276,10 +276,16 @@
     const tindak  = keg ? (keg.tindak_lanjut || '') : '';
     const rekom   = keg ? (keg.rekomendasi || '') : '';
 
+    // Fallback ke library template kegiatan kalau field kosong
+    const TPL = window.TemplateKegiatan;
+    const tplTindak = TPL ? TPL.getTemplate(rhk, 'tindak_lanjut', 0) : '';
+    const tplRekom  = TPL ? TPL.getTemplate(rhk, 'rekomendasi',  0) : '';
+
     const ringkasPelaksanaan = uraian || U.fillTemplate(N.langkah || '', v) || '-';
     const ringkasHasil       = hasil  || U.fillTemplate(N.hasil || '', v) || '-';
     const ringkasAnalisis    = U.fillTemplate(N.analisis || '', v) || '-';
-    const ringkasRekom       = rekom  || U.fillTemplate(N.rekomendasi || '', v) || '-';
+    const ringkasTindak      = tindak || tplTindak || U.fillTemplate(N.tindak_lanjut || '', v) || '-';
+    const ringkasRekom       = rekom  || tplRekom  || U.fillTemplate(N.rekomendasi || '', v) || '-';
 
     return `
       <div class="doc-page">
@@ -328,7 +334,7 @@
         </table>` : ''}
 
         <h4>${(kendala || solusi) ? 'E' : 'D'}. Tindak Lanjut</h4>
-        <p style="text-align:justify;">${U.nl2br(tindak || '-')}</p>
+        <p style="text-align:justify;">${U.nl2br(ringkasTindak)}</p>
 
         <h4>${(kendala || solusi) ? 'F' : 'E'}. Rekomendasi</h4>
         <p style="text-align:justify;">${U.nl2br(ringkasRekom)}</p>

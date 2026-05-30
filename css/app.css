@@ -434,13 +434,20 @@ a:hover { color: var(--primary-dark); }
   .app-sidebar, .app-topbar, .no-print { display: none !important; }
   .app-shell { display: block; }
   .app-content { padding: 0; }
-  .doc-page { page-break-after: always; }
+  .doc-page {
+    page-break-after: always;
+    padding: 1in 1in 1in 1.2in;
+    margin: 0 auto;
+    box-shadow: none;
+  }
+  @page { margin: 0; size: A4; }
 }
 
 /* ===== Document preview ===== */
 .doc-page {
   background: #fff;
-  padding: 25mm 15mm 25mm 20mm;
+  /* Margin standar: Top 1", Right 1", Bottom 1", Left 1.2" */
+  padding: 1in 1in 1in 1.2in;
   max-width: 210mm;
   min-height: 297mm;
   margin: 16px auto;

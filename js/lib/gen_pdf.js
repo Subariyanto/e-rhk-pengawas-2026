@@ -7,8 +7,8 @@
     return `<!doctype html><html><head><meta charset="utf-8">${bs}${css}<title>Eviden</title>
       <style>
         body{font-family:"Times New Roman",serif;font-size:12pt;line-height:1.5;background:#fff}
-        .doc-page{padding:25mm 15mm 25mm 20mm;max-width:210mm;min-height:297mm;page-break-after:always;}
-        @media print {.doc-page{padding:20mm 12mm 20mm 18mm;}}
+        .doc-page{padding:1in 1in 1in 1.2in;max-width:210mm;min-height:297mm;page-break-after:always;}
+        @media print {.doc-page{padding:1in 1in 1in 1.2in;}}
         .kop{display:flex;align-items:center;gap:12px;border-bottom:3px double #000;padding-bottom:8px;margin-bottom:16px}
         .kop .logo{width:80px;height:80px;flex-shrink:0}
         .kop .text{flex:1;text-align:center;min-width:0}

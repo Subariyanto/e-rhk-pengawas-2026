@@ -6,24 +6,65 @@
 
     if (!tw) {
       // Pilih TW dulu
+      const allKegiatan = Store.get('kegiatan', []) || [];
+      const allRhk = Page.MasterRHK.get();
+      const stats = (twKey) => {
+        const rhks = allRhk.filter(r => r.triwulan === twKey);
+        const ids = new Set(rhks.map(r => r.id));
+        const kegs = allKegiatan.filter(k => ids.has(k.rhk_id));
+        return { rhks: rhks.length, kegs: kegs.length };
+      };
+      const cards = [
+        { tw: 'I',        label: 'Triwulan I',        bulan: 'Jan – Mar',  icon: 'bi-1-circle-fill',  warna: '#1E2A5A', accent: '#3B5BB8' },
+        { tw: 'II',       label: 'Triwulan II',       bulan: 'Apr – Jun',  icon: 'bi-2-circle-fill',  warna: '#0F766E', accent: '#14B8A6' },
+        { tw: 'III',      label: 'Triwulan III',      bulan: 'Jul – Sep',  icon: 'bi-3-circle-fill',  warna: '#92400E', accent: '#F59E0B' },
+        { tw: 'IV',       label: 'Triwulan IV',       bulan: 'Okt – Des',  icon: 'bi-4-circle-fill',  warna: '#7C2D12', accent: '#DC2626' },
+        { tw: 'TAMBAHAN', label: 'Kinerja Tambahan',  bulan: 'Sepanjang Tahun', icon: 'bi-stars',         warna: '#581C87', accent: '#A855F7' },
+      ];
       UI.shell('Laporan Triwulan', `
-        <div class="alert alert-light border">
-          <i class="bi bi-info-circle text-success"></i>
-          Pilih triwulan untuk membuat laporan lengkap kegiatan selama satu triwulan.
+        <div class="alert alert-light border d-flex align-items-center gap-2">
+          <i class="bi bi-info-circle text-success fs-5"></i>
+          <div>Pilih triwulan untuk membuat laporan lengkap kegiatan selama satu triwulan. Laporan otomatis disusun dari Master RHK + Data Kegiatan + Identitas Pengawas.</div>
         </div>
         <div class="row g-3">
-          ${['I','II','III','IV','TAMBAHAN'].map(t => `
+          ${cards.map(c => {
+            const s = stats(c.tw);
+            const pct = s.rhks ? Math.round((s.kegs > 0 ? Math.min(s.kegs / s.rhks, 1) : 0) * 100) : 0;
+            return `
             <div class="col-md-6 col-lg-4">
-              <a class="card text-decoration-none h-100" href="#/laporan-triwulan?tw=${t}">
-                <div class="card-body text-center py-4">
-                  <div style="font-size:42px;color:var(--primary);"><i class="bi bi-journal-richtext"></i></div>
-                  <h4 class="mt-2 mb-1" style="color:var(--primary-dark)">${t === 'TAMBAHAN' ? 'Kinerja Tambahan' : 'Triwulan ' + t}</h4>
-                  <div class="text-muted small">Laporan lengkap ${t === 'TAMBAHAN' ? 'kinerja tambahan' : 'TW ' + t} 2026</div>
+              <a class="card text-decoration-none h-100 tw-card" href="#/laporan-triwulan?tw=${c.tw}" style="border:none;overflow:hidden;box-shadow:0 4px 14px rgba(30,42,90,.08);transition:transform .15s ease, box-shadow .15s ease;">
+                <div style="background:linear-gradient(135deg, ${c.warna} 0%, ${c.accent} 100%);color:#fff;padding:22px 24px;position:relative;">
+                  <div style="position:absolute;top:8px;right:14px;opacity:.18;font-size:96px;line-height:1;"><i class="bi ${c.icon}"></i></div>
+                  <div style="position:relative;z-index:1;">
+                    <div style="font-size:11pt;opacity:.85;letter-spacing:1px;text-transform:uppercase;">${c.bulan}</div>
+                    <div style="font-size:22pt;font-weight:700;line-height:1.1;margin-top:4px;">${c.label}</div>
+                    <div style="font-size:10pt;opacity:.85;margin-top:2px;">Tahun 2026</div>
+                  </div>
+                </div>
+                <div class="card-body py-3 px-3" style="color:var(--bs-body-color);">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="small text-muted">
+                      <i class="bi bi-clipboard-data text-primary"></i> ${s.rhks} RHK
+                    </div>
+                    <div class="small text-muted">
+                      <i class="bi bi-calendar-check text-success"></i> ${s.kegs} kegiatan
+                    </div>
+                  </div>
+                  <div class="progress" style="height:6px;">
+                    <div class="progress-bar" role="progressbar" style="width:${pct}%;background:${c.accent};" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"></div>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center mt-2">
+                    <div class="small text-muted">${pct > 0 ? `${pct}% capaian` : 'Belum ada kegiatan'}</div>
+                    <div class="small fw-semibold" style="color:${c.warna};">Buat Laporan <i class="bi bi-arrow-right"></i></div>
+                  </div>
                 </div>
               </a>
-            </div>
-          `).join('')}
+            </div>`;
+          }).join('')}
         </div>
+        <style>
+          .tw-card:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(30,42,90,.18) !important; }
+        </style>
       `);
       return;
     }

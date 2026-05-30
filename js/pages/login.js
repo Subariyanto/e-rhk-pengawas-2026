@@ -35,7 +35,8 @@
       const fd = new FormData(e.target);
       try {
         await Auth.login({ email: fd.get('email'), password: fd.get('password') });
-        Router.navigate('/', true);
+        // Eksplisit ke dashboard, replaceState supaya tidak menumpuk history
+        history.replaceState(null, '', '#/dashboard');
         Router.dispatch();
       } catch (err) {
         UI.toast(err.message, 'danger');

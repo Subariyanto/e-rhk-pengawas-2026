@@ -565,6 +565,9 @@ a:hover { color: var(--primary-dark); }
 }
 
 /* Display-mode link inside cells (e.g. Nama Eviden -> detail) */
+.rhk-table .cell-display-block {
+  display: block;
+}
 .rhk-table .cell-display-link {
   display: block;
   padding: 4px 6px;
@@ -579,9 +582,34 @@ a:hover { color: var(--primary-dark); }
   text-decoration: underline;
   color: var(--primary-dark);
 }
-.rhk-table tr.row-editing .cell-display-link { display: none; }
-.rhk-table .cell-link-wrap .cell-editor { display: none; }
-.rhk-table tr.row-editing .cell-link-wrap .cell-editor { display: block; }
+.rhk-table .cell-drive-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin: 2px 6px 4px;
+  padding: 2px 8px;
+  background: var(--accent-soft);
+  color: var(--accent-dark);
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-decoration: none;
+  line-height: 1.4;
+}
+.rhk-table .cell-drive-link:hover {
+  background: var(--accent);
+  color: #1F2937;
+  text-decoration: none;
+}
+.rhk-table .cell-drive-link i { font-size: 13px; }
+.rhk-table tr.row-editing .cell-display-block { display: none; }
+.rhk-table .cell-editor-block { display: none; }
+.rhk-table tr.row-editing .cell-editor-block { display: block; }
+.rhk-table .cell-editor-block .cell-link-input {
+  margin-top: 4px;
+  font-size: 12px;
+}
 .rhk-table .cell-textarea {
   min-height: 32px;
   overflow: hidden;

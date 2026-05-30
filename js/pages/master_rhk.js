@@ -206,8 +206,14 @@
         <td class="cell-wrap"><textarea class="cell-textarea" data-field="target_kuantitas" rows="1" readonly>${U.escapeHtml(r.target_kuantitas || '')}</textarea></td>
         <td rowspan="2" class="cell-wrap"><textarea class="cell-textarea" data-field="rencana_aksi" rows="1" readonly>${U.escapeHtml(r.rencana_aksi || '')}</textarea></td>
         <td rowspan="2" class="cell-wrap cell-link-wrap" data-link-target="#/master-rhk/${idEnc}" data-field-text="nama_eviden">
-          <a class="cell-display-link" href="#/master-rhk/${idEnc}" title="Buka detail RHK">${U.escapeHtml(r.nama_eviden || '—')}</a>
-          <textarea class="cell-textarea cell-editor" data-field="nama_eviden" rows="1" readonly>${U.escapeHtml(r.nama_eviden || '')}</textarea>
+          <div class="cell-display-block">
+            <a class="cell-display-link" href="#/master-rhk/${idEnc}" title="Buka detail RHK">${U.escapeHtml(r.nama_eviden || '—')}</a>
+            ${r.link_bukti_dukung ? `<a class="cell-drive-link" href="${attr(r.link_bukti_dukung)}" target="_blank" rel="noopener" title="Buka Link Drive"><i class="bi bi-link-45deg"></i> Link Drive</a>` : ''}
+          </div>
+          <div class="cell-editor-block">
+            <textarea class="cell-textarea cell-editor" data-field="nama_eviden" rows="1" placeholder="Nama eviden / bukti dukung" readonly>${U.escapeHtml(r.nama_eviden || '')}</textarea>
+            <input class="cell-input cell-editor cell-link-input" data-field="link_bukti_dukung" placeholder="Link Google Drive (https://drive.google.com/...)" value="${attr(r.link_bukti_dukung)}" readonly />
+          </div>
         </td>
         <td rowspan="2" class="cell-wrap"><textarea class="cell-textarea" data-field="target_waktu" rows="1" title="Durasi (sama dengan target waktu)" readonly>${U.escapeHtml(r.target_waktu || '')}</textarea></td>
         <td rowspan="2" class="text-center text-nowrap cell-actions" style="vertical-align:middle;">
@@ -451,6 +457,25 @@
     if (!wrap) return;
     const link = wrap.querySelector('.cell-display-link');
     if (link) link.textContent = rec.nama_eviden && rec.nama_eviden.trim() ? rec.nama_eviden : '—';
+
+    // Sync drive link icon
+    const block = wrap.querySelector('.cell-display-block');
+    if (!block) return;
+    let drive = block.querySelector('.cell-drive-link');
+    if (rec.link_bukti_dukung && rec.link_bukti_dukung.trim()) {
+      if (!drive) {
+        drive = document.createElement('a');
+        drive.className = 'cell-drive-link';
+        drive.target = '_blank';
+        drive.rel = 'noopener';
+        drive.title = 'Buka Link Drive';
+        drive.innerHTML = '<i class="bi bi-link-45deg"></i> Link Drive';
+        block.appendChild(drive);
+      }
+      drive.href = rec.link_bukti_dukung;
+    } else if (drive) {
+      drive.remove();
+    }
   }
 
   // ===== Detail page (read-only deep view) =====

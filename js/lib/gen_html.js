@@ -649,9 +649,357 @@
     `;
   }
 
+  // ===== Program Pendampingan Tahunan (Program Kerja Pengawas) — khusus RHK-1 =====
+  function genProgramPendampingan(rhk, keg, idn) {
+    const i = idn || Page.Identitas.get();
+    const tahun = new Date().getFullYear();
+    const madrasahList = (Store && typeof Store.get === 'function') ? (Store.get('madrasah', []) || []) : [];
+    const kegiatan = (Store && typeof Store.get === 'function') ? (Store.get('kegiatan', []) || []) : [];
+    const allRhk = (Page && Page.MasterRHK && Page.MasterRHK.get) ? Page.MasterRHK.get() : [rhk];
+
+    // Cover
+    const pCover = `
+      <div class="doc-page">
+        ${header(i)}
+        <div class="cover-title">PROGRAM PENDAMPINGAN TAHUNAN</div>
+        <div class="cover-sub">PENGAWAS MADRASAH<br/>TAHUN ${tahun}</div>
+        <div style="text-align:center;margin:60px auto;">
+          ${i.logo ? `<img src="${i.logo}" style="width:160px" />` : '<div style="height:160px;display:grid;place-items:center;color:#888">— LOGO KEMENAG —</div>'}
+        </div>
+        <div class="cover-id">
+          <div>Disusun oleh:</div>
+          <div style="font-weight:700; font-size:14pt;">${U.escapeHtml(i.pegawai.nama)}</div>
+          <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
+          <div>${U.escapeHtml(i.pegawai.jabatan)}</div>
+          <div>${U.escapeHtml(i.pegawai.unit_kerja)}</div>
+        </div>
+        <div class="cover-foot">
+          <div>${U.escapeHtml(i.kop_l3 || 'POKJAWAS KEMENAG')}</div>
+          <div>${U.escapeHtml(i.kop_l2 || 'KEMENAG KAB. JEMBER')}</div>
+          <div>TAHUN ${tahun}</div>
+        </div>
+      </div>`;
+
+    // Pengesahan
+    const pPengesahan = `
+      <div class="doc-page">
+        ${header(i)}
+        <h2 style="text-align:center;text-decoration:underline;">LEMBAR PENGESAHAN</h2>
+        <p style="text-align:justify;">Yang bertanda tangan di bawah ini, mengesahkan dokumen <strong>Program Pendampingan Tahunan ${tahun}</strong> yang disusun oleh:</p>
+        <table class="fmt" style="width:90%;margin:8px auto;">
+          <tr><td style="width:30%">Nama</td><td>${U.escapeHtml(i.pegawai.nama)}</td></tr>
+          <tr><td>NIP</td><td>${U.escapeHtml(i.pegawai.nip)}</td></tr>
+          <tr><td>Pangkat/Gol</td><td>${U.escapeHtml(i.pegawai.pangkat_golongan)}</td></tr>
+          <tr><td>Jabatan</td><td>${U.escapeHtml(i.pegawai.jabatan)}</td></tr>
+          <tr><td>Unit Kerja</td><td>${U.escapeHtml(i.pegawai.unit_kerja)}</td></tr>
+        </table>
+        <p style="text-align:justify;">Dokumen ini menjadi acuan pelaksanaan tugas pokok dan fungsi Pengawas Madrasah pada ${U.escapeHtml(i.pegawai.unit_kerja)} Tahun ${tahun}, sebagai bagian dari Sasaran Kinerja Pegawai (SKP) sesuai Perdirjen GTK Nomor 7328 Tahun 2023.</p>
+        <div style="text-align:right;margin-top:30px">${tanggalKota(i)}</div>
+        <div class="ttd">
+          <div class="ttd-block">
+            <div>Pengawas Madrasah,</div>
+            <div style="height:80px"></div>
+            <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
+            <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
+          </div>
+          <div class="ttd-block">
+            <div>Mengetahui,<br/>${U.escapeHtml(i.pejabat_penilai.jabatan)},</div>
+            <div style="height:80px"></div>
+            <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pejabat_penilai.nama)}</div>
+            <div>NIP. ${U.escapeHtml(i.pejabat_penilai.nip)}</div>
+          </div>
+        </div>
+      </div>`;
+
+    // Kata Pengantar
+    const pKata = `
+      <div class="doc-page">
+        <h2 style="text-align:center;text-decoration:underline;">KATA PENGANTAR</h2>
+        <p style="text-align:justify;">Puji syukur kami panjatkan kehadirat Allah SWT atas limpahan rahmat dan karunia-Nya, sehingga penyusunan <strong>Program Pendampingan Tahunan Pengawas Madrasah Tahun ${tahun}</strong> dapat diselesaikan. Shalawat dan salam senantiasa tercurah kepada Nabi Muhammad SAW.</p>
+        <p style="text-align:justify;">Program Pendampingan Tahunan ini disusun sebagai pedoman pelaksanaan tugas Pengawas Madrasah dalam melakukan supervisi akademik dan manajerial pada madrasah binaan selama satu tahun pelajaran. Program ini memuat rencana kegiatan, jadwal pelaksanaan, sasaran, indikator keberhasilan, dan strategi pendampingan yang berorientasi pada peningkatan mutu layanan pendidikan berbasis Kurikulum Berbasis Cinta dan kompetensi peserta didik.</p>
+        <p style="text-align:justify;">Kami mengucapkan terima kasih kepada Kepala ${U.escapeHtml(i.pejabat_penilai.unit_kerja)}, Ketua Pokjawas, Kepala Madrasah, dewan guru, dan seluruh pemangku kepentingan yang telah memberikan dukungan dalam penyusunan program ini.</p>
+        <p style="text-align:justify;">Kami menyadari masih terdapat kekurangan dalam penyusunan program ini, sehingga masukan dan saran yang konstruktif sangat kami harapkan demi penyempurnaan di masa mendatang.</p>
+        <div style="text-align:right;margin-top:30px">${tanggalKota(i)}<br/>Penyusun,</div>
+        <div style="text-align:right;margin-top:60px">
+          <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
+          <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
+        </div>
+      </div>`;
+
+    // Daftar Isi
+    const items = [
+      ['HALAMAN JUDUL', 'i'],
+      ['LEMBAR PENGESAHAN', 'ii'],
+      ['KATA PENGANTAR', 'iii'],
+      ['DAFTAR ISI', 'iv'],
+      ['BAB I PENDAHULUAN', '1'],
+      ['  A. Latar Belakang', '1'],
+      ['  B. Dasar Hukum', '2'],
+      ['  C. Tujuan', '3'],
+      ['  D. Sasaran Pendampingan', '3'],
+      ['  E. Ruang Lingkup', '4'],
+      ['BAB II ANALISIS KEBUTUHAN MADRASAH BINAAN', '5'],
+      ['  A. Profil Madrasah Binaan', '5'],
+      ['  B. Pemetaan Mutu', '7'],
+      ['  C. Identifikasi Kebutuhan', '8'],
+      ['BAB III PROGRAM PENDAMPINGAN TAHUNAN', '9'],
+      ['  A. Visi & Misi Pendampingan', '9'],
+      ['  B. Strategi Pendampingan', '10'],
+      ['  C. Matriks Program per Triwulan', '12'],
+      ['BAB IV JADWAL & STRATEGI PENDAMPINGAN', '15'],
+      ['  A. Jadwal Pelaksanaan', '15'],
+      ['  B. Metode & Pendekatan', '17'],
+      ['  C. Indikator Keberhasilan', '18'],
+      ['BAB V PENUTUP', '19'],
+      ['LAMPIRAN', '20'],
+      ['  - SK Pembagian Tugas', '20'],
+      ['  - Matriks Program', '21'],
+      ['  - Surat Pengesahan Pengawas', '22'],
+    ];
+    const pDaftarIsi = `
+      <div class="doc-page">
+        <h2 style="text-align:center;text-decoration:underline;">DAFTAR ISI</h2>
+        <table style="width:100%;border-collapse:collapse;">
+          ${items.map(([t, p]) => `<tr><td style="padding:4px 0;border-bottom:1px dotted #888;">${U.escapeHtml(t)}</td><td style="padding:4px 0;text-align:right;border-bottom:1px dotted #888;">${p}</td></tr>`).join('')}
+        </table>
+      </div>`;
+
+    // BAB I Pendahuluan
+    const pBab1 = `
+      <div class="doc-page">
+        <h2 style="text-align:center;">BAB I<br/>PENDAHULUAN</h2>
+        <h3>A. Latar Belakang</h3>
+        <p style="text-align:justify;">Pengawas Madrasah merupakan tenaga kependidikan yang memiliki tugas pokok melaksanakan supervisi akademik dan manajerial pada satuan pendidikan madrasah. Sesuai Perdirjen GTK Nomor 7328 Tahun 2023, Pengawas Madrasah dituntut menyusun Program Pendampingan Tahunan sebagai acuan pelaksanaan tugas selama satu tahun anggaran.</p>
+        <p style="text-align:justify;">Pendampingan oleh Pengawas Madrasah berfokus pada peningkatan mutu pendidikan berbasis cinta kemanusiaan, pelestarian lingkungan, dan pengembangan kompetensi peserta didik melalui implementasi Kurikulum Berbasis Cinta. Program ini disusun untuk memastikan setiap madrasah binaan memperoleh pendampingan yang sistematis, terukur, dan berkelanjutan.</p>
+        <p style="text-align:justify;">Sebagai bentuk akuntabilitas pelaksanaan tugas, dokumen ini menjadi pedoman bagi pengawas dalam menyelenggarakan kegiatan supervisi, evaluasi, dan tindak lanjut pada ${madrasahList.length} madrasah binaan di wilayah ${U.escapeHtml(i.pegawai.kabupaten || 'Jember')}.</p>
+
+        <h3>B. Dasar Hukum</h3>
+        <ol style="text-align:justify;">
+          <li>Undang-Undang Nomor 20 Tahun 2003 tentang Sistem Pendidikan Nasional;</li>
+          <li>Undang-Undang Nomor 14 Tahun 2005 tentang Guru dan Dosen;</li>
+          <li>Peraturan Pemerintah Nomor 19 Tahun 2017 tentang Perubahan atas PP Nomor 74 Tahun 2008 tentang Guru;</li>
+          <li>Peraturan Menteri PAN-RB Nomor 21 Tahun 2010 tentang Jabatan Fungsional Pengawas Sekolah dan Angka Kreditnya;</li>
+          <li>Peraturan Menteri Agama Nomor 31 Tahun 2013 tentang Pengawas Madrasah dan Pengawas Pendidikan Agama Islam pada Sekolah;</li>
+          <li>Peraturan Menteri Agama Nomor 2 Tahun 2012 tentang Pengawas Madrasah dan Pengawas Pendidikan Agama Islam pada Sekolah, sebagaimana diubah dengan PMA Nomor 31 Tahun 2013;</li>
+          <li>Peraturan Direktur Jenderal Pendidikan Islam Nomor 7328 Tahun 2023 tentang Petunjuk Teknis Pengelolaan Kinerja Pengawas Madrasah;</li>
+          <li>Peraturan Menteri Agama Nomor 13 Tahun 2014 tentang Pendidikan Keagamaan Islam (Madrasah);</li>
+          <li>Surat Keputusan Kepala Kantor Kementerian Agama tentang Pembagian Tugas Pengawas Madrasah Tahun ${tahun}.</li>
+        </ol>
+
+        <h3>C. Tujuan</h3>
+        <ol style="text-align:justify;">
+          <li>Memberikan pedoman pelaksanaan tugas Pengawas Madrasah selama tahun ${tahun};</li>
+          <li>Memastikan pendampingan berjalan sistematis, terukur, dan berkelanjutan pada seluruh madrasah binaan;</li>
+          <li>Meningkatkan mutu pengelolaan madrasah dan layanan pembelajaran berbasis Kurikulum Berbasis Cinta;</li>
+          <li>Mewujudkan akuntabilitas pelaksanaan kinerja sebagai bagian dari SKP Pengawas Madrasah.</li>
+        </ol>
+
+        <h3>D. Sasaran Pendampingan</h3>
+        <p style="text-align:justify;">Program Pendampingan Tahunan ini ditujukan kepada seluruh madrasah binaan di wilayah ${U.escapeHtml(i.pegawai.kabupaten || 'Jember')} dengan rincian sebagai berikut:</p>
+        ${madrasahList.length ? `<table class="fmt" style="width:100%;">
+          <thead><tr style="background:#f0f0f0;"><th>No</th><th>Nama Madrasah</th><th>Jenjang</th><th>Alamat</th></tr></thead>
+          <tbody>${madrasahList.map((m, idx) => `<tr><td style="text-align:center;width:40px;">${idx+1}</td><td>${U.escapeHtml(m.nama_madrasah || '-')}</td><td style="text-align:center;width:80px;">${U.escapeHtml(m.jenjang || '-')}</td><td>${U.escapeHtml(m.alamat || '-')}</td></tr>`).join('')}</tbody>
+        </table>` : `<p><em>Daftar madrasah binaan belum diisi. Silakan tambahkan pada menu "Madrasah Binaan".</em></p>`}
+
+        <h3>E. Ruang Lingkup</h3>
+        <p style="text-align:justify;">Ruang lingkup pendampingan meliputi:</p>
+        <ol style="text-align:justify;">
+          <li><strong>Supervisi Akademik:</strong> pendampingan implementasi kurikulum, perangkat pembelajaran, evaluasi pembelajaran, dan peningkatan kompetensi profesional guru;</li>
+          <li><strong>Supervisi Manajerial:</strong> pendampingan tata kelola madrasah, manajemen mutu, kepemimpinan kepala madrasah, dan pelayanan publik;</li>
+          <li><strong>Pembinaan Karakter:</strong> penguatan profil pelajar Pancasila Rahmatan lil 'Alamin (P3RA), karakter siswa, dan pendidikan inklusif;</li>
+          <li><strong>Penilaian Kinerja:</strong> Penilaian Kinerja Guru (PKG) dan Penilaian Kinerja Kepala Madrasah (PKKM);</li>
+          <li><strong>Tindak Lanjut:</strong> rekomendasi perbaikan, monitoring, evaluasi, dan pelaporan.</li>
+        </ol>
+      </div>`;
+
+    // BAB II Analisis Kebutuhan
+    const pBab2 = `
+      <div class="doc-page">
+        <h2 style="text-align:center;">BAB II<br/>ANALISIS KEBUTUHAN MADRASAH BINAAN</h2>
+        <h3>A. Profil Madrasah Binaan</h3>
+        <p style="text-align:justify;">Berdasarkan SK Pembagian Tugas Pengawas Tahun ${tahun}, ${U.escapeHtml(i.pegawai.nama)} ditugaskan untuk melakukan pendampingan pada ${madrasahList.length} madrasah binaan dengan komposisi sebagai berikut:</p>
+        ${(() => {
+          const stats = { MI: 0, MTs: 0, MA: 0, MAK: 0, RA: 0 };
+          madrasahList.forEach(m => { const j = (m.jenjang||'').toUpperCase(); if (stats[j] !== undefined) stats[j]++; });
+          return `<table class="fmt" style="width:60%;margin:8px auto;">
+            <thead><tr style="background:#f0f0f0;"><th>Jenjang</th><th>Jumlah</th></tr></thead>
+            <tbody>
+              ${Object.entries(stats).filter(([_, n]) => n > 0).map(([j, n]) => `<tr><td>${j}</td><td style="text-align:center;">${n}</td></tr>`).join('') || '<tr><td colspan="2" style="text-align:center;color:#888;">Belum ada data</td></tr>'}
+              <tr style="background:#f8f9fc;font-weight:700;"><td>TOTAL</td><td style="text-align:center;">${madrasahList.length}</td></tr>
+            </tbody>
+          </table>`;
+        })()}
+
+        <h3>B. Pemetaan Mutu</h3>
+        <p style="text-align:justify;">Pemetaan mutu madrasah binaan dilakukan berdasarkan delapan Standar Nasional Pendidikan (SNP) dan hasil evaluasi diri madrasah (EDM) tahun sebelumnya. Aspek yang menjadi prioritas pendampingan meliputi:</p>
+        <ol style="text-align:justify;">
+          <li>Standar Isi (kurikulum dan perangkat pembelajaran)</li>
+          <li>Standar Proses (perencanaan, pelaksanaan, dan penilaian pembelajaran)</li>
+          <li>Standar Kompetensi Lulusan (capaian peserta didik)</li>
+          <li>Standar Pendidik dan Tenaga Kependidikan</li>
+          <li>Standar Sarana dan Prasarana</li>
+          <li>Standar Pengelolaan</li>
+          <li>Standar Pembiayaan</li>
+          <li>Standar Penilaian Pendidikan</li>
+        </ol>
+
+        <h3>C. Identifikasi Kebutuhan</h3>
+        <p style="text-align:justify;">Berdasarkan pemetaan mutu, identifikasi kebutuhan pendampingan tahun ${tahun} difokuskan pada:</p>
+        <ol style="text-align:justify;">
+          <li><strong>Implementasi Kurikulum Berbasis Cinta</strong> di seluruh madrasah binaan;</li>
+          <li><strong>Penguatan literasi dan numerasi</strong> sebagai prioritas nasional;</li>
+          <li><strong>Penguatan karakter</strong> melalui Profil Pelajar Pancasila Rahmatan lil 'Alamin (P3RA);</li>
+          <li><strong>Akreditasi madrasah</strong> bagi madrasah yang akan re-akreditasi;</li>
+          <li><strong>Peningkatan profesionalisme guru</strong> melalui kegiatan PKB (Pengembangan Keprofesian Berkelanjutan);</li>
+          <li><strong>Penguatan tata kelola madrasah</strong> dan kepemimpinan Kepala Madrasah;</li>
+          <li><strong>Penyusunan instrumen evaluasi kebijakan</strong> Kemenag.</li>
+        </ol>
+      </div>`;
+
+    // BAB III Program Pendampingan
+    const tw1 = allRhk.filter(r => r.triwulan === 'I');
+    const tw2 = allRhk.filter(r => r.triwulan === 'II');
+    const tw3 = allRhk.filter(r => r.triwulan === 'III');
+    const tw4 = allRhk.filter(r => r.triwulan === 'IV');
+    const twRow = (arr) => arr.map((r, idx) => `<tr><td style="text-align:center;width:40px;">${idx+1}</td><td>${U.escapeHtml(r.id)}</td><td>${U.escapeHtml(r.nama_eviden || r.rencana_hasil_kerja || '-')}</td><td style="width:120px;">${U.escapeHtml(r.target_waktu || '-')}</td></tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:#888;">Belum ada</td></tr>';
+
+    const pBab3 = `
+      <div class="doc-page">
+        <h2 style="text-align:center;">BAB III<br/>PROGRAM PENDAMPINGAN TAHUNAN</h2>
+        <h3>A. Visi & Misi Pendampingan</h3>
+        <p style="text-align:justify;"><strong>Visi:</strong> Terwujudnya madrasah binaan yang unggul, inklusif, dan berkarakter Rahmatan lil 'Alamin melalui pendampingan profesional yang sistematis dan berkelanjutan.</p>
+        <p style="text-align:justify;"><strong>Misi:</strong></p>
+        <ol style="text-align:justify;">
+          <li>Melaksanakan supervisi akademik yang berfokus pada peningkatan kualitas pembelajaran;</li>
+          <li>Melaksanakan supervisi manajerial untuk penguatan tata kelola madrasah;</li>
+          <li>Mendampingi implementasi Kurikulum Berbasis Cinta;</li>
+          <li>Memberikan bimbingan teknis berkelanjutan kepada Kepala Madrasah, guru, dan tendik;</li>
+          <li>Melakukan evaluasi dan tindak lanjut hasil pendampingan secara periodik.</li>
+        </ol>
+
+        <h3>B. Strategi Pendampingan</h3>
+        <ol style="text-align:justify;">
+          <li><strong>Pendekatan kolaboratif</strong> — melibatkan Kepala Madrasah, guru, dan komite madrasah;</li>
+          <li><strong>Pendekatan klinis</strong> — supervisi yang berfokus pada perbaikan praktik pembelajaran melalui observasi & feedback;</li>
+          <li><strong>Pendekatan reflektif</strong> — mendorong guru dan kepala madrasah melakukan refleksi diri atas praktik kerja;</li>
+          <li><strong>Pendekatan terbuka</strong> — berbasis dialog dan saling belajar (peer-coaching);</li>
+          <li><strong>Pemanfaatan teknologi</strong> — supervisi blended (luring + daring) dengan dokumentasi digital.</li>
+        </ol>
+
+        <h3>C. Matriks Program per Triwulan</h3>
+        <h4 style="margin-top:10px;">Triwulan I</h4>
+        <table class="fmt" style="width:100%;font-size:11pt;"><thead><tr style="background:#f0f0f0;"><th>No</th><th>Kode RHK</th><th>Program/Kegiatan</th><th>Durasi</th></tr></thead><tbody>${twRow(tw1)}</tbody></table>
+        <h4 style="margin-top:10px;">Triwulan II</h4>
+        <table class="fmt" style="width:100%;font-size:11pt;"><thead><tr style="background:#f0f0f0;"><th>No</th><th>Kode RHK</th><th>Program/Kegiatan</th><th>Durasi</th></tr></thead><tbody>${twRow(tw2)}</tbody></table>
+        <h4 style="margin-top:10px;">Triwulan III</h4>
+        <table class="fmt" style="width:100%;font-size:11pt;"><thead><tr style="background:#f0f0f0;"><th>No</th><th>Kode RHK</th><th>Program/Kegiatan</th><th>Durasi</th></tr></thead><tbody>${twRow(tw3)}</tbody></table>
+        <h4 style="margin-top:10px;">Triwulan IV</h4>
+        <table class="fmt" style="width:100%;font-size:11pt;"><thead><tr style="background:#f0f0f0;"><th>No</th><th>Kode RHK</th><th>Program/Kegiatan</th><th>Durasi</th></tr></thead><tbody>${twRow(tw4)}</tbody></table>
+      </div>`;
+
+    // BAB IV Jadwal & Strategi
+    const pBab4 = `
+      <div class="doc-page">
+        <h2 style="text-align:center;">BAB IV<br/>JADWAL &amp; STRATEGI PENDAMPINGAN</h2>
+        <h3>A. Jadwal Pelaksanaan</h3>
+        <p style="text-align:justify;">Jadwal pelaksanaan pendampingan disusun mengikuti kalender pendidikan madrasah dan jadwal akademik Kemenag. Secara umum, kegiatan pendampingan dilakukan dengan ritme bulanan untuk supervisi rutin dan triwulanan untuk evaluasi.</p>
+        <table class="fmt" style="width:100%;font-size:11pt;">
+          <thead><tr style="background:#f0f0f0;"><th>Bulan</th><th>Fokus Kegiatan</th><th>Output</th></tr></thead>
+          <tbody>
+            <tr><td>Januari</td><td>Penyusunan program & pemetaan madrasah</td><td>Program tahunan</td></tr>
+            <tr><td>Februari</td><td>Supervisi awal semester genap</td><td>Laporan supervisi</td></tr>
+            <tr><td>Maret</td><td>Reviu kurikulum & RPP</td><td>Catatan reviu</td></tr>
+            <tr><td>April</td><td>Monev penilaian + pendampingan PKKM</td><td>Hasil PKKM</td></tr>
+            <tr><td>Mei</td><td>Bimtek evaluasi pembelajaran</td><td>Laporan bimtek</td></tr>
+            <tr><td>Juni</td><td>Evaluasi semester genap & laporan TW II</td><td>Laporan TW II</td></tr>
+            <tr><td>Juli</td><td>Penyiapan tahun ajaran baru + pendampingan kurikulum</td><td>Dokumen perencanaan</td></tr>
+            <tr><td>Agustus</td><td>Supervisi awal semester gasal</td><td>Laporan supervisi</td></tr>
+            <tr><td>September</td><td>PKG Guru + bimtek karakter siswa</td><td>Hasil PKG</td></tr>
+            <tr><td>Oktober</td><td>Monev kurikulum & literasi-numerasi</td><td>Laporan monev</td></tr>
+            <tr><td>November</td><td>Akreditasi & evaluasi kebijakan Kemenag</td><td>Dokumen akreditasi</td></tr>
+            <tr><td>Desember</td><td>Evaluasi tahunan & laporan akhir</td><td>Laporan tahunan</td></tr>
+          </tbody>
+        </table>
+
+        <h3>B. Metode &amp; Pendekatan</h3>
+        <ol style="text-align:justify;">
+          <li><strong>Observasi langsung</strong> ke madrasah binaan;</li>
+          <li><strong>Wawancara terstruktur</strong> dengan kepala madrasah, guru, tendik, dan siswa;</li>
+          <li><strong>Studi dokumentasi</strong> perangkat pembelajaran, kurikulum, dan tata kelola;</li>
+          <li><strong>Diskusi reflektif</strong> dan focus group discussion (FGD);</li>
+          <li><strong>Bimbingan teknis</strong> melalui workshop, pelatihan, dan in-house training;</li>
+          <li><strong>Pendampingan berkelanjutan</strong> via grup koordinasi (luring & daring).</li>
+        </ol>
+
+        <h3>C. Indikator Keberhasilan</h3>
+        <ol style="text-align:justify;">
+          <li>Seluruh madrasah binaan telah disupervisi minimal 2 kali dalam setahun;</li>
+          <li>Tersusunnya 30 RHK dengan capaian eviden lengkap minimal 90%;</li>
+          <li>Meningkatnya nilai EDM/Akreditasi madrasah binaan;</li>
+          <li>Meningkatnya kompetensi guru dan kepala madrasah berdasarkan hasil PKG/PKKM;</li>
+          <li>Tersedianya laporan pendampingan triwulanan dan tahunan tepat waktu.</li>
+        </ol>
+      </div>`;
+
+    // BAB V Penutup
+    const pBab5 = `
+      <div class="doc-page">
+        <h2 style="text-align:center;">BAB V<br/>PENUTUP</h2>
+        <p style="text-align:justify;">Demikian Program Pendampingan Tahunan ini disusun sebagai pedoman pelaksanaan tugas Pengawas Madrasah pada ${U.escapeHtml(i.pegawai.unit_kerja)} Tahun ${tahun}. Dokumen ini bersifat dinamis dan dapat dilakukan penyesuaian sesuai kebutuhan dan dinamika lapangan dengan tetap mengacu pada peraturan perundang-undangan yang berlaku.</p>
+        <p style="text-align:justify;">Kelancaran pelaksanaan program ini sangat bergantung pada dukungan dan kerja sama yang baik antara Pengawas Madrasah, Kepala ${U.escapeHtml(i.pejabat_penilai.unit_kerja)}, Ketua Pokjawas, Kepala Madrasah, dewan guru, dan seluruh pemangku kepentingan pendidikan.</p>
+        <p style="text-align:justify;">Atas perhatian dan dukungan semua pihak, kami sampaikan terima kasih.</p>
+        <div style="text-align:right;margin-top:30px">${tanggalKota(i)}</div>
+        <div class="ttd">
+          <div class="ttd-block"></div>
+          <div class="ttd-block">
+            <div>${U.escapeHtml(i.pegawai.jabatan)},</div>
+            <div style="height:80px;display:grid;place-items:center;">${i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : ''}</div>
+            <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
+            <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
+          </div>
+        </div>
+      </div>`;
+
+    // Lampiran
+    const pLampiran = `
+      <div class="doc-page">
+        <h2 style="text-align:center;">LAMPIRAN</h2>
+        <h3>1. SK Pembagian Tugas Pengawas Madrasah Tahun ${tahun}</h3>
+        <p style="font-style:italic;color:#888;">[Lampirkan SK Pembagian Tugas dari Kepala ${U.escapeHtml(i.pejabat_penilai.unit_kerja)}]</p>
+
+        <h3 style="margin-top:20px;">2. Matriks Program Pendampingan</h3>
+        <table class="fmt" style="width:100%;font-size:10pt;">
+          <thead>
+            <tr style="background:#f0f0f0;">
+              <th style="width:40px;">No</th>
+              <th style="width:80px;">Kode</th>
+              <th>Program/Kegiatan</th>
+              <th style="width:60px;">TW</th>
+              <th style="width:80px;">Durasi</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${allRhk.map((r, idx) => `<tr>
+              <td style="text-align:center;">${idx+1}</td>
+              <td>${U.escapeHtml(r.id)}</td>
+              <td>${U.escapeHtml(r.nama_eviden || r.rencana_hasil_kerja || '-')}</td>
+              <td style="text-align:center;">${r.triwulan === 'TAMBAHAN' ? 'Tmb' : r.triwulan}</td>
+              <td style="text-align:center;">${U.escapeHtml(r.target_waktu || '-')}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+
+        <h3 style="margin-top:20px;">3. Surat Pengesahan Pengawas</h3>
+        <p style="font-style:italic;color:#888;">[Lampirkan Surat Pengesahan Program oleh ${U.escapeHtml(i.pejabat_penilai.jabatan)}]</p>
+      </div>`;
+
+    return pCover + pPengesahan + pKata + pDaftarIsi + pBab1 + pBab2 + pBab3 + pBab4 + pBab5 + pLampiran;
+  }
+
   // Document type catalog: id -> { label, gen }
   const TYPES = {
     laporan_singkat: { label: 'Laporan Singkat Hasil Pendampingan', gen: genLaporanSingkat },
+    program_pendampingan: { label: 'Program Pendampingan Tahunan (Program Kerja Pengawas)', gen: genProgramPendampingan },
     surat_tugas: { label: 'Surat Tugas', gen: genSuratTugas },
     undangan: { label: 'Undangan Kegiatan', gen: genUndangan },
     daftar_hadir: { label: 'Daftar Hadir', gen: genDaftarHadir },
@@ -666,6 +1014,9 @@
   };
 
   function defaultTypesFor(rhk) {
+    if (rhk && rhk.id === 'RHK-1') {
+      return ['program_pendampingan','laporan_singkat','surat_tugas','undangan','daftar_hadir','notulen','berita_acara','foto','link'];
+    }
     return ['laporan_singkat','surat_tugas','undangan','daftar_hadir','notulen','berita_acara','instrumen','rekap','analisis','rekomendasi','foto','link'];
   }
 

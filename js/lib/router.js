@@ -13,8 +13,9 @@
   function current() { return location.hash.slice(1) || '/'; }
 
   async function dispatch() {
-    const path = current();
-    console.log('[Router] dispatch ->', path);
+    const fullPath = current();
+    const path = fullPath.split('?')[0]; // strip query string for pattern match
+    console.log('[Router] dispatch ->', fullPath);
     for (const r of routes) {
       const m = path.match(r.pattern);
       if (m) {
@@ -25,12 +26,12 @@
           if (!s) { navigate('/login', true); return; }
           if (r.opts.role && r.opts.role !== Auth.currentUser()?.role) { navigate('/', true); return; }
         }
-        try { await r.handler(params); } catch (e) { console.error('[Router] handler error for', path, e); UI.toast('Error: ' + e.message, 'danger'); }
+        try { await r.handler(params); } catch (e) { console.error('[Router] handler error for', fullPath, e); UI.toast('Error: ' + e.message, 'danger'); }
         return;
       }
     }
     // not found
-    console.warn('[Router] no route for', path);
+    console.warn('[Router] no route for', fullPath);
     document.getElementById('app').innerHTML = '<div class="p-4">Halaman tidak ditemukan. <a href="#/">Beranda</a></div>';
   }
 

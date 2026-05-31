@@ -37,7 +37,10 @@
     // Always reveal app, even if init had warnings
     const ld = document.getElementById('app-loading'); if (ld) ld.classList.add('d-none');
     const ap = document.getElementById('app'); if (ap) ap.classList.remove('d-none');
-    if (!location.hash) location.hash = '#/';
+    // Default landing: Dashboard (kecuali user buka deep link tertentu)
+    if (!location.hash || location.hash === '#' || location.hash === '#/') {
+      history.replaceState(null, '', '#/dashboard');
+    }
     Router.dispatch();
   }
 

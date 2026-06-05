@@ -53,6 +53,33 @@
     `;
   }
 
+  // TTD untuk Laporan Triwulan: Kiri Ketua Pokjawas, Kanan Pengawas + Kota & Tanggal (sejajar, tanpa Mengetahui)
+  function ttdTriwulan(idn) {
+    const i = idn || Page.Identitas.get();
+    const kota = i.pegawai.kabupaten || 'Jember';
+    const ketuaPokjawasNama = (i.ketua_pokjawas && i.ketua_pokjawas.nama) || 'SUBARIYANTO, S.Pd, M.Pd.I';
+    const ketuaPokjawasNIP  = (i.ketua_pokjawas && i.ketua_pokjawas.nip) || '197002122005011004';
+    const sigImg = i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : '';
+    return `
+      <div class="ttd" style="margin-top:24px;">
+        <div class="ttd-block">
+          <div>&nbsp;</div>
+          <div>Ketua Pokjawas Madrasah,</div>
+          <div style="height:80px;"></div>
+          <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(ketuaPokjawasNama)}</div>
+          <div>NIP. ${U.escapeHtml(ketuaPokjawasNIP)}</div>
+        </div>
+        <div class="ttd-block">
+          <div>${U.escapeHtml(kota)}, ${U.fmtTanggal(new Date())}</div>
+          <div>Pengawas Madrasah,</div>
+          <div style="height:80px;display:grid;place-items:center;">${sigImg}</div>
+          <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
+          <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
+        </div>
+      </div>
+    `;
+  }
+
   // TTD versi sederhana (cuma pengawas, untuk dokumen yang tidak butuh pengesahan kepala)
   function ttdPengawas(idn) {
     const i = idn || Page.Identitas.get();
@@ -1050,5 +1077,5 @@
                .replace(/\n{3,}/g, '\n\n').trim();
   }
 
-  window.GenHTML = { TYPES, defaultTypesFor, htmlToPlain, header, varsFor, getNarasi, tanggalKota, ttdBlokStandar, ttdBlokPenutup, ttdPengawas };
+  window.GenHTML = { TYPES, defaultTypesFor, htmlToPlain, header, varsFor, getNarasi, tanggalKota, ttdBlokStandar, ttdBlokPenutup, ttdPengawas, ttdTriwulan };
 })();

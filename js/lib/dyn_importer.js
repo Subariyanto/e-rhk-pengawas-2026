@@ -276,7 +276,10 @@
     let body = '';
     if (doc.kind === 'excel') body = renderExcel(doc.payload);
     else if (doc.kind === 'docx') body = `<div class="card"><div class="card-body skp-doc">${doc.payload.html}</div></div>`;
-    else if (doc.kind === 'pdf') body = renderPDF(doc.payload);
+    else if (doc.kind === 'pdf' && doc.idbKey) {
+      // PDF stored in IndexedDB — render placeholder, filled async
+      body = '<div id="pdfRenderTarget"><div class="card"><div class="card-body text-center py-5"><div class="spinner-border text-primary" role="status"></div><div class="mt-2 text-muted">Memuat PDF...</div></div></div></div>';
+    } else if (doc.kind === 'pdf') body = renderPDF(doc.payload);
     else body = '<div class="alert alert-warning">Format tidak dikenali.</div>';
     return meta + body;
   }
@@ -317,7 +320,14 @@
       try {
         UI.toast('Membaca file…', 'info');
         const result = await importFile(f);
-        Store.set(storeKey, result);
+        if (result.kind === 'pdf') {
+          // PDF data too large for localStorage — store in IndexedDB
+          const idbKey = storeKey + '__pdf';
+          await IDBStore.setBlob(idbKey, result.payload);
+          Store.set(storeKey, { kind: 'pdf', fileName: result.fileName, importedAt: result.importedAt, idbKey: idbKey });
+        } else {
+          Store.set(storeKey, result);
+        }
         Store.set(storeKey + '__editing', false);
         UI.toast('Import berhasil.', 'success');
         onRefresh();
@@ -326,6 +336,18 @@
         UI.toast('Gagal import: ' + (e?.message || e), 'danger');
       }
     });
+    if (doc && doc.kind === 'pdf' && doc.idbKey) {
+      // Load PDF payload from IndexedDB and render
+      (async () => {
+        try {
+          const payload = await IDBStore.getBlob(doc.idbKey);
+          if (payload) {
+            const container = document.getElementById('pdfRenderTarget');
+            if (container) container.innerHTML = renderPDF(payload);
+          }
+        } catch (e) { console.error('IDB load error:', e); }
+      })();
+    }
     if (doc) {
       const btnEdit = document.getElementById('btnEdit');
       if (btnEdit) btnEdit.addEventListener('click', () => {
@@ -367,6 +389,11 @@
       const btnClear = document.getElementById('btnClear');
       if (btnClear) btnClear.addEventListener('click', async () => {
         if (await UI.confirmDialog('Hapus dokumen yang sudah diimport?')) {
+          // Clean up IndexedDB if PDF
+          const cur = Store.get(storeKey, null);
+          if (cur && cur.idbKey) {
+            try { await IDBStore.removeBlob(cur.idbKey); } catch(e) {}
+          }
           Store.set(storeKey, null);
           Store.set(storeKey + '__editing', false);
           onRefresh();

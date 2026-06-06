@@ -19,7 +19,7 @@
         <a class="btn btn-success ms-auto" href="#/kegiatan/baru"><i class="bi bi-plus-circle"></i> Tambah Kegiatan</a>
       </div>
       <div class="card"><div class="table-responsive"><table class="table table-hover table-sm mb-0 align-middle">
-        <thead><tr><th>Tanggal</th><th>RHK</th><th>Nama Kegiatan</th><th>Tempat</th><th>Sasaran</th><th>Status</th><th></th></tr></thead>
+        <thead><tr><th>Tanggal</th><th>RHK</th><th>Nama Kegiatan</th><th>Tempat</th><th>Status</th><th></th></tr></thead>
         <tbody id="tbody"></tbody>
       </table></div></div>
     `);
@@ -45,7 +45,6 @@
           <td><strong>${U.escapeHtml(k.rhk_id || '')}</strong><div class="small text-muted text-truncate" style="max-width:240px">${U.escapeHtml(r ? r.nama_eviden : '')}</div></td>
           <td><a href="#/kegiatan/${encodeURIComponent(k.id)}">${U.escapeHtml(k.nama_kegiatan)}</a></td>
           <td>${U.escapeHtml(k.tempat || '')}</td>
-          <td class="small">${U.escapeHtml((k.sasaran || '').slice(0, 60))}</td>
           <td><span class="badge ${k.status === 'final' ? 'bg-success' : 'bg-warning text-dark'}">${k.status}</span></td>
           <td class="text-end">
             <a class="btn btn-sm btn-outline-success" href="#/kegiatan/${encodeURIComponent(k.id)}" title="Edit"><i class="bi bi-pencil"></i></a>
@@ -53,7 +52,7 @@
             <button class="btn btn-sm btn-outline-danger" data-del="${k.id}" title="Hapus"><i class="bi bi-trash"></i></button>
           </td>
         </tr>`;
-      }).join('') || `<tr><td colspan="7" class="text-center text-muted p-5">
+      }).join('') || `<tr><td colspan="6" class="text-center text-muted p-5">
           <div style="font-size:48px;opacity:.3">📝</div>
           <div class="mt-2"><strong>Belum ada kegiatan.</strong></div>
           <div class="mb-3 small">Tambah kegiatan untuk mulai membuat eviden RHK.</div>
@@ -136,8 +135,6 @@
                 ${madrasah.map(m => `<option value="${m.id}" ${k.madrasah_id === m.id ? 'selected' : ''}>${U.escapeHtml(m.nama_madrasah)} (${m.jenjang})</option>`).join('')}
               </select>
             </div>
-            <div class="col-md-6"><label class="form-label">Sasaran</label><textarea class="form-control" rows="2" name="sasaran">${U.escapeHtml(k.sasaran || '')}</textarea></div>
-            <div class="col-md-6"><label class="form-label">Peserta</label><textarea class="form-control" rows="2" name="peserta">${U.escapeHtml(k.peserta || '')}</textarea></div>
             <div class="col-md-12"><label class="form-label">Narasumber/Pengawas</label><input class="form-control" name="narasumber" value="${U.escapeHtml(k.narasumber || '')}" /></div>
           </div>
         </div>
@@ -345,6 +342,23 @@
         });
       });
       modalEl.addEventListener('hidden.bs.modal', () => modalEl.remove(), { once: true });
+    }
+
+    // Auto-fill Nama Kegiatan dari RHK yang dipilih
+    const selRhk = document.querySelector('select[name="rhk_id"]');
+    const inputNama = document.querySelector('input[name="nama_kegiatan"]');
+    if (selRhk && inputNama) {
+      selRhk.addEventListener('change', () => {
+        const rhk = masterRhk.find(r => r.id === selRhk.value);
+        if (rhk && (!inputNama.value || !inputNama.value.trim())) {
+          inputNama.value = rhk.nama_eviden || '';
+        }
+      });
+      // Jika baru dan belum ada nama, isi otomatis dari preRhk
+      if (isNew && !k.nama_kegiatan && k.rhk_id) {
+        const rhk = masterRhk.find(r => r.id === k.rhk_id);
+        if (rhk) inputNama.value = rhk.nama_eviden || '';
+      }
     }
 
     const btnGenAll = document.getElementById('btnGenAll');

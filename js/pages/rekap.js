@@ -7,7 +7,15 @@
     const madrasah = Store.get('madrasah', []) || [];
 
     UI.shell('Rekapitulasi', `
-      <div class="d-flex gap-2 mb-3">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <select id="ftwRekap" class="form-select" style="max-width:200px;">
+          <option value="">Semua Triwulan</option>
+          <option value="I">Triwulan I</option>
+          <option value="II">Triwulan II</option>
+          <option value="III">Triwulan III</option>
+          <option value="IV">Triwulan IV</option>
+          <option value="TAMBAHAN">Kinerja Tambahan</option>
+        </select>
         <button class="btn btn-success" id="btnExp"><i class="bi bi-file-earmark-spreadsheet"></i> Export Excel</button>
         <button class="btn btn-outline-success" id="btnPdf"><i class="bi bi-file-earmark-pdf"></i> Cetak / PDF</button>
       </div>
@@ -22,7 +30,7 @@
                 const evs = eviden.filter(e => e.rhk_id === r.id);
                 const final = evs.filter(e => e.status === 'final').length;
                 const draft = evs.filter(e => e.status === 'draft').length;
-                return `<tr>
+                return `<tr class="rekap-rhk-row" data-tw="${r.triwulan}">
                   <td><strong>${r.id}</strong></td>
                   <td>${r.triwulan === 'TAMBAHAN' ? 'Tambahan' : 'TW ' + r.triwulan}</td>
                   <td>${U.escapeHtml(r.nama_eviden)}</td>
@@ -90,6 +98,12 @@
 
     document.getElementById('btnPdf').addEventListener('click', () => window.print());
     document.getElementById('btnExp').addEventListener('click', exportExcel);
+    document.getElementById('ftwRekap').addEventListener('change', function() {
+      const tw = this.value;
+      document.querySelectorAll('.rekap-rhk-row').forEach(row => {
+        row.style.display = (!tw || row.dataset.tw === tw) ? '' : 'none';
+      });
+    });
 
     async function exportExcel() {
       const wb = new ExcelJS.Workbook();

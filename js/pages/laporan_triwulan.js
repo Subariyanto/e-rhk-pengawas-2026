@@ -94,6 +94,10 @@
       <div class="d-flex flex-wrap gap-2 mb-3 no-print">
         <a class="btn btn-outline-secondary" href="#/laporan-triwulan"><i class="bi bi-arrow-left"></i> Pilih Triwulan</a>
         <button class="btn btn-success" id="btnPrint"><i class="bi bi-printer"></i> Cetak</button>
+        <div class="btn-group" role="group">
+          <button class="btn btn-outline-secondary active" id="btnPortrait"><i class="bi bi-file-earmark"></i> Portrait</button>
+          <button class="btn btn-outline-secondary" id="btnLandscape"><i class="bi bi-file-earmark-richtext"></i> Landscape</button>
+        </div>
         <div class="dropdown">
           <button class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown">
             <i class="bi bi-download"></i> Download
@@ -114,6 +118,16 @@
     `);
 
     document.getElementById('btnPrint').addEventListener('click', () => window.print());
+    document.getElementById('btnPortrait').addEventListener('click', () => {
+      document.body.classList.remove('print-landscape');
+      document.getElementById('btnPortrait').classList.add('active');
+      document.getElementById('btnLandscape').classList.remove('active');
+    });
+    document.getElementById('btnLandscape').addEventListener('click', () => {
+      document.body.classList.add('print-landscape');
+      document.getElementById('btnLandscape').classList.add('active');
+      document.getElementById('btnPortrait').classList.remove('active');
+    });
     document.getElementById('btnDocx').addEventListener('click', async (e) => {
       e.preventDefault();
       UI.toast('Membuat Word… mohon tunggu.');

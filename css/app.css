@@ -445,14 +445,15 @@ a:hover { color: var(--primary-dark); }
   }
   .doc-cover { padding: 0; }
   /* Browser yang handle margin halaman supaya tidak terpotong di break */
-  @page { size: A4; margin: 1in 1in 1in 1.2in; }
+  @page { size: A4 portrait; margin: 0.8in; }
+  body.print-landscape @page { size: A4 landscape; margin: 0.8in; }
 }
 
 /* ===== Document preview ===== */
 .doc-page {
   background: #fff;
-  /* Margin standar: Top 1", Right 1", Bottom 1", Left 1.2" */
-  padding: 1in 1in 1in 1.2in;
+  /* Margin standar: 0.8" semua sisi */
+  padding: 0.8in;
   max-width: 210mm;
   min-height: 297mm;
   margin: 16px auto;
@@ -474,8 +475,8 @@ a:hover { color: var(--primary-dark); }
 .doc-page .kop .text .l2,
 .doc-page .kop .text .l3,
 .doc-page .kop .text .l4 {
-  white-space: nowrap;
-  overflow: hidden;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 .doc-page .kop .text .l1 { font-size: 12pt; }
 .doc-page .kop .text .l2 { font-size: 12pt; font-weight: 700; }
@@ -488,7 +489,7 @@ a:hover { color: var(--primary-dark); }
 .doc-page table.fmt th, .doc-page table.fmt td { border: 1px solid #000; padding: 4px 6px; }
 
 /* Cover khusus: tanpa kop, padding sama */
-.doc-cover { padding: 1in 1in 1in 1.2in; }
+.doc-cover { padding: 0.8in; }
 
 .cover-title { text-align: center; margin: 40px 0 8px; font-size: 12pt; font-weight: 700; }
 .cover-sub { text-align: center; font-size: 12pt; margin-bottom: 80px; }

@@ -10,10 +10,20 @@
       <div class="alert alert-light border">
         <i class="bi bi-info-circle text-success"></i> Pilih RHK dari daftar di bawah untuk membuat eviden otomatis. Anda dapat mengaitkan kegiatan yang sudah ada atau membuat eviden tanpa kegiatan (template kosong).
       </div>
-      <div class="row g-3">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <select id="ftwEviden" class="form-select" style="max-width:200px;">
+          <option value="">Semua Triwulan</option>
+          <option value="I">Triwulan I</option>
+          <option value="II">Triwulan II</option>
+          <option value="III">Triwulan III</option>
+          <option value="IV">Triwulan IV</option>
+          <option value="TAMBAHAN">Kinerja Tambahan</option>
+        </select>
+      </div>
+      <div class="row g-3" id="evidenGrid">
         ${masterRhk.map(r => {
           const cnt = (evidenByRHK[r.id] || []).length;
-          return `<div class="col-md-6 col-lg-4">
+          return `<div class="col-md-6 col-lg-4 eviden-card" data-tw="${r.triwulan}">
             <div class="card h-100">
               <div class="card-body">
                 <div class="d-flex justify-content-between align-items-start mb-2">
@@ -32,6 +42,13 @@
         }).join('')}
       </div>
     `);
+
+    document.getElementById('ftwEviden').addEventListener('change', function() {
+      const tw = this.value;
+      document.querySelectorAll('.eviden-card').forEach(card => {
+        card.style.display = (!tw || card.dataset.tw === tw) ? '' : 'none';
+      });
+    });
   };
 
   Page.EvidenForRHK = function (rhkId) {

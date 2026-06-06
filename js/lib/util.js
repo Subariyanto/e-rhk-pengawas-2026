@@ -99,3 +99,50 @@
 
   window.U = { $, $$, el, escapeHtml, nl2br, fmtTanggal, fmtTanggalISO, readFileAsDataURL, readFileAsArrayBuffer, compressImage, debounce, downloadBlob, fillTemplate, sanitizeFilename };
 })();
+
+// Global Print Dialog (orientasi + skala)
+function showPrintDialog() {
+  const html = `
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label">Orientasi</label>
+        <select class="form-select" id="printOrientation">
+          <option value="portrait">Portrait</option>
+          <option value="landscape">Landscape</option>
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Skala / Zoom</label>
+        <select class="form-select" id="printScale">
+          <option value="100">100%</option>
+          <option value="90">90%</option>
+          <option value="80">80%</option>
+          <option value="75">75%</option>
+          <option value="70">70%</option>
+          <option value="60">60%</option>
+          <option value="50">50%</option>
+        </select>
+      </div>
+    </div>
+    <div class="mt-3 text-muted small">
+      <i class="bi bi-info-circle"></i> Tips: set Margin = None di print dialog browser supaya tidak double margin.
+    </div>
+    <div class="mt-3 text-end">
+      <button class="btn btn-outline-secondary" id="printCancel">Batal</button>
+      <button class="btn btn-success ms-2" id="printGo"><i class="bi bi-printer"></i> Cetak Sekarang</button>
+    </div>
+  `;
+  UI.showModal('Pengaturan Cetak', html, { size: 'sm', onMount: (body, close) => {
+    body.querySelector('#printCancel').addEventListener('click', close);
+    body.querySelector('#printGo').addEventListener('click', () => {
+      const orientation = body.querySelector('#printOrientation').value;
+      const scale = parseInt(body.querySelector('#printScale').value);
+      // Set orientation
+      document.body.classList.toggle('print-landscape', orientation === 'landscape');
+      // Set scale via CSS variable
+      document.documentElement.style.setProperty('--print-scale', (scale / 100).toString());
+      close();
+      setTimeout(() => window.print(), 150);
+    });
+  }});
+}

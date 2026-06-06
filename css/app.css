@@ -442,6 +442,8 @@ a:hover { color: var(--primary-dark); }
     box-shadow: none;
     max-width: none;
     min-height: 0;
+    transform: scale(var(--print-scale, 1));
+    transform-origin: top left;
   }
   .doc-cover { padding: 0.8in; }
   /* @page margin set ke 0 supaya padding .doc-page yang kontrol jarak */

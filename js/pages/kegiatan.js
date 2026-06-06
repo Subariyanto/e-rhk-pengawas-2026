@@ -132,6 +132,7 @@
             <div class="col-md-12"><label class="form-label">Madrasah Sasaran</label>
               <select class="form-select" name="madrasah_id">
                 <option value="">(opsional — pilih madrasah binaan)</option>
+                <option value="semua" ${k.madrasah_id === 'semua' ? 'selected' : ''}>Semua Madrasah</option>
                 ${madrasah.map(m => `<option value="${m.id}" ${k.madrasah_id === m.id ? 'selected' : ''}>${U.escapeHtml(m.nama_madrasah)} (${m.jenjang})</option>`).join('')}
               </select>
             </div>

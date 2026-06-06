@@ -28,15 +28,16 @@
     const ketuaPokjawasNIP  = (i.ketua_pokjawas && i.ketua_pokjawas.nip) || '197002122005011004';
     const sigImg = i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : '';
     return `
-      <div style="text-align:center;margin-top:24px;">${U.escapeHtml(kota)}, ${U.fmtTanggal(new Date())}</div>
-      <div class="ttd" style="margin-top:4px;">
+      <div class="ttd" style="margin-top:24px;">
         <div class="ttd-block">
+          <div>&nbsp;</div>
           <div>Ketua Pokjawas Madrasah,</div>
           <div style="height:80px;"></div>
           <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(ketuaPokjawasNama)}</div>
           <div>NIP. ${U.escapeHtml(ketuaPokjawasNIP)}</div>
         </div>
         <div class="ttd-block">
+          <div>${U.escapeHtml(kota)}, ${U.fmtTanggal(new Date())}</div>
           <div>Pengawas Madrasah,</div>
           <div style="height:80px;display:grid;place-items:center;">${sigImg}</div>
           <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
@@ -61,8 +62,7 @@
     const ketuaPokjawasNIP  = (i.ketua_pokjawas && i.ketua_pokjawas.nip) || '197002122005011004';
     const sigImg = i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : '';
     return `
-      <div style="text-align:center;margin-top:24px;">${U.escapeHtml(kota)}, ${U.fmtTanggal(new Date())}</div>
-      <div class="ttd" style="margin-top:4px;">
+      <div class="ttd" style="margin-top:24px;">
         <div class="ttd-block">
           <div>&nbsp;</div>
           <div>Ketua Pokjawas Madrasah,</div>
@@ -71,7 +71,7 @@
           <div>NIP. ${U.escapeHtml(ketuaPokjawasNIP)}</div>
         </div>
         <div class="ttd-block">
-          <div>&nbsp;</div>
+          <div>${U.escapeHtml(kota)}, ${U.fmtTanggal(new Date())}</div>
           <div>Pengawas Madrasah,</div>
           <div style="height:80px;display:grid;place-items:center;">${sigImg}</div>
           <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
@@ -87,9 +87,9 @@
     const kota = i.pegawai.kabupaten || 'Jember';
     const sigImg = i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : '';
     return `
-      <div style="text-align:center;margin-top:30px;">${U.escapeHtml(kota)}, ${U.fmtTanggal(new Date())}</div>
-      <div style="display:flex;justify-content:flex-end;margin-top:4px;">
+      <div style="display:flex;justify-content:flex-end;margin-top:30px;">
         <div style="width:50%;text-align:center;padding-right:6%;">
+          <div>${U.escapeHtml(kota)}, ${U.fmtTanggal(new Date())}</div>
           <div>Pengawas Madrasah,</div>
           <div style="height:80px;display:grid;place-items:center;">${sigImg}</div>
           <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
@@ -105,9 +105,9 @@
     const kota = i.pegawai.kabupaten || 'Jember';
     const sigImg = i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : '';
     return `
-      <div style="text-align:center;margin-top:30px;">${U.escapeHtml(kota)}, ${U.fmtTanggal(new Date())}</div>
-      <div style="display:flex;justify-content:flex-end;margin-top:4px;">
+      <div style="display:flex;justify-content:flex-end;margin-top:30px;">
         <div style="width:50%;text-align:center;padding-right:6%;">
+          <div>${U.escapeHtml(kota)}, ${U.fmtTanggal(new Date())}</div>
           <div>Pengawas Madrasah,</div>
           <div style="height:80px;display:grid;place-items:center;">${sigImg}</div>
           <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
@@ -408,9 +408,9 @@
         <h4>${(kendala || solusi) ? 'F' : 'E'}. Rekomendasi</h4>
         <p style="text-align:justify;">${U.nl2br(ringkasRekom)}</p>
 
-        <p style="text-align:center;margin-top:24px;">${tanggalKota(i)}</p>
-        <div style="display:flex;justify-content:flex-end;margin-top:8px;">
+        <div style="display:flex;justify-content:flex-end;margin-top:24px;">
           <div style="width:50%;text-align:center;padding-right:6%;">
+            <div>${tanggalKota(i)}</div>
             <div>Pengawas Madrasah,</div>
             <div style="height:80px;display:grid;place-items:center;">${i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : ''}</div>
             <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
@@ -445,9 +445,9 @@
         <p>Setelah melaksanakan tugas, yang bersangkutan diharapkan menyampaikan laporan tertulis kepada pimpinan.</p>
         <p>Demikian surat tugas ini diberikan untuk dilaksanakan sebagaimana mestinya.</p>
 
-        <div style="text-align:center;margin-top:30px">${tanggalKota(i)}</div>
-        <div style="display:flex;justify-content:flex-end;margin-top:8px;">
+        <div style="display:flex;justify-content:flex-end;margin-top:30px;">
           <div style="width:50%;text-align:center;padding-right:6%;">
+            <div>${tanggalKota(i)}</div>
             <div>${U.escapeHtml(i.pejabat_penilai.jabatan)},</div>
             <div style="height:80px"></div>
             <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pejabat_penilai.nama)}</div>

@@ -492,17 +492,24 @@
 
   function genDaftarHadir(rhk, keg, idn) {
     const i = idn || Page.Identitas.get();
-    // Build rows from GTK data if available
+    // Build rows from GTK data or Kepala Madrasah
     let gtkRows = [];
     const allMadrasah = Store.get('madrasah', []) || [];
-    if (keg && keg.madrasah_id) {
-      // Specific madrasah
+    if (keg && keg.madrasah_id === 'semua') {
+      // Semua Madrasah — isi dengan Kepala Madrasah
+      allMadrasah.forEach(mad => {
+        if (mad.kepala_madrasah) {
+          gtkRows.push({ nama: mad.kepala_madrasah, nip_nuptk: mad.nip_kepala || '', asal: mad.nama_madrasah, jabatan: 'Kepala Madrasah' });
+        }
+      });
+    } else if (keg && keg.madrasah_id) {
+      // Specific madrasah — isi dengan GTK
       const mad = allMadrasah.find(x => x.id === keg.madrasah_id);
       if (mad && mad.gtk && mad.gtk.length) {
         gtkRows = mad.gtk.map(g => ({ nama: g.nama, nip_nuptk: g.nip_nuptk || '', asal: mad.nama_madrasah, jabatan: g.jabatan || '' }));
       }
     } else if (keg && keg.rhk_id) {
-      // All madrasah binaan
+      // Fallback: semua GTK dari semua madrasah
       allMadrasah.forEach(mad => {
         if (mad.gtk && mad.gtk.length) {
           mad.gtk.forEach(g => {

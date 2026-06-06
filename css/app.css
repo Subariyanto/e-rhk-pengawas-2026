@@ -437,16 +437,16 @@ a:hover { color: var(--primary-dark); }
   body { background: #fff; }
   .doc-page {
     page-break-after: always;
-    padding: 0;
+    padding: 0.8in;
     margin: 0;
     box-shadow: none;
     max-width: none;
     min-height: 0;
   }
-  .doc-cover { padding: 0; }
-  /* Browser yang handle margin halaman supaya tidak terpotong di break */
-  @page { size: A4 portrait; margin: 0.8in; }
-  body.print-landscape @page { size: A4 landscape; margin: 0.8in; }
+  .doc-cover { padding: 0.8in; }
+  /* @page margin set ke 0 supaya padding .doc-page yang kontrol jarak */
+  @page { size: A4 portrait; margin: 0; }
+  body.print-landscape @page { size: A4 landscape; margin: 0; }
 }
 
 /* ===== Document preview ===== */

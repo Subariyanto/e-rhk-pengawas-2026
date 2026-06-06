@@ -495,7 +495,30 @@
 
   function genDaftarHadir(rhk, keg, idn) {
     const i = idn || Page.Identitas.get();
-    const rows = Array.from({ length: 15 }).map((_, k) => `<tr><td>${k+1}</td><td></td><td></td><td></td><td></td><td></td></tr>`).join('');
+    // Build rows from GTK data if available
+    let gtkRows = [];
+    const allMadrasah = Store.get('madrasah', []) || [];
+    if (keg && keg.madrasah_id) {
+      // Specific madrasah
+      const mad = allMadrasah.find(x => x.id === keg.madrasah_id);
+      if (mad && mad.gtk && mad.gtk.length) {
+        gtkRows = mad.gtk.map(g => ({ nama: g.nama, nip_nuptk: g.nip_nuptk || '', asal: mad.nama_madrasah, jabatan: g.jabatan || '' }));
+      }
+    } else if (keg && keg.rhk_id) {
+      // All madrasah binaan
+      allMadrasah.forEach(mad => {
+        if (mad.gtk && mad.gtk.length) {
+          mad.gtk.forEach(g => {
+            gtkRows.push({ nama: g.nama, nip_nuptk: g.nip_nuptk || '', asal: mad.nama_madrasah, jabatan: g.jabatan || '' });
+          });
+        }
+      });
+    }
+    // Generate table rows: GTK data + 5 empty rows
+    const emptyCount = gtkRows.length > 0 ? 5 : 15;
+    const dataRowsHtml = gtkRows.map((g, idx) => `<tr><td>${idx+1}</td><td>${U.escapeHtml(g.nama)}</td><td>${U.escapeHtml(g.nip_nuptk)}</td><td>${U.escapeHtml(g.asal)}</td><td>${U.escapeHtml(g.jabatan)}</td><td></td></tr>`).join('');
+    const emptyRowsHtml = Array.from({ length: emptyCount }).map((_, k) => `<tr><td>${gtkRows.length + k + 1}</td><td></td><td></td><td></td><td></td><td></td></tr>`).join('');
+    const rows = dataRowsHtml + emptyRowsHtml;
     return `
       <div class="doc-page">
         ${header(i)}

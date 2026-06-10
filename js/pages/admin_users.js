@@ -5,10 +5,11 @@
     UI.shell('Kelola User', `
       <div class="alert alert-light border mb-3"><i class="bi bi-shield-check text-success"></i> Daftar pengawas terdaftar dan administrator. Pengawas dapat dinonaktifkan namun datanya tidak dapat dilihat oleh admin (terisolasi per akun).</div>
       <div class="card"><div class="table-responsive"><table class="table table-sm table-hover mb-0 align-middle">
-        <thead><tr><th>Nama</th><th>Email</th><th>Role</th><th>Status</th><th>Dibuat</th><th></th></tr></thead>
+        <thead><tr><th>Nama</th><th>NIP</th><th>Email</th><th>Role</th><th>Status</th><th>Dibuat</th><th></th></tr></thead>
         <tbody>
           ${users.map(u => `<tr>
             <td>${U.escapeHtml(u.nama)}</td>
+            <td style="font-family:'Courier New',monospace;font-size:.85em;">${U.escapeHtml(u.nip || '-')}</td>
             <td>${U.escapeHtml(u.email)}</td>
             <td><span class="badge ${u.role === 'admin' ? 'bg-success' : 'bg-secondary'}">${u.role}</span></td>
             <td><span class="badge ${u.status === 'aktif' ? 'bg-success' : 'bg-warning text-dark'}">${u.status}</span></td>

@@ -1,4 +1,4 @@
-// Kode Aktivasi: deterministik per-email lewat SHA-256(secret + ':' + email)
+// Kode Aktivasi: deterministik per-NIP lewat SHA-256(secret + ':nip:' + nip)
 // Admin generate kode → share ke pengawas → pengawas pakai untuk register.
 // Tanpa kode valid, register ditolak.
 (function () {
@@ -23,22 +23,23 @@
     return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
   }
 
-  function normEmail(e) { return String(e || '').toLowerCase().trim(); }
+  function normNip(n) { return String(n || '').replace(/[^0-9]/g, ''); }
   function normCode(c) { return String(c || '').toUpperCase().replace(/[\s-]+/g, ''); }
 
-  async function generate(email) {
-    const e = normEmail(email);
-    if (!e) return '';
-    const h = await sha256hex(getSecret() + ':' + e);
+  // Generate kode aktivasi 8 hex char (XXXX-XXXX) dari NIP
+  async function generate(nip) {
+    const n = normNip(nip);
+    if (!n) return '';
+    const h = await sha256hex(getSecret() + ':nip:' + n);
     const code = h.slice(0, 8).toUpperCase();
-    // Format XXXX-XXXX biar gampang dibaca/diketik
     return code.slice(0, 4) + '-' + code.slice(4);
   }
 
-  async function verify(email, code) {
-    const expect = await generate(email);
+  async function verify(nip, code) {
+    const expect = await generate(nip);
+    if (!expect) return false;
     return normCode(code) === normCode(expect);
   }
 
-  window.KodeAktivasi = { getSecret, setSecret, isDefault, generate, verify };
+  window.KodeAktivasi = { getSecret, setSecret, isDefault, generate, verify, normNip };
 })();

@@ -31,15 +31,19 @@
     }
   }
 
-  async function register({ nama, email, password }) {
+  async function register({ nama, email, password, nip }) {
     const users = listUsers();
     if (users.find(u => u.email.toLowerCase() === String(email).toLowerCase())) {
       throw new Error('Email sudah terdaftar.');
+    }
+    if (nip && users.find(u => u.nip === nip)) {
+      throw new Error('NIP sudah terdaftar.');
     }
     const u = {
       id: Store.uid('u_'),
       nama,
       email,
+      nip: nip || '',
       password: await hashPassword(password),
       role: 'pengawas',
       status: 'aktif',

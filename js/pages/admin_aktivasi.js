@@ -184,7 +184,13 @@
           telp = String(telp || '').trim();
           out.push({ nama, nip, wilayah, telp, kode: await KodeAktivasi.generate(nip) });
         }
-        if (out.length) return out;
+        if (!out.length) return [];
+        // Simpan ke registry biar register page bisa lookup nama dari NIP
+        try {
+          const stat = window.PengawasRegistry?.upsertMany(out);
+          if (stat) console.log('[registry] added', stat.added, 'updated', stat.updated, 'total', stat.total);
+        } catch (e) { console.warn('registry upsert:', e); }
+        return out;
       }
       return [];
     }

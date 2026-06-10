@@ -1,4 +1,4 @@
-// Login page
+// Login page — terima NIP atau email
 (function () {
   Page.Login = function () {
     UI.bareShell(`
@@ -11,8 +11,9 @@
           </div>
           <form id="frmLogin">
             <div class="mb-3">
-              <label class="form-label">Email</label>
-              <input class="form-control" type="email" name="email" required autofocus />
+              <label class="form-label">NIP atau Email</label>
+              <input class="form-control" name="email" required autofocus placeholder="18 digit NIP atau email" />
+              <div class="form-text">Pengawas: masukkan NIP. Admin: <code>admin@local</code>.</div>
             </div>
             <div class="mb-3">
               <label class="form-label">Password</label>
@@ -35,7 +36,6 @@
       const fd = new FormData(e.target);
       try {
         await Auth.login({ email: fd.get('email'), password: fd.get('password') });
-        // Eksplisit ke dashboard, replaceState supaya tidak menumpuk history
         history.replaceState(null, '', '#/dashboard');
         Router.dispatch();
       } catch (err) {

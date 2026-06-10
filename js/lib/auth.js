@@ -33,7 +33,7 @@
 
   async function register({ nama, email, password, nip }) {
     const users = listUsers();
-    if (users.find(u => u.email.toLowerCase() === String(email).toLowerCase())) {
+    if (email && users.find(u => u.email.toLowerCase() === String(email).toLowerCase())) {
       throw new Error('Email sudah terdaftar.');
     }
     if (nip && users.find(u => u.nip === nip)) {
@@ -41,8 +41,8 @@
     }
     const u = {
       id: Store.uid('u_'),
-      nama,
-      email,
+      nama: nama || '',
+      email: email || (nip ? nip + '@pengawas.local' : ''),
       nip: nip || '',
       password: await hashPassword(password),
       role: 'pengawas',
@@ -54,11 +54,26 @@
     return u;
   }
 
-  async function login({ email, password }) {
+  async function login({ email, password, nip }) {
     const users = listUsers();
     const hash = await hashPassword(password);
-    const u = users.find(x => x.email.toLowerCase() === String(email).toLowerCase() && x.password === hash);
-    if (!u) throw new Error('Email atau password salah.');
+    let u = null;
+    if (nip) {
+      const n = String(nip).replace(/[^0-9]/g, '');
+      u = users.find(x => x.nip === n && x.password === hash);
+    }
+    if (!u && email) {
+      // Login via email atau via NIP yang dimasukkan di field email
+      const v = String(email).trim();
+      const vDigits = v.replace(/[^0-9]/g, '');
+      u = users.find(x =>
+        x.password === hash && (
+          x.email.toLowerCase() === v.toLowerCase() ||
+          (vDigits && x.nip === vDigits)
+        )
+      );
+    }
+    if (!u) throw new Error('Email/NIP atau password salah.');
     if (u.status !== 'aktif') throw new Error('Akun tidak aktif.');
     localStorage.setItem(SESSION_KEY, JSON.stringify({ userId: u.id, role: u.role, ts: Date.now() }));
     return u;

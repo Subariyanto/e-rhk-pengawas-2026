@@ -1,4 +1,6 @@
-// Register page
+// Register page — cukup NIP + Kode Aktivasi + Password + Konfirmasi Password.
+// Nama auto-lookup dari Pengawas Registry (yang di-import admin via Import Excel).
+// Email auto-generate dari NIP (NIP@pengawas.local) — login pakai NIP juga.
 (function () {
   Page.Register = function () {
     UI.bareShell(`
@@ -10,27 +12,18 @@
             <div class="small text-muted">Pendaftaran memerlukan <strong>kode aktivasi</strong> dari admin.</div>
           </div>
           <div class="alert alert-warning small py-2">
-            <i class="bi bi-info-circle"></i> Belum punya kode aktivasi? Silakan hubungi <strong>Subariyanto, S.Pd, M.Pd.I.</strong> (Ketua Pokjawas Madrasah Kab. Jember) untuk meminta kode sesuai NIP Anda.
+            <i class="bi bi-info-circle"></i> Belum punya kode aktivasi? Hubungi <strong>Subariyanto, S.Pd, M.Pd.I.</strong> (Ketua Pokjawas Madrasah Kab. Jember) untuk meminta kode sesuai NIP Anda.
           </div>
           <form id="frmReg">
             <div class="mb-3">
-              <label class="form-label">Nama Lengkap (sesuai SK)</label>
-              <input class="form-control" name="nama" required />
-            </div>
-            <div class="mb-3">
               <label class="form-label">NIP (18 digit)</label>
-              <input class="form-control" name="nip" required inputmode="numeric" maxlength="18" placeholder="18 digit NIP" style="font-family:'Courier New',monospace;" />
-              <div class="form-text">Wajib sesuai NIP yang didaftarkan ke admin.</div>
+              <input class="form-control" name="nip" required inputmode="numeric" maxlength="18" placeholder="18 digit NIP" autofocus style="font-family:'Courier New',monospace;letter-spacing:.05em;" />
+              <div id="nipInfo" class="form-text"></div>
             </div>
             <div class="mb-3">
               <label class="form-label">Kode Aktivasi</label>
               <input class="form-control" name="kode" required placeholder="XXXX-XXXX" style="font-family:'Courier New',monospace;letter-spacing:.1em;text-transform:uppercase;" />
-              <div class="form-text">Kode unik dari admin sesuai NIP di atas. Tanda strip opsional.</div>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Email (untuk login)</label>
-              <input class="form-control" type="email" name="email" required />
-              <div class="form-text">Email pribadi Anda — dipakai untuk login.</div>
+              <div class="form-text">Format <code>XXXX-XXXX</code> dari admin. Tanda strip opsional.</div>
             </div>
             <div class="mb-3">
               <label class="form-label">Password (min 6 karakter)</label>
@@ -48,14 +41,32 @@
         </div>
       </div>
     `);
+
+    // Auto-lookup nama saat NIP diketik
+    const nipInput = document.querySelector('input[name="nip"]');
+    const nipInfo = document.getElementById('nipInfo');
+    function refreshNipInfo() {
+      const nip = String(nipInput.value || '').replace(/[^0-9]/g, '');
+      if (nip.length < 15) {
+        nipInfo.innerHTML = '<span class="text-muted">Masukkan NIP 18 digit yang sudah didaftarkan ke admin.</span>';
+        return;
+      }
+      const reg = window.PengawasRegistry?.findByNip(nip);
+      if (reg && reg.nama) {
+        nipInfo.innerHTML = '<span class="text-success"><i class="bi bi-check-circle"></i> Terdaftar atas nama <strong>' + U.escapeHtml(reg.nama) + '</strong>' + (reg.wilayah ? ' &mdash; ' + U.escapeHtml(reg.wilayah) : '') + '</span>';
+      } else {
+        nipInfo.innerHTML = '<span class="text-muted">NIP tidak ditemukan di daftar pengawas. Pastikan benar atau hubungi admin.</span>';
+      }
+    }
+    nipInput.addEventListener('input', refreshNipInfo);
+    refreshNipInfo();
+
     document.getElementById('frmReg').addEventListener('submit', async (e) => {
       e.preventDefault();
       const fd = new FormData(e.target);
       const pw = fd.get('password');
-      const email = String(fd.get('email') || '').trim();
-      const nip = KodeAktivasi.normNip(fd.get('nip'));
+      const nip = String(fd.get('nip') || '').replace(/[^0-9]/g, '');
       const kode = String(fd.get('kode') || '').trim();
-      const nama = String(fd.get('nama') || '').trim();
       if (pw !== fd.get('password2')) return UI.toast('Konfirmasi password tidak cocok.', 'danger');
       if (!nip || nip.length < 15) return UI.toast('NIP tidak valid (minimal 15 digit angka).', 'danger');
       if (!kode) return UI.toast('Kode aktivasi wajib diisi.', 'danger');
@@ -64,13 +75,16 @@
         if (!ok) {
           return UI.toast('Kode aktivasi tidak cocok dengan NIP ini. Pastikan NIP & kode sesuai pemberian admin.', 'danger');
         }
-        // Cek NIP sudah pernah register?
         const existing = Auth.listUsers().find(u => u.nip === nip);
         if (existing) {
-          return UI.toast('NIP ini sudah terdaftar dengan email ' + existing.email + '. Silakan login atau hubungi admin untuk reset password.', 'danger');
+          return UI.toast('NIP ini sudah terdaftar. Silakan login atau hubungi admin untuk reset password.', 'danger');
         }
+        // Auto-lookup nama dari registry
+        const reg = window.PengawasRegistry?.findByNip(nip);
+        const nama = reg?.nama || ('Pengawas ' + nip.slice(-4));
+        const email = nip + '@pengawas.local';
         await Auth.register({ nama, email, password: pw, nip });
-        UI.toast('Pendaftaran berhasil. Silakan login.');
+        UI.toast('Pendaftaran berhasil. Silakan login dengan NIP & password Anda.');
         Router.navigate('/login', true);
         Router.dispatch();
       } catch (err) {

@@ -23,6 +23,7 @@
     Router.on('/periode', () => Page.Periode(), { requireAuth: true });
     Router.on('/backup', () => Page.Backup(), { requireAuth: true });
     Router.on('/admin/users', () => Page.AdminUsers(), { requireAuth: true, role: 'admin' });
+    Router.on('/admin/aktivasi', () => Page.AdminAktivasi(), { requireAuth: true, role: 'admin' });
   }
 
   async function boot() {

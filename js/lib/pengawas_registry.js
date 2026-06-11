@@ -36,5 +36,26 @@
 
   function clear() { save([]); }
 
-  window.PengawasRegistry = { list, save, findByNip, upsertMany, clear };
+  function removeByNip(nip) {
+    const n = String(nip || '').replace(/[^0-9]/g, '');
+    if (!n) return false;
+    const before = list();
+    const after = before.filter(p => p.nip !== n);
+    if (after.length === before.length) return false;
+    save(after);
+    return true;
+  }
+
+  function updateByNip(nip, patch) {
+    const n = String(nip || '').replace(/[^0-9]/g, '');
+    if (!n) return null;
+    const cur = list();
+    const i = cur.findIndex(p => p.nip === n);
+    if (i < 0) return null;
+    cur[i] = { ...cur[i], ...(patch || {}), nip: n };
+    save(cur);
+    return cur[i];
+  }
+
+  window.PengawasRegistry = { list, save, findByNip, upsertMany, clear, removeByNip, updateByNip };
 })();

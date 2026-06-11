@@ -221,13 +221,16 @@
     function renderRows(rows, container, prefix) {
       const showWil = rows.some(r => r.wilayah);
       const showTelp = rows.some(r => r.telp);
+      const isImport = prefix === 'import';
+      const aksiWidth = isImport ? '10rem' : '5rem';
       const tbl = `
-        <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
           <div><strong>${rows.length}</strong> kode aktivasi tergenerate.</div>
-          <div>
+          <div class="d-flex flex-wrap gap-2">
             <button class="btn btn-sm btn-outline-success" id="${prefix}_csv"><i class="bi bi-filetype-csv"></i> Export CSV</button>
             <button class="btn btn-sm btn-outline-success" id="${prefix}_xlsx"><i class="bi bi-file-earmark-excel"></i> Export Excel</button>
             <button class="btn btn-sm btn-outline-success" id="${prefix}_print"><i class="bi bi-printer"></i> Cetak</button>
+            ${isImport ? `<button class="btn btn-sm btn-outline-danger" id="${prefix}_clearAll"><i class="bi bi-trash"></i> Hapus Semua</button>` : ''}
           </div>
         </div>
         <div class="table-responsive" style="max-height:480px;">
@@ -237,7 +240,7 @@
               ${showWil ? '<th>Wilayah</th>' : ''}
               ${showTelp ? '<th style="width:9rem;">Telp/WA</th>' : ''}
               <th style="width:10rem;">Kode</th>
-              <th style="width:5rem;">Aksi</th>
+              <th style="width:${aksiWidth};">Aksi</th>
             </tr></thead>
             <tbody>${rows.map((r, i) => `<tr>
               <td>${i+1}</td>
@@ -246,14 +249,62 @@
               ${showWil ? `<td>${U.escapeHtml(r.wilayah || '')}</td>` : ''}
               ${showTelp ? `<td>${U.escapeHtml(r.telp || '')}</td>` : ''}
               <td style="font-family:'Courier New',monospace;letter-spacing:.05em;font-weight:bold;">${r.kode}</td>
-              <td>
+              <td class="text-nowrap">
                 <button class="btn btn-sm btn-outline-success" data-row="${i}" title="Salin pesan WhatsApp"><i class="bi bi-whatsapp"></i></button>
+                ${isImport ? `
+                <button class="btn btn-sm btn-outline-primary" data-edit="${i}" title="Edit data pengawas"><i class="bi bi-pencil"></i></button>
+                <button class="btn btn-sm btn-outline-danger" data-del="${i}" title="Hapus pengawas dari registry"><i class="bi bi-trash"></i></button>
+                ` : ''}
               </td>
             </tr>`).join('')}</tbody>
           </table>
         </div>
       `;
       container.innerHTML = tbl;
+
+      // Hapus Semua (import only)
+      if (isImport) {
+        const btnAll = document.getElementById(prefix + '_clearAll');
+        if (btnAll) btnAll.addEventListener('click', async () => {
+          if (!await UI.confirmDialog(`Hapus SEMUA ${rows.length} pengawas dari registry? Akun login pengawas yang sudah daftar tidak ikut dihapus.`)) return;
+          try { window.PengawasRegistry?.clear(); } catch (e) {}
+          rows.length = 0;
+          container.innerHTML = '<div class="alert alert-success mb-0"><i class="bi bi-check-circle"></i> Registry pengawas dikosongkan.</div>';
+          UI.toast('Registry pengawas dikosongkan.');
+        });
+
+        // Edit per-row
+        container.querySelectorAll('button[data-edit]').forEach(b => b.addEventListener('click', async () => {
+          const idx = Number(b.dataset.edit);
+          const r = rows[idx];
+          if (!r) return;
+          const nama = prompt('Nama:', r.nama || '');
+          if (nama == null) return;
+          const wilayah = prompt('Wilayah/KKMA:', r.wilayah || '');
+          if (wilayah == null) return;
+          const telp = prompt('Telp/WA:', r.telp || '');
+          if (telp == null) return;
+          r.nama = String(nama).trim();
+          r.wilayah = String(wilayah).trim();
+          r.telp = String(telp).trim();
+          try { window.PengawasRegistry?.updateByNip(r.nip, { nama: r.nama, wilayah: r.wilayah, telp: r.telp }); } catch (e) { console.warn(e); }
+          renderRows(rows, container, prefix);
+          UI.toast('Data ' + r.nama + ' tersimpan.');
+        }));
+
+        // Hapus per-row
+        container.querySelectorAll('button[data-del]').forEach(b => b.addEventListener('click', async () => {
+          const idx = Number(b.dataset.del);
+          const r = rows[idx];
+          if (!r) return;
+          if (!await UI.confirmDialog('Hapus pengawas ' + (r.nama || r.nip) + ' dari registry?')) return;
+          try { window.PengawasRegistry?.removeByNip(r.nip); } catch (e) { console.warn(e); }
+          rows.splice(idx, 1);
+          if (rows.length) renderRows(rows, container, prefix);
+          else container.innerHTML = '<div class="alert alert-info mb-0"><i class="bi bi-info-circle"></i> Tidak ada data pengawas tersisa.</div>';
+          UI.toast('Pengawas ' + (r.nama || r.nip) + ' dihapus.');
+        }));
+      }
 
       // CSV
       document.getElementById(prefix + '_csv').onclick = () => {

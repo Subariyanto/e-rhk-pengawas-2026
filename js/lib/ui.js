@@ -21,6 +21,7 @@
     if (role === 'admin') {
       menus.push({ href: '#/admin/users', icon: 'people', label: 'Kelola User', section: 'Admin' });
       menus.push({ href: '#/admin/aktivasi', icon: 'key', label: 'Kode Aktivasi' });
+      menus.push({ href: '#/admin/pembelian', icon: 'cash-coin', label: 'Pengaturan Pembelian' });
     }
 
     const cur = location.hash || '#/';

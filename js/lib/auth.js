@@ -24,14 +24,25 @@
         email: 'admin@local',
         password: await hashPassword('admin123'),
         role: 'admin',
+        tier: 'full',
         status: 'aktif',
         created_at: new Date().toISOString(),
       });
       saveUsers(users);
+    } else {
+      // Pastikan admin selalu tier='full' (idempotent migration)
+      const list = listUsers();
+      let changed = false;
+      list.forEach(u => {
+        if (u.role === 'admin' && u.tier !== 'full') { u.tier = 'full'; changed = true; }
+      });
+      if (changed) saveUsers(list);
     }
   }
 
-  async function register({ nama, email, password, nip }) {
+  // register({ nama, email, password, nip, tier, trialExpiresAt, activatedWith })
+  // tier default 'full' agar backward-compat dengan kode legacy per-NIP.
+  async function register({ nama, email, password, nip, tier, trialExpiresAt, activatedWith }) {
     const users = listUsers();
     if (email && users.find(u => u.email.toLowerCase() === String(email).toLowerCase())) {
       throw new Error('Email sudah terdaftar.');
@@ -46,6 +57,9 @@
       nip: nip || '',
       password: await hashPassword(password),
       role: 'pengawas',
+      tier: tier || 'full',
+      trialExpiresAt: trialExpiresAt || null,
+      activatedWith: activatedWith || null,
       status: 'aktif',
       created_at: new Date().toISOString(),
     };

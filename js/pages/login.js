@@ -24,6 +24,9 @@
           <div class="mt-3 text-center small">
             Belum punya akun? <a href="#/register">Daftar di sini</a>
           </div>
+          <div class="mt-2 text-center small">
+            🛒 <a href="#/beli-lisensi">Beli Lisensi FULL</a>
+          </div>
           <hr />
           <div class="small text-muted">
             <strong>Akun admin default:</strong> <code>admin@local</code> / <code>admin123</code>

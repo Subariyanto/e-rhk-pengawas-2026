@@ -72,10 +72,20 @@
   };
 
   Page.KegiatanForm = function (id) {
+    const isNew = !id;
+    // Guard: trial expired/limit reached → block create
+    if (isNew && window.Tier) {
+      const can = Tier.canCreateKegiatan();
+      if (!can.ok) {
+        UI.toast(can.reason, 'danger');
+        Router.navigate('/dashboard', true);
+        Router.dispatch();
+        return;
+      }
+    }
     const data = Store.get('kegiatan', []) || [];
     const masterRhk = Page.MasterRHK.get();
     const madrasah = Store.get('madrasah', []) || [];
-    const isNew = !id;
     const existing = id ? data.find(k => k.id === id) : null;
     const params = new URLSearchParams(location.hash.split('?')[1] || '');
     const preRhk = params.get('rhk') || '';

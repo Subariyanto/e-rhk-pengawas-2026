@@ -9,14 +9,37 @@
       </div>
 
       <ul class="nav nav-tabs mb-3" id="aktTab" role="tablist">
-        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabSingle" type="button">Per NIP</button></li>
+        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabRandom" type="button">Kode Tier (Random)</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabSingle" type="button">Per NIP (Legacy)</button></li>
         <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabBulk" type="button">Bulk (Daftar NIP)</button></li>
         <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabImport" type="button">Import Excel Pengawas</button></li>
-        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabSecret" type="button">Secret</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabSecret" type="button">Secret Legacy</button></li>
       </ul>
 
       <div class="tab-content">
-        <div class="tab-pane fade show active" id="tabSingle">
+        <div class="tab-pane fade show active" id="tabRandom">
+          <div class="card mb-3"><div class="card-body">
+            <h5 class="card-title mb-2"><i class="bi bi-shuffle"></i> Generate Kode Random (TRIAL / FULL)</h5>
+            <p class="small text-muted mb-3">Format <code>PREFIX-XXXX-XXXX-XXXX</code>. Sekali pakai, tidak terkait NIP. Cocok untuk lisensi yang dijual via WhatsApp.</p>
+            <div class="d-flex flex-wrap gap-2">
+              <button class="btn btn-success btn-sm" id="btnGenFull"><i class="bi bi-plus-circle"></i> 1 Kode FULL</button>
+              <button class="btn btn-outline-success btn-sm" id="btnGen10Full"><i class="bi bi-collection"></i> 10 Kode FULL</button>
+              <button class="btn btn-warning btn-sm" id="btnGenTrial"><i class="bi bi-plus-circle"></i> 1 Kode TRIAL</button>
+              <button class="btn btn-outline-warning btn-sm" id="btnGen10Trial"><i class="bi bi-collection"></i> 10 Kode TRIAL</button>
+              <button class="btn btn-outline-secondary btn-sm ms-auto" id="btnClearUsed"><i class="bi bi-eraser"></i> Hapus Kode Terpakai/Cabut</button>
+            </div>
+            <div class="alert alert-info mt-3 small mb-0">
+              <i class="bi bi-key"></i> Kode <strong>master</strong> (selalu aktif, hard-coded di source):
+              <code style="font-family:monospace;font-weight:600;">${U.escapeHtml(Codes.MASTER_CODE)}</code>
+              &mdash; ganti + redeploy kalau bocor.
+            </div>
+          </div></div>
+          <div class="card"><div class="card-body">
+            <div id="randomList"></div>
+          </div></div>
+        </div>
+
+        <div class="tab-pane fade" id="tabSingle">
           <div class="card"><div class="card-body">
             <h5 class="card-title"><i class="bi bi-key"></i> Generate Kode untuk Satu NIP</h5>
             <div class="row g-2">
@@ -343,5 +366,143 @@
       inp.type = inp.type === 'password' ? 'text' : 'password';
     });
     document.getElementById('secretIn').type = 'password';
+
+    // ===== Tab Kode Tier (Random) =====
+    function renderRandomList() {
+      const list = Codes.getCodes();
+      const wrap = document.getElementById('randomList');
+      if (!wrap) return;
+      if (!list.length) {
+        wrap.innerHTML = '<div class="text-center text-muted p-4"><div style="font-size:48px;opacity:.3">🔑</div><div class="mt-2">Belum ada kode random. Klik tombol di atas untuk generate.</div></div>';
+        return;
+      }
+      wrap.innerHTML = `
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <div><strong>${list.length}</strong> kode tersimpan.</div>
+          <div class="small text-muted">Aktif: ${list.filter(c=>!c.usedBy && !c.revoked).length} | Terpakai: ${list.filter(c=>c.usedBy).length} | Dicabut: ${list.filter(c=>c.revoked).length}</div>
+        </div>
+        <div class="table-responsive" style="max-height:520px;">
+          <table class="table table-sm table-hover align-middle mb-0">
+            <thead class="table-light position-sticky top-0"><tr>
+              <th style="width:3rem;">#</th>
+              <th style="min-width:18rem;">Kode</th>
+              <th>Tier</th>
+              <th>Status</th>
+              <th>Dipakai Oleh</th>
+              <th>Tanggal</th>
+              <th class="text-end" style="width:14rem;">Aksi</th>
+            </tr></thead>
+            <tbody>
+              ${list.map((c, i) => {
+                const tier = c.tier === 'trial' ? 'TRIAL' : 'FULL';
+                const tierBadge = c.tier === 'trial'
+                  ? '<span class="badge bg-warning text-dark">TRIAL</span>'
+                  : '<span class="badge bg-success">FULL</span>';
+                let status;
+                if (c.revoked) status = '<span class="badge bg-danger">Dicabut</span>';
+                else if (c.usedBy) status = '<span class="badge bg-secondary">Terpakai</span>';
+                else status = '<span class="badge bg-success-subtle text-success border border-success">Aktif</span>';
+                let usedBy = '-';
+                if (c.usedBy) {
+                  const u = (Auth.listUsers() || []).find(x => x.id === c.usedBy);
+                  usedBy = u ? (U.escapeHtml(u.nama || u.email) + (u.nip ? ' (' + u.nip + ')' : '')) : U.escapeHtml(c.usedBy);
+                }
+                const tgl = c.usedAt
+                  ? ('dipakai: ' + (U.fmtTanggalISO ? U.fmtTanggalISO(c.usedAt) : c.usedAt.slice(0,10)))
+                  : (c.createdAt ? ('dibuat: ' + (U.fmtTanggalISO ? U.fmtTanggalISO(c.createdAt) : c.createdAt.slice(0,10))) : '-');
+                const aksi = (c.usedBy || c.revoked)
+                  ? `<button class="btn btn-sm btn-outline-danger" data-del="${U.escapeHtml(c.code)}" title="Hapus"><i class="bi bi-trash"></i></button>`
+                  : `
+                    <button class="btn btn-sm btn-outline-secondary" data-copy="${U.escapeHtml(c.code)}" title="Salin Kode"><i class="bi bi-clipboard"></i></button>
+                    <button class="btn btn-sm btn-outline-success" data-wa="${U.escapeHtml(c.code)}" title="Kirim via WhatsApp"><i class="bi bi-whatsapp"></i></button>
+                    <button class="btn btn-sm btn-outline-warning" data-revoke="${U.escapeHtml(c.code)}" title="Cabut"><i class="bi bi-slash-circle"></i></button>
+                    <button class="btn btn-sm btn-outline-danger" data-del="${U.escapeHtml(c.code)}" title="Hapus"><i class="bi bi-trash"></i></button>
+                  `;
+                return `<tr>
+                  <td>${i + 1}</td>
+                  <td style="font-family:'Courier New',monospace;font-weight:600;letter-spacing:.05em;">${U.escapeHtml(c.code)}</td>
+                  <td>${tierBadge}</td>
+                  <td>${status}</td>
+                  <td class="small">${usedBy}</td>
+                  <td class="small text-muted">${tgl}</td>
+                  <td class="text-end">${aksi}</td>
+                </tr>`;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+
+      wrap.querySelectorAll('button[data-copy]').forEach(b => b.addEventListener('click', async () => {
+        const c = b.dataset.copy;
+        try { await navigator.clipboard.writeText(c); UI.toast('Kode tersalin: ' + c); }
+        catch (_) { UI.toast('Gagal salin.', 'danger'); }
+      }));
+      wrap.querySelectorAll('button[data-wa]').forEach(b => b.addEventListener('click', () => sendCodeViaWa(b.dataset.wa)));
+      wrap.querySelectorAll('button[data-revoke]').forEach(b => b.addEventListener('click', async () => {
+        if (!await UI.confirmDialog('Cabut kode ' + b.dataset.revoke + '? Tidak bisa dipakai lagi.')) return;
+        Codes.revokeCode(b.dataset.revoke);
+        renderRandomList();
+      }));
+      wrap.querySelectorAll('button[data-del]').forEach(b => b.addEventListener('click', async () => {
+        if (!await UI.confirmDialog('Hapus kode ' + b.dataset.del + ' dari daftar?')) return;
+        Codes.deleteCode(b.dataset.del);
+        renderRandomList();
+      }));
+    }
+
+    async function sendCodeViaWa(code) {
+      const s = Codes.getPurchaseSettings();
+      const nomor = prompt('Nomor WA penerima (mis 0812xxxx atau 62812xxxx):');
+      if (nomor == null) return;
+      const trimmed = String(nomor).trim();
+      if (!trimmed) return UI.toast('Nomor kosong.', 'danger');
+      const text = Codes.fillTemplate(s.sendTemplate || '', {
+        KODE: code,
+        APP: s.appName,
+        URL: s.appUrl,
+        NAMA: '',
+        NIP: '',
+      });
+      const url = Codes.buildWaLink(trimmed, text);
+      if (!url) return UI.toast('Nomor WA tidak valid.', 'danger');
+      window.open(url, '_blank');
+    }
+
+    const btnGenFull = document.getElementById('btnGenFull');
+    if (btnGenFull) btnGenFull.addEventListener('click', () => {
+      const c = Codes.addNewCode('full');
+      renderRandomList();
+      UI.toast('Kode FULL dibuat: ' + c.code);
+    });
+    const btnGenTrial = document.getElementById('btnGenTrial');
+    if (btnGenTrial) btnGenTrial.addEventListener('click', () => {
+      const c = Codes.addNewCode('trial');
+      renderRandomList();
+      UI.toast('Kode TRIAL dibuat: ' + c.code);
+    });
+    const btnGen10Full = document.getElementById('btnGen10Full');
+    if (btnGen10Full) btnGen10Full.addEventListener('click', async () => {
+      if (!await UI.confirmDialog('Generate 10 kode FULL random sekaligus?')) return;
+      Codes.addNewCodesBatch('full', 10);
+      renderRandomList();
+      UI.toast('10 kode FULL berhasil dibuat.');
+    });
+    const btnGen10Trial = document.getElementById('btnGen10Trial');
+    if (btnGen10Trial) btnGen10Trial.addEventListener('click', async () => {
+      if (!await UI.confirmDialog('Generate 10 kode TRIAL random sekaligus?')) return;
+      Codes.addNewCodesBatch('trial', 10);
+      renderRandomList();
+      UI.toast('10 kode TRIAL berhasil dibuat.');
+    });
+    const btnClearUsed = document.getElementById('btnClearUsed');
+    if (btnClearUsed) btnClearUsed.addEventListener('click', async () => {
+      if (!await UI.confirmDialog('Hapus semua kode yang sudah dipakai atau dicabut?')) return;
+      Codes.clearUsedAndRevoked();
+      renderRandomList();
+      UI.toast('Kode terpakai/dicabut dihapus.');
+    });
+
+    renderRandomList();
   };
 })();

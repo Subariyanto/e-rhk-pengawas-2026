@@ -3,6 +3,7 @@
   function bootRoutes() {
     Router.on('/login', () => Page.Login());
     Router.on('/register', () => Page.Register());
+    Router.on('/beli-lisensi', () => Page.BeliLisensi());
     Router.on('/', () => Page.Dashboard(), { requireAuth: true });
     Router.on('/dashboard', () => Page.Dashboard(), { requireAuth: true });
     Router.on('/identitas', () => Page.Identitas(), { requireAuth: true });
@@ -24,6 +25,7 @@
     Router.on('/backup', () => Page.Backup(), { requireAuth: true });
     Router.on('/admin/users', () => Page.AdminUsers(), { requireAuth: true, role: 'admin' });
     Router.on('/admin/aktivasi', () => Page.AdminAktivasi(), { requireAuth: true, role: 'admin' });
+    Router.on('/admin/pembelian', () => Page.AdminPembelian(), { requireAuth: true, role: 'admin' });
   }
 
   async function boot() {
@@ -31,6 +33,8 @@
       await Auth.ensureAdminSeeded();
       // Migrasi data lama ke periode tahun aktif (master_rhk, kegiatan, eviden)
       try { Store.migrateLegacy && Store.migrateLegacy(); } catch (e) { console.warn('migrate legacy:', e); }
+      // Pastikan admin user selalu tier='full'
+      try { window.Tier && Tier.ensureAdminFullTier && Tier.ensureAdminFullTier(); } catch (e) {}
       bootRoutes();
     } catch (e) {
       console.error('boot error:', e);

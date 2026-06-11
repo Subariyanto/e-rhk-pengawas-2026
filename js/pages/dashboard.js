@@ -24,7 +24,33 @@
     const totTW = { I: 0, II: 0, III: 0, IV: 0, TAMBAHAN: 0 };
     masterRhk.forEach(r => { totTW[r.triwulan] = (totTW[r.triwulan] || 0) + 1; });
 
+    // ===== Trial banner =====
+    const u = Auth.currentUser();
+    const t = Tier.getTrialStatus(u);
+    let trialBanner = '';
+    let blockTambah = false;
+    if (t.isTrial) {
+      if (t.isExpired || t.limitReached) {
+        blockTambah = true;
+        const reason = t.isExpired
+          ? `<strong>⛔ Masa TRIAL ${Tier.TRIAL_DAYS} hari sudah habis.</strong> Hubungi admin untuk Kode Aktivasi FULL.`
+          : `<strong>⚠️ Limit TRIAL tercapai</strong> (${t.kegiatanCount}/${Tier.TRIAL_MAX_KEGIATAN} kegiatan). Hubungi admin untuk upgrade.`;
+        trialBanner = `<div class="alert alert-danger d-flex flex-wrap gap-2 align-items-center mb-3">
+          <span class="flex-grow-1">${reason}</span>
+          <a href="#/beli-lisensi" class="btn btn-sm btn-success"><i class="bi bi-cart"></i> Beli Lisensi</a>
+          <button id="btnInputKodeFull" class="btn btn-sm btn-outline-success"><i class="bi bi-key"></i> Masukkan Kode FULL</button>
+        </div>`;
+      } else {
+        trialBanner = `<div class="alert alert-warning d-flex flex-wrap gap-2 align-items-center mb-3">
+          <span class="flex-grow-1"><i class="bi bi-hourglass-split"></i> Mode <strong>TRIAL</strong> &mdash; sisa <strong>${t.daysLeft} hari</strong> &middot; sudah pakai <strong>${t.kegiatanCount}/${Tier.TRIAL_MAX_KEGIATAN}</strong> kegiatan.</span>
+          <a href="#/beli-lisensi" class="btn btn-sm btn-success"><i class="bi bi-cart"></i> Beli Lisensi</a>
+          <button id="btnInputKodeFull" class="btn btn-sm btn-outline-success"><i class="bi bi-key"></i> Masukkan Kode FULL</button>
+        </div>`;
+      }
+    }
+
     UI.shell('Dashboard', `
+      ${trialBanner}
       <div class="row g-3 mb-3">
         ${stat('list-check', 'Total RHK', totalRHK)}
         ${stat('check2-circle', 'Eviden Final', evidenSelesai, 'text-success')}
@@ -58,7 +84,10 @@
         </div>
         <div class="card-body d-flex gap-2 flex-wrap">
           <a href="#/eviden" class="btn btn-success"><i class="bi bi-file-earmark-plus"></i> Buat Eviden</a>
-          <a href="#/kegiatan/baru" class="btn btn-outline-success"><i class="bi bi-plus-circle"></i> Tambah Kegiatan</a>
+          ${blockTambah
+            ? '<button class="btn btn-outline-secondary" disabled title="Trial habis/limit"><i class="bi bi-plus-circle"></i> Tambah Kegiatan (terkunci)</button>'
+            : '<a href="#/kegiatan/baru" class="btn btn-outline-success"><i class="bi bi-plus-circle"></i> Tambah Kegiatan</a>'
+          }
           <a href="#/madrasah" class="btn btn-outline-success"><i class="bi bi-building"></i> Madrasah Binaan</a>
           <a href="#/arsip" class="btn btn-outline-success"><i class="bi bi-archive"></i> Arsip Eviden</a>
         </div>
@@ -83,6 +112,27 @@
     `);
 
     const ctxTW = document.getElementById('chTW').getContext('2d');
+
+    // Wire trial banner button
+    const btnKodeFull = document.getElementById('btnInputKodeFull');
+    if (btnKodeFull) {
+      btnKodeFull.addEventListener('click', () => {
+        const kode = prompt('Masukkan Kode Aktivasi FULL untuk upgrade akun ini:');
+        if (kode == null) return;
+        const c = String(kode).trim();
+        if (!c) return;
+        const found = Codes.findCode(c);
+        if (!found || found.tier !== 'full') {
+          return UI.toast('Kode tidak valid, sudah dipakai, atau bukan kode FULL.', 'danger');
+        }
+        const cur = Auth.currentUser();
+        if (!cur) return UI.toast('Sesi tidak ditemukan, silakan login ulang.', 'danger');
+        Tier.upgradeUserToFull(cur.id);
+        if (!found.master) Codes.consumeCode(c, cur.id);
+        UI.toast('🎉 Akun di-upgrade ke FULL. Selamat menikmati semua fitur!');
+        Page.Dashboard();
+      });
+    }
     try {
       if (typeof Chart === 'undefined') throw new Error('Chart.js belum termuat');
       new Chart(ctxTW, {

@@ -1,0 +1,113 @@
+// Halaman public "Beli Lisensi FULL". Bisa diakses tanpa login (#/beli-lisensi).
+// Kalau user sudah login, ada tombol "Aktivasi Kode FULL" untuk upgrade akun saat ini.
+(function () {
+  Page.BeliLisensi = function () {
+    const s = Codes.getPurchaseSettings();
+    const u = Auth.currentUser();
+    const isLogin = !!u;
+
+    const html = `
+      <div class="auth-wrap" style="min-height:100vh;align-items:flex-start;padding:32px 12px;">
+        <div class="auth-card" style="max-width:720px;width:100%;">
+          <div class="text-center mb-3">
+            <div class="auth-logo">🛒</div>
+            <h1 class="mt-3 mb-0">Beli Lisensi FULL</h1>
+            <div class="small text-muted">Aktifkan semua fitur tanpa batasan trial.</div>
+          </div>
+
+          <div class="card mb-3 border-success">
+            <div class="card-body">
+              <h5 class="card-title text-success mb-2"><i class="bi bi-stars"></i> Yang Anda Dapatkan dengan Lisensi FULL</h5>
+              <ul class="mb-0">
+                <li>✅ Tanpa batas waktu (akun aktif selamanya)</li>
+                <li>✅ Tanpa batas jumlah kegiatan & eviden</li>
+                <li>✅ Cetak laporan tanpa watermark TRIAL</li>
+                <li>✅ Semua menu (Master RHK, Kegiatan, Eviden, Arsip, Rekap, Laporan Triwulan)</li>
+                <li>✅ Backup &amp; Restore data per akun</li>
+                <li>✅ Update aplikasi otomatis (PWA)</li>
+              </ul>
+            </div>
+          </div>
+
+          ${s.harga ? `
+          <div class="text-center mb-3">
+            <div class="small text-muted">Harga Lisensi</div>
+            <div class="display-6 fw-bold text-success">${U.escapeHtml(s.harga)}</div>
+          </div>` : ''}
+
+          <div class="card mb-3" style="background:#fff7ed;border-color:#f59e0b;">
+            <div class="card-body">
+              <h5 class="card-title text-warning-emphasis mb-2"><i class="bi bi-list-ol"></i> Cara Membeli</h5>
+              <ol class="mb-0">
+                <li>Klik tombol <strong>📲 Pesan via WhatsApp</strong> di bawah</li>
+                <li>Lakukan pembayaran sesuai instruksi admin</li>
+                <li>Kirim bukti transfer via WA</li>
+                <li>Kode Aktivasi FULL dikirim balik via WA dalam <strong>1–6 jam</strong> (jam kerja)</li>
+                <li>Login aplikasi → klik banner kuning di dashboard → <strong>Masukkan Kode FULL</strong> → selesai ✅</li>
+              </ol>
+            </div>
+          </div>
+
+          ${s.bankInfo ? `
+          <div class="card mb-3 bg-light">
+            <div class="card-body">
+              <h6 class="card-title"><i class="bi bi-bank"></i> Info Pembayaran</h6>
+              <pre style="white-space:pre-wrap;font-family:inherit;margin:0;color:#334155">${U.escapeHtml(s.bankInfo)}</pre>
+            </div>
+          </div>` : ''}
+
+          <div class="d-grid gap-2 mb-3">
+            ${s.waNumber
+              ? `<button class="btn btn-success btn-lg" id="btnWaOrder"><i class="bi bi-whatsapp"></i> Pesan via WhatsApp</button>`
+              : `<div class="alert alert-warning mb-0"><i class="bi bi-exclamation-triangle"></i> Nomor WA admin belum dikonfigurasi.</div>`
+            }
+            <button class="btn btn-outline-success" id="btnActivate"><i class="bi bi-key"></i> Aktivasi Kode FULL</button>
+          </div>
+
+          <div class="text-center small">
+            ${isLogin
+              ? '<a href="#/dashboard"><i class="bi bi-arrow-left"></i> Kembali ke Dashboard</a>'
+              : '<a href="#/login"><i class="bi bi-arrow-left"></i> Kembali ke Login</a>'
+            }
+          </div>
+        </div>
+      </div>
+    `;
+    UI.bareShell(html);
+
+    const btnWa = document.getElementById('btnWaOrder');
+    if (btnWa) {
+      btnWa.addEventListener('click', () => {
+        const ss = Codes.getPurchaseSettings();
+        if (!ss.waNumber) return UI.toast('Nomor WA admin belum dikonfigurasi.', 'danger');
+        const text = Codes.fillTemplate(ss.orderTemplate, { APP: ss.appName, URL: ss.appUrl });
+        const url = Codes.buildWaLink(ss.waNumber, text);
+        if (!url) return UI.toast('Nomor WA tidak valid.', 'danger');
+        window.open(url, '_blank');
+      });
+    }
+
+    document.getElementById('btnActivate').addEventListener('click', () => {
+      const kode = prompt('Masukkan Kode Aktivasi FULL:');
+      if (kode == null) return;
+      const c = String(kode).trim();
+      if (!c) return;
+      const found = Codes.findCode(c);
+      if (!found || found.tier !== 'full') {
+        return UI.toast('Kode tidak valid, sudah dipakai, atau bukan kode FULL.', 'danger');
+      }
+      const cur = Auth.currentUser();
+      if (!cur) {
+        UI.toast('Anda perlu login terlebih dahulu untuk aktivasi. Silakan login dulu, kemudian masukkan kode dari banner dashboard.', 'warning');
+        Router.navigate('/login', true);
+        Router.dispatch();
+        return;
+      }
+      Tier.upgradeUserToFull(cur.id);
+      if (!found.master) Codes.consumeCode(c, cur.id);
+      UI.toast('🎉 Akun berhasil di-upgrade ke FULL. Selamat menikmati semua fitur!');
+      Router.navigate('/dashboard', true);
+      Router.dispatch();
+    });
+  };
+})();

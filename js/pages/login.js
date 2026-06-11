@@ -13,7 +13,7 @@
             <div class="mb-3">
               <label class="form-label">NIP atau Email</label>
               <input class="form-control" name="email" required autofocus placeholder="18 digit NIP atau email" />
-              <div class="form-text">Pengawas: masukkan NIP. Admin: <code>admin@local</code>.</div>
+              <div class="form-text">Pengawas: masukkan NIP.</div>
             </div>
             <div class="mb-3">
               <label class="form-label">Password</label>
@@ -26,10 +26,6 @@
           </div>
           <div class="mt-2 text-center small">
             🛒 <a href="#/beli-lisensi">Beli Lisensi FULL</a>
-          </div>
-          <hr />
-          <div class="small text-muted">
-            <strong>Akun admin default:</strong> <code>admin@local</code> / <code>admin123</code>
           </div>
         </div>
       </div>

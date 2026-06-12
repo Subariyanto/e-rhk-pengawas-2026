@@ -11,15 +11,35 @@
   function normCode(s) { return String(s || '').toUpperCase().replace(/\s+/g, '').trim(); }
 
   function getCodes() { return Store.getGlobal(STORE_KEY, []) || []; }
+
+  // Debounce + serialize sync ke gh-pages (anti race condition).
+  let _syncTimer = null;
+  let _syncInFlight = null;
+  let _syncQueued = false;
+  function scheduleSync() {
+    if (typeof window === 'undefined' || !window.GithubSync || !window.GithubSync.hasPAT()) return;
+    if (_syncTimer) clearTimeout(_syncTimer);
+    _syncTimer = setTimeout(async () => {
+      _syncTimer = null;
+      // Kalau ada push yang masih jalan, mark queued biar dijalankan setelahnya.
+      if (_syncInFlight) { _syncQueued = true; return; }
+      try {
+        _syncInFlight = window.GithubSync.pushIfConfigured(getCodes(), 'sync codes after admin op');
+        await _syncInFlight;
+      } finally {
+        _syncInFlight = null;
+        if (_syncQueued) {
+          _syncQueued = false;
+          scheduleSync();
+        }
+      }
+    }, 800);
+  }
+
   function saveCodes(list) {
     Store.setGlobal(STORE_KEY, list || []);
-    // Auto-sync ke gh-pages kalau admin sudah set PAT (best-effort, async).
-    try {
-      if (typeof window !== 'undefined' && window.GithubSync && window.GithubSync.hasPAT && window.GithubSync.hasPAT()) {
-        // Kirim semua kode (termasuk usedBy/revoked) supaya state lintas device sinkron.
-        window.GithubSync.pushIfConfigured(list || [], 'sync codes after admin op');
-      }
-    } catch (e) { console.warn('[codes] auto-sync skipped:', e.message); }
+    // Auto-sync ke gh-pages kalau admin sudah set PAT (debounced + serialized).
+    try { scheduleSync(); } catch (e) { console.warn('[codes] auto-sync skipped:', e.message); }
   }
 
   // Generate kode random format: PREFIX-XXXX-XXXX-XXXX
@@ -121,7 +141,7 @@
   }
 
   // Tambah kode random baru (de-dupe terhadap list eksisting).
-  function addNewCode(tier) {
+  function addNewCode(tier, suppressSync) {
     tier = (tier || 'full').toLowerCase();
     if (tier !== 'full' && tier !== 'trial') tier = 'full';
     const list = getCodes();
@@ -140,15 +160,22 @@
       revoked: false,
     };
     list.unshift(item);
-    saveCodes(list);
+    if (suppressSync) {
+      // Save ke localStorage tanpa trigger sync (untuk batch)
+      Store.setGlobal(STORE_KEY, list);
+    } else {
+      saveCodes(list);
+    }
     return item;
   }
 
-  // Generate banyak sekaligus.
+  // Generate banyak sekaligus. Push satu kali di akhir biar ngga race condition.
   function addNewCodesBatch(tier, n) {
     n = Math.max(1, Math.min(100, parseInt(n, 10) || 10));
     const out = [];
-    for (let i = 0; i < n; i++) out.push(addNewCode(tier));
+    for (let i = 0; i < n; i++) out.push(addNewCode(tier, /* suppressSync */ true));
+    // Single sync di akhir batch
+    saveCodes(getCodes());
     return out;
   }
 

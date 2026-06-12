@@ -1,4 +1,13 @@
 {
-  "codes": [],
-  "updatedAt": "2026-06-12T15:58:24.942Z"
+  "codes": [
+    {
+      "code": "FULL-U732-QBGK-2R2K",
+      "tier": "full",
+      "createdAt": "2026-06-12T15:58:38.634Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    }
+  ],
+  "updatedAt": "2026-06-12T15:58:38.997Z"
 }

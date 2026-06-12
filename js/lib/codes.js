@@ -125,7 +125,10 @@
   const SETTINGS_KEY = 'purchase_settings';
 
   function getPurchaseSettings() {
-    const def = {
+    // Default berlaku global (dideploy via js/data/purchase_default.js).
+    // Admin bisa override per-device lewat halaman Pengaturan Pembelian (saved ke localStorage).
+    const bundled = (typeof window !== 'undefined' && window.PURCHASE_DEFAULT) ? window.PURCHASE_DEFAULT : null;
+    const def = bundled || {
       waNumber: '',
       harga: '',
       bankInfo: '',
@@ -136,7 +139,14 @@
     };
     let saved = null;
     try { saved = Store.getGlobal(SETTINGS_KEY, null); } catch (e) {}
-    return Object.assign({}, def, saved || {});
+    // Merge: bundled defaults < saved overrides. Field kosong di saved jangan menimpa bundled.
+    const merged = Object.assign({}, def);
+    if (saved && typeof saved === 'object') {
+      Object.entries(saved).forEach(([k, v]) => {
+        if (v !== '' && v != null) merged[k] = v;
+      });
+    }
+    return merged;
   }
 
   function savePurchaseSettings(s) {

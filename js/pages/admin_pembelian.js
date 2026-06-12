@@ -6,6 +6,12 @@
     const s = Codes.getPurchaseSettings();
 
     UI.shell('Pengaturan Pembelian', `
+      <div class="alert alert-info small mb-3">
+        <i class="bi bi-info-circle"></i> <strong>Penting tentang penyimpanan:</strong>
+        Pengaturan ini disimpan di <strong>browser Bapak/Ibu saja</strong> (localStorage device ini). User lain yang buka <code>#/beli-lisensi</code> dari HP/laptop mereka <strong>tidak otomatis melihat nomor WA Bapak</strong>.
+        <br>Untuk membuat nomor WA muncul ke <strong>semua user</strong>, edit file <code>js/data/purchase_default.js</code> di repo (commit + push gh-pages). Atau minta Bari untuk update default lewat chat.
+      </div>
+
       <div class="alert alert-light border mb-3">
         <i class="bi bi-info-circle text-success"></i>
         Data ini muncul di halaman publik <code>#/beli-lisensi</code> dan dipakai sebagai template pesan WhatsApp ke calon pembeli.

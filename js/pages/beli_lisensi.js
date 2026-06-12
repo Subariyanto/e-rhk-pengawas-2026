@@ -53,6 +53,12 @@
             <div class="card-body">
               <h6 class="card-title"><i class="bi bi-bank"></i> Info Pembayaran</h6>
               <pre style="white-space:pre-wrap;font-family:inherit;margin:0;color:#334155">${U.escapeHtml(s.bankInfo)}</pre>
+              ${s.qrisImage ? `
+                <div class="mt-3 text-center">
+                  <img src="${U.escapeHtml(s.qrisImage)}" alt="QRIS" style="max-width:280px;width:100%;height:auto;border:1px solid #e5e7eb;border-radius:8px;padding:6px;background:#fff;" onerror="this.style.display='none'">
+                  <div class="small text-muted mt-1"><i class="bi bi-qr-code-scan"></i> Scan QRIS di atas pakai aplikasi e-wallet / m-banking</div>
+                </div>
+              ` : ''}
             </div>
           </div>` : ''}
 

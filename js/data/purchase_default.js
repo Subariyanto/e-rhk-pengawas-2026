@@ -11,7 +11,8 @@
 window.PURCHASE_DEFAULT = {
   waNumber: '6282330647698',           // 082330647698 → normalisasi ke 62
   harga: 'Rp 100.000 (lifetime / 1 akun)',
-  bankInfo: 'BNI 0168798767 a.n. SUBARIYANTO',
+  bankInfo: 'QRIS — SUBARIYANTO, DIGITAL & KREATIF\nNMID: ID1026531620742\n(scan QR di bawah, semua e-wallet & m-banking)\n\nAtau Transfer BNI:\nNo. Rek: 0168798767\na.n. SUBARIYANTO',
+  qrisImage: 'images/qris.jpg',        // path relatif ke aset QRIS
   appName: 'e-RHK Pengawas Madrasah 2026',
   appUrl: 'https://subariyanto.github.io/e-rhk-pengawas-2026/',
   orderTemplate:

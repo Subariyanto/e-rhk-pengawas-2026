@@ -109,9 +109,24 @@
       if (kode == null) return;
       const c = String(kode).trim();
       if (!c) return;
+      // Diagnostik bertingkat
       const found = Codes.findCode(c);
-      if (!found || found.tier !== 'full') {
-        return UI.toast('Kode tidak valid, sudah dipakai, atau bukan kode FULL.', 'danger');
+      if (!found) {
+        // Kode benar-benar tidak ada di registry, ATAU sudah dipakai / dicabut
+        const any = Codes.findCodeAny(c);
+        if (any) {
+          if (any.usedBy) return UI.toast('Kode "' + c.toUpperCase() + '" sudah pernah dipakai oleh akun lain. Hubungi admin untuk kode baru.', 'danger');
+          if (any.revoked) return UI.toast('Kode "' + c.toUpperCase() + '" sudah dicabut/expired oleh admin.', 'danger');
+        }
+        // Kode benar-benar tidak ada → kasih hint cross-device
+        const msg = 'Kode "' + c.toUpperCase() + '" tidak ditemukan.\n\nKemungkinan penyebab:\n1. Salah ketik (cek huruf O vs angka 0, I vs 1)\n2. Kode di-generate di browser/device lain (localStorage tidak sinkron lintas device)\n3. Belum dideploy ke gh-pages (kalau pakai bundled codes)\n\nUntuk admin: cek halaman Kode Aktivasi di device yang sama dengan tempat generate, atau coba master code POKJAWAS-JEMBER-ERHK-2026.';
+        if (window.confirm) alert(msg);
+        else UI.toast('Kode tidak ditemukan. Cek pesan di console.', 'danger');
+        console.warn('[Aktivasi] kode tidak ditemukan:', c.toUpperCase(), '\nKode di registry:', Codes.getCodes().length, 'item');
+        return;
+      }
+      if (found.tier !== 'full') {
+        return UI.toast('Kode "' + c.toUpperCase() + '" valid tapi tier-nya "' + found.tier + '", bukan FULL. Untuk upgrade FULL, butuh kode FULL-* atau master code.', 'warning');
       }
       const cur = Auth.currentUser();
       if (!cur) {

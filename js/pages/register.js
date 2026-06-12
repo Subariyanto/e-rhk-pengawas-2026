@@ -107,6 +107,10 @@
       let trialExpiresAt = null;
 
       if (kode) {
+        // Pastikan REMOTE_CODES ter-load dari gh-pages dulu (HP user pertama buka).
+        if (window.GithubSync && (!window.REMOTE_CODES || window.REMOTE_CODES.length === 0)) {
+          try { await window.GithubSync.refreshFromPublic(); } catch (e) { console.warn('[register] refresh failed:', e); }
+        }
         // Coba 1: kode random (PREFIX-XXXX-XXXX-XXXX) atau master
         const randCode = Codes.findCode(kode);
         if (randCode) {

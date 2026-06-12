@@ -104,11 +104,16 @@
       });
     }
 
-    document.getElementById('btnActivate').addEventListener('click', () => {
+    document.getElementById('btnActivate').addEventListener('click', async () => {
       const kode = prompt('Masukkan Kode Aktivasi FULL:');
       if (kode == null) return;
       const c = String(kode).trim();
       if (!c) return;
+      // Pastikan REMOTE_CODES ter-load dari gh-pages sebelum lookup (HP user mungkin baru pertama buka).
+      if (window.GithubSync && (!window.REMOTE_CODES || window.REMOTE_CODES.length === 0)) {
+        UI.toast('Memuat daftar kode terbaru...', 'info');
+        try { await window.GithubSync.refreshFromPublic(); } catch (e) { console.warn('refresh failed:', e); }
+      }
       // Diagnostik bertingkat
       const found = Codes.findCode(c);
       if (!found) {

@@ -202,6 +202,19 @@
     saveCodes(list);
   }
 
+  // Set/update note (Catatan / Pemilik) untuk kode tertentu.
+  function setNote(code, note) {
+    const c = normCode(code);
+    const list = getCodes();
+    const idx = list.findIndex(x => normCode(x.code) === c);
+    if (idx >= 0) {
+      list[idx].note = String(note || '');
+      saveCodes(list);
+      return true;
+    }
+    return false;
+  }
+
   // ===== Purchase settings =====
   const SETTINGS_KEY = 'purchase_settings';
 
@@ -267,6 +280,7 @@
     consumeCode,
     addNewCode, addNewCodesBatch,
     revokeCode, deleteCode, clearUsedAndRevoked,
+    setNote,
     getPurchaseSettings, savePurchaseSettings,
     normalizeWa, buildWaLink, fillTemplate,
   };

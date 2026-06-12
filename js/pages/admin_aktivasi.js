@@ -572,8 +572,9 @@
               <th>Tier</th>
               <th>Status</th>
               <th>Dipakai Oleh</th>
+              <th style="min-width:12rem;">Catatan / Pemilik</th>
               <th>Tanggal</th>
-              <th class="text-end" style="width:14rem;">Aksi</th>
+              <th class="text-end" style="width:16rem;">Aksi</th>
             </tr></thead>
             <tbody>
               ${list.map((c, i) => {
@@ -590,14 +591,19 @@
                   const u = (Auth.listUsers() || []).find(x => x.id === c.usedBy);
                   usedBy = u ? (U.escapeHtml(u.nama || u.email) + (u.nip ? ' (' + u.nip + ')' : '')) : U.escapeHtml(c.usedBy);
                 }
+                const noteText = c.note ? U.escapeHtml(c.note) : '<span class="text-muted fst-italic">— belum diisi —</span>';
                 const tgl = c.usedAt
                   ? ('dipakai: ' + (U.fmtTanggalISO ? U.fmtTanggalISO(c.usedAt) : c.usedAt.slice(0,10)))
                   : (c.createdAt ? ('dibuat: ' + (U.fmtTanggalISO ? U.fmtTanggalISO(c.createdAt) : c.createdAt.slice(0,10))) : '-');
                 const aksi = (c.usedBy || c.revoked)
-                  ? `<button class="btn btn-sm btn-outline-danger" data-del="${U.escapeHtml(c.code)}" title="Hapus"><i class="bi bi-trash"></i></button>`
+                  ? `
+                    <button class="btn btn-sm btn-outline-primary" data-note="${U.escapeHtml(c.code)}" title="Edit Catatan/Pemilik"><i class="bi bi-pencil"></i></button>
+                    <button class="btn btn-sm btn-outline-danger" data-del="${U.escapeHtml(c.code)}" title="Hapus"><i class="bi bi-trash"></i></button>
+                  `
                   : `
                     <button class="btn btn-sm btn-outline-secondary" data-copy="${U.escapeHtml(c.code)}" title="Salin Kode"><i class="bi bi-clipboard"></i></button>
                     <button class="btn btn-sm btn-outline-success" data-wa="${U.escapeHtml(c.code)}" title="Kirim via WhatsApp"><i class="bi bi-whatsapp"></i></button>
+                    <button class="btn btn-sm btn-outline-primary" data-note="${U.escapeHtml(c.code)}" title="Edit Catatan/Pemilik"><i class="bi bi-pencil"></i></button>
                     <button class="btn btn-sm btn-outline-warning" data-revoke="${U.escapeHtml(c.code)}" title="Cabut"><i class="bi bi-slash-circle"></i></button>
                     <button class="btn btn-sm btn-outline-danger" data-del="${U.escapeHtml(c.code)}" title="Hapus"><i class="bi bi-trash"></i></button>
                   `;
@@ -607,8 +613,9 @@
                   <td>${tierBadge}</td>
                   <td>${status}</td>
                   <td class="small">${usedBy}</td>
+                  <td class="small">${noteText}</td>
                   <td class="small text-muted">${tgl}</td>
-                  <td class="text-end">${aksi}</td>
+                  <td class="text-end text-nowrap">${aksi}</td>
                 </tr>`;
               }).join('')}
             </tbody>
@@ -622,6 +629,7 @@
         catch (_) { UI.toast('Gagal salin.', 'danger'); }
       }));
       wrap.querySelectorAll('button[data-wa]').forEach(b => b.addEventListener('click', () => sendCodeViaWa(b.dataset.wa)));
+      wrap.querySelectorAll('button[data-note]').forEach(b => b.addEventListener('click', () => editNote(b.dataset.note)));
       wrap.querySelectorAll('button[data-revoke]').forEach(b => b.addEventListener('click', async () => {
         if (!await UI.confirmDialog('Cabut kode ' + b.dataset.revoke + '? Tidak bisa dipakai lagi.')) return;
         Codes.revokeCode(b.dataset.revoke);
@@ -650,6 +658,18 @@
       const url = Codes.buildWaLink(trimmed, text);
       if (!url) return UI.toast('Nomor WA tidak valid.', 'danger');
       window.open(url, '_blank');
+    }
+
+    async function editNote(code) {
+      const list = Codes.getCodes();
+      const item = list.find(x => x.code === code);
+      if (!item) return UI.toast('Kode tidak ditemukan.', 'danger');
+      const cur = item.note || '';
+      const v = prompt('Catatan / Pemilik untuk kode ' + code + '\n\nContoh: "Pak Fulan - MA Sukowono" atau "Bu Aminah - WA 0812xxxx".', cur);
+      if (v == null) return; // cancel
+      Codes.setNote(code, String(v).trim());
+      renderRandomList();
+      UI.toast('Catatan tersimpan.');
     }
 
     const btnGenFull = document.getElementById('btnGenFull');
@@ -689,7 +709,7 @@
     function exportRandomCsv() {
       const list = Codes.getCodes();
       if (!list.length) return UI.toast('Tidak ada kode untuk di-export.', 'warning');
-      const head = ['No', 'Kode', 'Tier', 'Status', 'Dipakai Oleh', 'Tanggal Dibuat', 'Tanggal Dipakai'];
+      const head = ['No', 'Kode', 'Tier', 'Status', 'Dipakai Oleh', 'Catatan / Pemilik', 'Tanggal Dibuat', 'Tanggal Dipakai'];
       const lines = [head.join(',')];
       list.forEach((c, i) => {
         const tier = (c.tier || 'full').toUpperCase();
@@ -707,6 +727,7 @@
           tier,
           status,
           '"' + String(usedBy).replace(/"/g, '""') + '"',
+          '"' + String(c.note || '').replace(/"/g, '""') + '"',
           c.createdAt ? c.createdAt.slice(0, 10) : '',
           c.usedAt ? c.usedAt.slice(0, 10) : '',
         ];
@@ -724,7 +745,7 @@
       const wb = new ExcelJS.Workbook();
       wb.creator = 'Pokjawas Madrasah Kab. Jember';
       const ws = wb.addWorksheet('Kode Aktivasi');
-      const head = ['No', 'Kode Aktivasi', 'Tier', 'Status', 'Dipakai Oleh', 'Tanggal Dibuat', 'Tanggal Dipakai'];
+      const head = ['No', 'Kode Aktivasi', 'Tier', 'Status', 'Dipakai Oleh', 'Catatan / Pemilik', 'Tanggal Dibuat', 'Tanggal Dipakai'];
       ws.addRow(head);
       const headerRow = ws.getRow(1);
       headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
@@ -747,6 +768,7 @@
           tier,
           status,
           usedBy,
+          c.note || '',
           c.createdAt ? c.createdAt.slice(0, 10) : '',
           c.usedAt ? c.usedAt.slice(0, 10) : '',
         ]);
@@ -781,6 +803,7 @@
         { width: 10 },
         { width: 12 },
         { width: 38 },
+        { width: 30 },
         { width: 16 },
         { width: 16 },
       ];
@@ -788,10 +811,10 @@
       ws.getColumn(2).alignment = { horizontal: 'center' };
       ws.getColumn(3).alignment = { horizontal: 'center' };
       ws.getColumn(4).alignment = { horizontal: 'center' };
-      ws.getColumn(6).alignment = { horizontal: 'center' };
       ws.getColumn(7).alignment = { horizontal: 'center' };
+      ws.getColumn(8).alignment = { horizontal: 'center' };
       ws.views = [{ state: 'frozen', ySplit: 1 }];
-      ws.autoFilter = { from: 'A1', to: 'G1' };
+      ws.autoFilter = { from: 'A1', to: 'H1' };
       // Sheet ringkasan
       const ws2 = wb.addWorksheet('Ringkasan');
       ws2.addRow(['Total kode', list.length]);
@@ -823,7 +846,7 @@
           const u = (Auth.listUsers() || []).find(x => x.id === c.usedBy);
           usedBy = u ? (U.escapeHtml(u.nama || u.email || '') + (u.nip ? ' (' + u.nip + ')' : '')) : U.escapeHtml(c.usedBy);
         }
-        return `<tr><td>${i + 1}</td><td class="kode">${U.escapeHtml(c.code)}</td><td>${tier}</td><td>${status}</td><td>${usedBy}</td><td>${c.createdAt ? c.createdAt.slice(0, 10) : ''}</td><td>${c.usedAt ? c.usedAt.slice(0, 10) : ''}</td></tr>`;
+        return `<tr><td>${i + 1}</td><td class="kode">${U.escapeHtml(c.code)}</td><td>${tier}</td><td>${status}</td><td>${usedBy}</td><td>${U.escapeHtml(c.note || '')}</td><td>${c.createdAt ? c.createdAt.slice(0, 10) : ''}</td><td>${c.usedAt ? c.usedAt.slice(0, 10) : ''}</td></tr>`;
       }).join('');
       const aktif = list.filter(c => !c.usedBy && !c.revoked).length;
       const dipakai = list.filter(c => c.usedBy).length;
@@ -842,7 +865,7 @@
         <h2>Daftar Kode Aktivasi Random e-RHK Pengawas Madrasah 2026</h2>
         <div class="sub">Pokjawas Kab. Jember &mdash; ${U.fmtTanggal ? U.fmtTanggal(new Date()) : new Date().toLocaleDateString('id-ID')} &mdash; Total: ${list.length} (Aktif: ${aktif}, Terpakai: ${dipakai}, Dicabut: ${dicabut})</div>
         <table><thead><tr>
-          <th>No</th><th>Kode</th><th>Tier</th><th>Status</th><th>Dipakai Oleh</th><th>Dibuat</th><th>Dipakai</th>
+          <th>No</th><th>Kode</th><th>Tier</th><th>Status</th><th>Dipakai Oleh</th><th>Catatan / Pemilik</th><th>Dibuat</th><th>Dipakai</th>
         </tr></thead><tbody>${rowsHtml}</tbody></table>
         <p class="noprint"><button onclick="window.print()">Cetak</button></p>
       </body></html>`);

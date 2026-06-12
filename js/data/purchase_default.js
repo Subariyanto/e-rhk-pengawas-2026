@@ -9,9 +9,9 @@
 //
 // Prioritas baca: localStorage admin > default di file ini.
 window.PURCHASE_DEFAULT = {
-  waNumber: '',           // Format internasional: '6281234567890' (akan dinormalisasi otomatis)
-  harga: 'Rp 50.000 (lifetime / 1 akun)',
-  bankInfo: '',           // Multi-line: 'BRI 0123-4567-8901 a.n. Subariyanto\nDANA: 0812xxxx'
+  waNumber: '6282330647698',           // 082330647698 → normalisasi ke 62
+  harga: 'Rp 100.000 (lifetime / 1 akun)',
+  bankInfo: 'BNI 0168798767 a.n. SUBARIYANTO',
   appName: 'e-RHK Pengawas Madrasah 2026',
   appUrl: 'https://subariyanto.github.io/e-rhk-pengawas-2026/',
   orderTemplate:

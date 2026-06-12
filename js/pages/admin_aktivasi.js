@@ -41,7 +41,12 @@
           <div class="card"><div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
               <h6 class="mb-0"><i class="bi bi-list-check"></i> Daftar Kode Random</h6>
-              <button class="btn btn-sm btn-warning" id="btnExportBundle"><i class="bi bi-cloud-arrow-up"></i> Export untuk Bundled (cross-device)</button>
+              <div class="d-flex flex-wrap gap-2">
+                <button class="btn btn-sm btn-outline-success" id="btnRandomExportCsv"><i class="bi bi-filetype-csv"></i> Export CSV</button>
+                <button class="btn btn-sm btn-outline-success" id="btnRandomExportXlsx"><i class="bi bi-file-earmark-excel"></i> Export Excel</button>
+                <button class="btn btn-sm btn-outline-success" id="btnRandomPrint"><i class="bi bi-printer"></i> Cetak</button>
+                <button class="btn btn-sm btn-warning" id="btnExportBundle"><i class="bi bi-cloud-arrow-up"></i> Export untuk Bundled (cross-device)</button>
+              </div>
             </div>
             <div id="randomList"></div>
           </div></div>
@@ -680,6 +685,176 @@
       renderRandomList();
       UI.toast('Kode terpakai/dicabut dihapus.');
     });
+
+    function exportRandomCsv() {
+      const list = Codes.getCodes();
+      if (!list.length) return UI.toast('Tidak ada kode untuk di-export.', 'warning');
+      const head = ['No', 'Kode', 'Tier', 'Status', 'Dipakai Oleh', 'Tanggal Dibuat', 'Tanggal Dipakai'];
+      const lines = [head.join(',')];
+      list.forEach((c, i) => {
+        const tier = (c.tier || 'full').toUpperCase();
+        let status = 'Aktif';
+        if (c.revoked) status = 'Dicabut';
+        else if (c.usedBy) status = 'Terpakai';
+        let usedBy = '';
+        if (c.usedBy) {
+          const u = (Auth.listUsers() || []).find(x => x.id === c.usedBy);
+          usedBy = u ? (u.nama || u.email || '') + (u.nip ? ' (' + u.nip + ')' : '') : c.usedBy;
+        }
+        const cols = [
+          i + 1,
+          c.code,
+          tier,
+          status,
+          '"' + String(usedBy).replace(/"/g, '""') + '"',
+          c.createdAt ? c.createdAt.slice(0, 10) : '',
+          c.usedAt ? c.usedAt.slice(0, 10) : '',
+        ];
+        lines.push(cols.join(','));
+      });
+      const blob = new Blob(['\uFEFF' + lines.join('\n')], { type: 'text/csv;charset=utf-8' });
+      const fname = 'kode-aktivasi-random-' + (U.fmtTanggalISO ? U.fmtTanggalISO(new Date()) : new Date().toISOString().slice(0, 10)) + '.csv';
+      U.downloadBlob(blob, fname);
+      UI.toast(list.length + ' kode di-export ke CSV.');
+    }
+
+    async function exportRandomXlsx() {
+      const list = Codes.getCodes();
+      if (!list.length) return UI.toast('Tidak ada kode untuk di-export.', 'warning');
+      const wb = new ExcelJS.Workbook();
+      wb.creator = 'Pokjawas Madrasah Kab. Jember';
+      const ws = wb.addWorksheet('Kode Aktivasi');
+      const head = ['No', 'Kode Aktivasi', 'Tier', 'Status', 'Dipakai Oleh', 'Tanggal Dibuat', 'Tanggal Dipakai'];
+      ws.addRow(head);
+      const headerRow = ws.getRow(1);
+      headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+      headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1E2A5A' } };
+      headerRow.alignment = { horizontal: 'center', vertical: 'middle' };
+      headerRow.height = 22;
+      list.forEach((c, i) => {
+        const tier = (c.tier || 'full').toUpperCase();
+        let status = 'Aktif';
+        if (c.revoked) status = 'Dicabut';
+        else if (c.usedBy) status = 'Terpakai';
+        let usedBy = '';
+        if (c.usedBy) {
+          const u = (Auth.listUsers() || []).find(x => x.id === c.usedBy);
+          usedBy = u ? (u.nama || u.email || '') + (u.nip ? ' (' + u.nip + ')' : '') : c.usedBy;
+        }
+        ws.addRow([
+          i + 1,
+          c.code,
+          tier,
+          status,
+          usedBy,
+          c.createdAt ? c.createdAt.slice(0, 10) : '',
+          c.usedAt ? c.usedAt.slice(0, 10) : '',
+        ]);
+      });
+      // Style data rows + warna per status
+      ws.eachRow((row, rowNumber) => {
+        if (rowNumber === 1) return;
+        const statusCell = row.getCell(4);
+        const status = String(statusCell.value || '').toLowerCase();
+        let bgColor = null;
+        if (status === 'aktif') bgColor = 'FFE8F5E9';
+        else if (status === 'terpakai') bgColor = 'FFF1F3F5';
+        else if (status === 'dicabut') bgColor = 'FFFFEBEE';
+        if (bgColor) {
+          row.eachCell((cell) => {
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bgColor } };
+          });
+        }
+        row.getCell(2).font = { name: 'Courier New', bold: true };
+        row.eachCell((cell) => {
+          cell.border = {
+            top: { style: 'thin', color: { argb: 'FFB0B0B0' } },
+            left: { style: 'thin', color: { argb: 'FFB0B0B0' } },
+            right: { style: 'thin', color: { argb: 'FFB0B0B0' } },
+            bottom: { style: 'thin', color: { argb: 'FFB0B0B0' } },
+          };
+        });
+      });
+      ws.columns = [
+        { width: 5 },
+        { width: 26 },
+        { width: 10 },
+        { width: 12 },
+        { width: 38 },
+        { width: 16 },
+        { width: 16 },
+      ];
+      ws.getColumn(1).alignment = { horizontal: 'center' };
+      ws.getColumn(2).alignment = { horizontal: 'center' };
+      ws.getColumn(3).alignment = { horizontal: 'center' };
+      ws.getColumn(4).alignment = { horizontal: 'center' };
+      ws.getColumn(6).alignment = { horizontal: 'center' };
+      ws.getColumn(7).alignment = { horizontal: 'center' };
+      ws.views = [{ state: 'frozen', ySplit: 1 }];
+      ws.autoFilter = { from: 'A1', to: 'G1' };
+      // Sheet ringkasan
+      const ws2 = wb.addWorksheet('Ringkasan');
+      ws2.addRow(['Total kode', list.length]);
+      ws2.addRow(['Aktif', list.filter(c => !c.usedBy && !c.revoked).length]);
+      ws2.addRow(['Terpakai', list.filter(c => c.usedBy).length]);
+      ws2.addRow(['Dicabut', list.filter(c => c.revoked).length]);
+      ws2.addRow(['FULL', list.filter(c => (c.tier || 'full') === 'full').length]);
+      ws2.addRow(['TRIAL', list.filter(c => c.tier === 'trial').length]);
+      ws2.addRow(['Generated at', new Date().toISOString().slice(0, 19).replace('T', ' ')]);
+      ws2.getColumn(1).width = 22; ws2.getColumn(1).font = { bold: true };
+      ws2.getColumn(2).width = 30;
+      const buf = await wb.xlsx.writeBuffer();
+      const fname = 'kode-aktivasi-random-' + (U.fmtTanggalISO ? U.fmtTanggalISO(new Date()) : new Date().toISOString().slice(0, 10)) + '.xlsx';
+      U.downloadBlob(new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), fname);
+      UI.toast(list.length + ' kode di-export ke Excel.');
+    }
+
+    function printRandom() {
+      const list = Codes.getCodes();
+      if (!list.length) return UI.toast('Tidak ada kode untuk dicetak.', 'warning');
+      const w = window.open('', '_blank');
+      const rowsHtml = list.map((c, i) => {
+        const tier = (c.tier || 'full').toUpperCase();
+        let status = 'Aktif';
+        if (c.revoked) status = 'Dicabut';
+        else if (c.usedBy) status = 'Terpakai';
+        let usedBy = '-';
+        if (c.usedBy) {
+          const u = (Auth.listUsers() || []).find(x => x.id === c.usedBy);
+          usedBy = u ? (U.escapeHtml(u.nama || u.email || '') + (u.nip ? ' (' + u.nip + ')' : '')) : U.escapeHtml(c.usedBy);
+        }
+        return `<tr><td>${i + 1}</td><td class="kode">${U.escapeHtml(c.code)}</td><td>${tier}</td><td>${status}</td><td>${usedBy}</td><td>${c.createdAt ? c.createdAt.slice(0, 10) : ''}</td><td>${c.usedAt ? c.usedAt.slice(0, 10) : ''}</td></tr>`;
+      }).join('');
+      const aktif = list.filter(c => !c.usedBy && !c.revoked).length;
+      const dipakai = list.filter(c => c.usedBy).length;
+      const dicabut = list.filter(c => c.revoked).length;
+      w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Daftar Kode Aktivasi Random</title>
+        <style>
+          body{font-family:Arial,sans-serif;padding:18px;}
+          h2{margin:0 0 4px 0;color:#1E2A5A;}
+          .sub{color:#555;margin-bottom:12px;font-size:.9em;}
+          table{border-collapse:collapse;width:100%;font-size:.85em;}
+          th,td{border:1px solid #444;padding:4px 8px;}
+          th{background:#1E2A5A;color:#fff;}
+          .kode{font-family:'Courier New',monospace;letter-spacing:.05em;font-weight:bold;}
+          @media print{ .noprint{display:none;} body{padding:8px;} }
+        </style></head><body>
+        <h2>Daftar Kode Aktivasi Random e-RHK Pengawas Madrasah 2026</h2>
+        <div class="sub">Pokjawas Kab. Jember &mdash; ${U.fmtTanggal ? U.fmtTanggal(new Date()) : new Date().toLocaleDateString('id-ID')} &mdash; Total: ${list.length} (Aktif: ${aktif}, Terpakai: ${dipakai}, Dicabut: ${dicabut})</div>
+        <table><thead><tr>
+          <th>No</th><th>Kode</th><th>Tier</th><th>Status</th><th>Dipakai Oleh</th><th>Dibuat</th><th>Dipakai</th>
+        </tr></thead><tbody>${rowsHtml}</tbody></table>
+        <p class="noprint"><button onclick="window.print()">Cetak</button></p>
+      </body></html>`);
+      w.document.close();
+    }
+
+    const btnRandomCsv = document.getElementById('btnRandomExportCsv');
+    if (btnRandomCsv) btnRandomCsv.addEventListener('click', exportRandomCsv);
+    const btnRandomXlsx = document.getElementById('btnRandomExportXlsx');
+    if (btnRandomXlsx) btnRandomXlsx.addEventListener('click', exportRandomXlsx);
+    const btnRandomPrint = document.getElementById('btnRandomPrint');
+    if (btnRandomPrint) btnRandomPrint.addEventListener('click', printRandom);
 
     const btnExport = document.getElementById('btnExportBundle');
     if (btnExport) btnExport.addEventListener('click', async () => {

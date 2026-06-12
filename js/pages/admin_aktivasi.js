@@ -10,6 +10,7 @@
 
       <ul class="nav nav-tabs mb-3" id="aktTab" role="tablist">
         <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabRandom" type="button">Kode Tier (Random)</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabSync" type="button">🔄 Sinkronisasi</button></li>
         <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabSingle" type="button">Per NIP (Legacy)</button></li>
         <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabBulk" type="button">Bulk (Daftar NIP)</button></li>
         <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabImport" type="button">Import Excel Pengawas</button></li>
@@ -43,6 +44,47 @@
               <button class="btn btn-sm btn-warning" id="btnExportBundle"><i class="bi bi-cloud-arrow-up"></i> Export untuk Bundled (cross-device)</button>
             </div>
             <div id="randomList"></div>
+          </div></div>
+        </div>
+
+        <div class="tab-pane fade" id="tabSync">
+          <div class="card mb-3"><div class="card-body">
+            <h5 class="card-title mb-2"><i class="bi bi-cloud-arrow-up"></i> Sinkronisasi Kode Lintas Device</h5>
+            <p class="small text-muted mb-3">Sekali setup GitHub Personal Access Token (PAT). Setelah itu, setiap kali Anda generate / revoke / hapus kode, sistem otomatis push ke <code>gh-pages/data/codes.json</code>. User di HP / device manapun bisa langsung pakai kode itu (auto-fetch saat buka aplikasi).</p>
+
+            <div class="alert alert-info small">
+              <strong>Cara dapat PAT (gratis, 5 menit):</strong>
+              <ol class="mb-0 ps-3">
+                <li>Buka <a href="https://github.com/settings/personal-access-tokens/new" target="_blank">github.com/settings/personal-access-tokens/new</a></li>
+                <li>Token name: <code>e-RHK Pengawas Sync</code></li>
+                <li>Resource owner: <strong>Subariyanto</strong></li>
+                <li>Repository access: <strong>Only select repositories</strong> → pilih <code>e-rhk-pengawas-2026</code></li>
+                <li>Permissions → Repository permissions → <strong>Contents: Read and write</strong></li>
+                <li>Klik Generate token → salin token (mulai dengan <code>github_pat_...</code>)</li>
+                <li>Paste di field di bawah, klik Simpan + Test</li>
+              </ol>
+            </div>
+
+            <div class="row g-2 align-items-end">
+              <div class="col-md-9">
+                <label class="form-label">GitHub Personal Access Token</label>
+                <input id="patIn" class="form-control" type="password" placeholder="github_pat_..." autocomplete="off" />
+                <div class="form-text">Disimpan di localStorage admin's-browser saja. Tidak diupload ke server.</div>
+              </div>
+              <div class="col-md-3 d-grid">
+                <button class="btn btn-success" id="btnSavePat"><i class="bi bi-shield-check"></i> Simpan + Test</button>
+              </div>
+            </div>
+            <div class="mt-2 d-flex gap-2 flex-wrap">
+              <button class="btn btn-sm btn-outline-secondary" id="btnRevealPat"><i class="bi bi-eye"></i> Tampilkan/Sembunyikan</button>
+              <button class="btn btn-sm btn-outline-danger" id="btnClearPat"><i class="bi bi-trash"></i> Hapus PAT</button>
+              <button class="btn btn-sm btn-outline-success ms-auto" id="btnSyncNow"><i class="bi bi-arrow-clockwise"></i> Push Sekarang</button>
+            </div>
+            <div id="syncStatus" class="mt-3"></div>
+          </div></div>
+          <div class="card"><div class="card-body">
+            <h6 class="mb-2"><i class="bi bi-info-circle"></i> Status saat ini</h6>
+            <div id="syncInfo" class="small"></div>
           </div></div>
         </div>
 
@@ -424,6 +466,84 @@
       inp.type = inp.type === 'password' ? 'text' : 'password';
     });
     document.getElementById('secretIn').type = 'password';
+
+    // ===== Tab Sinkronisasi (PAT + Auto-push) =====
+    function refreshSyncInfo() {
+      const info = document.getElementById('syncInfo');
+      if (!info) return;
+      const hasPat = !!window.GithubSync && window.GithubSync.hasPAT();
+      const remoteCount = (window.REMOTE_CODES || []).length;
+      const remoteUpd = window.REMOTE_CODES_UPDATED_AT;
+      const localCount = Codes.getCodes().length;
+      info.innerHTML = `
+        <div class="mb-2"><strong>PAT:</strong> ${hasPat ? '<span class="text-success"><i class="bi bi-check-circle"></i> terkonfigurasi</span> — setiap perubahan kode auto-sync ke gh-pages.' : '<span class="text-warning"><i class="bi bi-exclamation-triangle"></i> belum diset</span> — kode tersimpan di device ini saja.'}</div>
+        <div class="mb-1"><strong>Kode di gh-pages (publik):</strong> ${remoteCount} kode${remoteUpd ? ' · update terakhir: ' + remoteUpd.replace('T', ' ').slice(0, 19) + ' UTC' : ''}</div>
+        <div><strong>Kode di device ini:</strong> ${localCount} kode</div>
+        <div class="mt-2 small text-muted">URL publik: <code>${window.GithubSync ? 'https://raw.githubusercontent.com/' + window.GithubSync.REPO_OWNER + '/' + window.GithubSync.REPO_NAME + '/' + window.GithubSync.REPO_BRANCH + '/' + window.GithubSync.CODES_PATH : ''}</code></div>
+      `;
+    }
+    refreshSyncInfo();
+
+    const patIn = document.getElementById('patIn');
+    if (patIn) {
+      patIn.value = window.GithubSync ? window.GithubSync.getPAT() : '';
+      patIn.type = 'password';
+    }
+    const btnSavePat = document.getElementById('btnSavePat');
+    if (btnSavePat) btnSavePat.addEventListener('click', async () => {
+      const v = patIn.value.trim();
+      if (!v) return UI.toast('PAT kosong. Paste token dari GitHub.', 'danger');
+      if (!/^github_pat_|^ghp_/.test(v)) {
+        if (!await UI.confirmDialog('Token tidak diawali github_pat_ atau ghp_. Tetap simpan?')) return;
+      }
+      window.GithubSync.setPAT(v);
+      const status = document.getElementById('syncStatus');
+      status.innerHTML = '<div class="alert alert-info mb-0"><i class="bi bi-arrow-repeat"></i> Test PAT...</div>';
+      const t = await window.GithubSync.testPAT();
+      if (t.ok) {
+        status.innerHTML = '<div class="alert alert-success mb-0"><i class="bi bi-check-circle"></i> ' + U.escapeHtml(t.message) + '</div>';
+        // Push current local codes immediately
+        const list = Codes.getCodes();
+        if (list.length) {
+          status.innerHTML += '<div class="alert alert-info mt-2 mb-0"><i class="bi bi-arrow-up-circle"></i> Push ' + list.length + ' kode lokal ke gh-pages...</div>';
+          const r = await window.GithubSync.pushIfConfigured(list, 'initial sync after PAT setup');
+          if (r.synced) status.innerHTML += '<div class="alert alert-success mt-2 mb-0"><i class="bi bi-cloud-check"></i> Berhasil push ' + list.length + ' kode. User di device manapun bisa aktivasi sekarang.</div>';
+          else status.innerHTML += '<div class="alert alert-danger mt-2 mb-0"><i class="bi bi-x-circle"></i> Gagal push: ' + U.escapeHtml(r.error || r.reason) + '</div>';
+        }
+        UI.toast('PAT tersimpan dan terverifikasi.');
+        refreshSyncInfo();
+      } else {
+        status.innerHTML = '<div class="alert alert-danger mb-0"><i class="bi bi-x-circle"></i> ' + U.escapeHtml(t.message) + '</div>';
+      }
+    });
+    const btnRevealPat = document.getElementById('btnRevealPat');
+    if (btnRevealPat) btnRevealPat.addEventListener('click', () => {
+      patIn.type = patIn.type === 'password' ? 'text' : 'password';
+    });
+    const btnClearPat = document.getElementById('btnClearPat');
+    if (btnClearPat) btnClearPat.addEventListener('click', async () => {
+      if (!await UI.confirmDialog('Hapus PAT? Auto-sync akan berhenti, kode baru hanya tersimpan di device ini.')) return;
+      window.GithubSync.clearPAT();
+      patIn.value = '';
+      document.getElementById('syncStatus').innerHTML = '<div class="alert alert-secondary mb-0"><i class="bi bi-info-circle"></i> PAT dihapus.</div>';
+      refreshSyncInfo();
+      UI.toast('PAT dihapus.');
+    });
+    const btnSyncNow = document.getElementById('btnSyncNow');
+    if (btnSyncNow) btnSyncNow.addEventListener('click', async () => {
+      if (!window.GithubSync.hasPAT()) return UI.toast('Set PAT dulu sebelum push.', 'warning');
+      const status = document.getElementById('syncStatus');
+      const list = Codes.getCodes();
+      status.innerHTML = '<div class="alert alert-info mb-0"><i class="bi bi-arrow-up-circle"></i> Push ' + list.length + ' kode lokal ke gh-pages...</div>';
+      const r = await window.GithubSync.pushIfConfigured(list, 'manual push from admin');
+      if (r.synced) {
+        status.innerHTML = '<div class="alert alert-success mb-0"><i class="bi bi-cloud-check"></i> Berhasil push ' + list.length + ' kode. Sinkron di semua device dalam ~30 detik (cache GitHub).</div>';
+        UI.toast('Push berhasil.');
+        refreshSyncInfo();
+      } else {
+        status.innerHTML = '<div class="alert alert-danger mb-0"><i class="bi bi-x-circle"></i> Gagal: ' + U.escapeHtml(r.error || r.reason) + '</div>';
+      }
+    });
 
     // ===== Tab Kode Tier (Random) =====
     function renderRandomList() {

@@ -36,6 +36,12 @@
       try { Store.migrateLegacy && Store.migrateLegacy(); } catch (e) { console.warn('migrate legacy:', e); }
       // Pastikan admin user selalu tier='full'
       try { window.Tier && Tier.ensureAdminFullTier && Tier.ensureAdminFullTier(); } catch (e) {}
+      // Load remote codes dari gh-pages (best-effort, async, jangan blocking).
+      try {
+        if (window.GithubSync && window.GithubSync.refreshFromPublic) {
+          window.GithubSync.refreshFromPublic().catch(e => console.warn('[boot] remote codes refresh failed:', e.message));
+        }
+      } catch (e) {}
       bootRoutes();
     } catch (e) {
       console.error('boot error:', e);

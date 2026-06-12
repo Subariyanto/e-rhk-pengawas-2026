@@ -11,7 +11,16 @@
   function normCode(s) { return String(s || '').toUpperCase().replace(/\s+/g, '').trim(); }
 
   function getCodes() { return Store.getGlobal(STORE_KEY, []) || []; }
-  function saveCodes(list) { Store.setGlobal(STORE_KEY, list || []); }
+  function saveCodes(list) {
+    Store.setGlobal(STORE_KEY, list || []);
+    // Auto-sync ke gh-pages kalau admin sudah set PAT (best-effort, async).
+    try {
+      if (typeof window !== 'undefined' && window.GithubSync && window.GithubSync.hasPAT && window.GithubSync.hasPAT()) {
+        // Kirim semua kode (termasuk usedBy/revoked) supaya state lintas device sinkron.
+        window.GithubSync.pushIfConfigured(list || [], 'sync codes after admin op');
+      }
+    } catch (e) { console.warn('[codes] auto-sync skipped:', e.message); }
+  }
 
   // Generate kode random format: PREFIX-XXXX-XXXX-XXXX
   // chars dipilih supaya gampang dibaca (tanpa O/0/I/1).
@@ -38,13 +47,20 @@
     const list = getCodes();
     const localHit = list.find(x => normCode(x.code) === c && !x.usedBy && !x.revoked);
     if (localHit) return localHit;
-    // Cek bundled codes (dideploy via js/data/purchase_default.js).
-    // Bundled codes tidak punya state usedBy/revoked di file (selalu valid),
-    // tapi konsumsi per-user dilacak di localStorage list (consumeCode).
+    // Cek REMOTE codes (loaded dari gh-pages via GithubSync.refreshFromPublic).
+    // REMOTE_CODES adalah source of truth untuk admin codes lintas device.
+    const remote = (typeof window !== 'undefined' && Array.isArray(window.REMOTE_CODES)) ? window.REMOTE_CODES : [];
+    const rHit = remote.find(x => normCode(x.code) === c && !x.usedBy && !x.revoked);
+    if (rHit) {
+      // Cek apakah kode ini sudah di-consume di localStorage user current
+      const consumedHere = list.find(x => normCode(x.code) === c && x.usedBy);
+      if (consumedHere) return null;
+      return { code: rHit.code, tier: (rHit.tier || 'full').toLowerCase(), remote: true, usedBy: null };
+    }
+    // Cek BUNDLED codes (statis dari js/data/purchase_default.js, fallback)
     const bundled = (typeof window !== 'undefined' && Array.isArray(window.BUNDLED_CODES)) ? window.BUNDLED_CODES : [];
     const bHit = bundled.find(x => normCode(x.code) === c);
     if (bHit) {
-      // Cek apakah kode ini sudah di-consume di localStorage user current
       const consumedHere = list.find(x => normCode(x.code) === c && x.usedBy);
       if (consumedHere) return null;
       return { code: bHit.code, tier: (bHit.tier || 'full').toLowerCase(), bundled: true, usedBy: null };
@@ -60,6 +76,9 @@
     const list = getCodes();
     const localHit = list.find(x => normCode(x.code) === c);
     if (localHit) return localHit;
+    const remote = (typeof window !== 'undefined' && Array.isArray(window.REMOTE_CODES)) ? window.REMOTE_CODES : [];
+    const rHit = remote.find(x => normCode(x.code) === c);
+    if (rHit) return { code: rHit.code, tier: (rHit.tier || 'full').toLowerCase(), remote: true, usedBy: rHit.usedBy || null, revoked: !!rHit.revoked };
     const bundled = (typeof window !== 'undefined' && Array.isArray(window.BUNDLED_CODES)) ? window.BUNDLED_CODES : [];
     const bHit = bundled.find(x => normCode(x.code) === c);
     if (bHit) return { code: bHit.code, tier: (bHit.tier || 'full').toLowerCase(), bundled: true, usedBy: null };

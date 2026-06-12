@@ -135,13 +135,13 @@ a:hover { color: var(--primary-dark); }
   margin-bottom: 8px;
 }
 .app-sidebar .brand .logo {
-  width: 48px; height: 48px;
-  background: #fff;
+  width: 52px; height: 52px;
+  background: radial-gradient(circle at center, rgba(255,255,255,.95) 0%, rgba(255,255,255,.65) 35%, rgba(255,255,255,.25) 65%, rgba(255,255,255,0) 85%);
   border-radius: 50%;
   display: grid; place-items: center;
-  color: var(--primary-dark);
+  color: #fff;
   font-weight: 800;
-  box-shadow: 0 2px 8px rgba(0,0,0,.35);
+  box-shadow: none;
   flex-shrink: 0;
   padding: 4px;
   box-sizing: border-box;
@@ -150,6 +150,7 @@ a:hover { color: var(--primary-dark); }
   width: 100%; height: 100%;
   object-fit: contain;
   display: block;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,.35));
 }
 .app-sidebar .brand .title { font-weight: 700; line-height: 1.15; color: #fff; }
 .app-sidebar .brand .subtitle { font-size: 11px; opacity: .75; color: var(--accent); }

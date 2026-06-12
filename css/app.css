@@ -135,13 +135,20 @@ a:hover { color: var(--primary-dark); }
   margin-bottom: 8px;
 }
 .app-sidebar .brand .logo {
-  width: 38px; height: 38px;
-  background: var(--accent);
-  border-radius: 9px;
+  width: 44px; height: 44px;
+  background: transparent;
+  border-radius: 0;
   display: grid; place-items: center;
-  color: var(--primary-dark);
+  color: #fff;
   font-weight: 800;
-  box-shadow: 0 2px 6px rgba(0,0,0,.25);
+  box-shadow: none;
+  flex-shrink: 0;
+}
+.app-sidebar .brand .logo img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  /* Drop-shadow biar logo gelap kontras di sidebar gelap */
+  filter: drop-shadow(0 0 1px rgba(255,255,255,.6)) drop-shadow(0 1px 2px rgba(0,0,0,.4));
 }
 .app-sidebar .brand .title { font-weight: 700; line-height: 1.15; color: #fff; }
 .app-sidebar .brand .subtitle { font-size: 11px; opacity: .75; color: var(--accent); }

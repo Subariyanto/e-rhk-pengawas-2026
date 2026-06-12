@@ -42,7 +42,7 @@
       <div class="app-shell">
         <aside class="app-sidebar" id="appSidebar">
           <div class="brand">
-            <div class="logo"><img src="icons/kemenag.svg" alt="Kemenag" style="width:42px;height:42px;display:block;" onerror="this.style.display='none';this.parentElement.textContent='\ud83d\udcdc';"></div>
+            <div class="logo"><img src="icons/kemenag.svg" alt="Kemenag" onerror="this.style.display='none';this.parentElement.textContent='\ud83d\udcdc';"></div>
             <div>
               <div class="title">e-RHK Pengawas</div>
             </div>

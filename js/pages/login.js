@@ -12,8 +12,8 @@
           <form id="frmLogin">
             <div class="mb-3">
               <label class="form-label">NIP atau Email</label>
-              <input class="form-control" name="email" required autofocus placeholder="18 digit NIP atau email" />
-              <div class="form-text">Pengawas: masukkan NIP.</div>
+              <input class="form-control" name="email" required autofocus placeholder="18 digit NIP atau email" id="loginIdInput" />
+              <div class="form-text">Pengawas: masukkan NIP. Trial tanpa NIP: pakai email yang didaftarkan.</div>
             </div>
             <div class="mb-3">
               <label class="form-label">Password</label>
@@ -30,6 +30,16 @@
         </div>
       </div>
     `);
+    // Pre-fill from last register if available
+    try {
+      const last = sessionStorage.getItem('erhk2026_last_login');
+      if (last) {
+        const inp = document.getElementById('loginIdInput');
+        if (inp) inp.value = last;
+        sessionStorage.removeItem('erhk2026_last_login');
+      }
+    } catch (e) {}
+
     document.getElementById('frmLogin').addEventListener('submit', async (e) => {
       e.preventDefault();
       const fd = new FormData(e.target);

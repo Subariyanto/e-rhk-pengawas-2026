@@ -28,6 +28,11 @@
               <input class="form-control" name="nama" placeholder="Nama lengkap (untuk trial tanpa NIP)" />
               <div class="form-text">Wajib diisi kalau NIP dikosongkan.</div>
             </div>
+            <div class="mb-3" id="emailWrap" style="display:none;">
+              <label class="form-label">Email</label>
+              <input class="form-control" type="email" name="email" placeholder="contoh@email.com" autocomplete="email" />
+              <div class="form-text">Wajib diisi kalau NIP dikosongkan. Email ini dipakai untuk <strong>login</strong>.</div>
+            </div>
             <div class="mb-3">
               <label class="form-label">Kode Aktivasi <span class="text-muted small">(opsional)</span></label>
               <input class="form-control" name="kode" placeholder="Kosongkan untuk TRIAL gratis" style="font-family:'Courier New',monospace;letter-spacing:.05em;text-transform:uppercase;" autocomplete="off" />
@@ -55,6 +60,7 @@
 
     const nipInput = document.querySelector('input[name="nip"]');
     const namaWrap = document.getElementById('namaWrap');
+    const emailWrap = document.getElementById('emailWrap');
     const namaInput = document.querySelector('input[name="nama"]');
     const nipInfo = document.getElementById('nipInfo');
 
@@ -62,10 +68,12 @@
       const nip = String(nipInput.value || '').replace(/[^0-9]/g, '');
       if (!nip) {
         namaWrap.style.display = '';
-        nipInfo.innerHTML = '<span class="text-muted">NIP kosong &rarr; daftar mode <strong>TRIAL tanpa NIP</strong>. Isi nama di bawah.</span>';
+        emailWrap.style.display = '';
+        nipInfo.innerHTML = '<span class="text-muted">NIP kosong &rarr; daftar mode <strong>TRIAL tanpa NIP</strong>. Isi nama &amp; email di bawah (email dipakai untuk login).</span>';
         return;
       }
       namaWrap.style.display = 'none';
+      emailWrap.style.display = 'none';
       if (nip.length < 15) {
         nipInfo.innerHTML = '<span class="text-muted">Lengkapi NIP minimal 15 digit, atau kosongkan untuk trial tanpa NIP.</span>';
         return;
@@ -88,6 +96,7 @@
       const kodeRaw = String(fd.get('kode') || '').trim();
       const kode = kodeRaw.toUpperCase();
       let nama = String(fd.get('nama') || '').trim();
+      let emailInput = String(fd.get('email') || '').trim();
 
       if (pw !== fd.get('password2')) return UI.toast('Konfirmasi password tidak cocok.', 'danger');
       if (!pw || pw.length < 6) return UI.toast('Password minimal 6 karakter.', 'danger');
@@ -123,8 +132,12 @@
 
       // Validasi NIP & nama
       if (!nip) {
-        // Trial tanpa NIP — wajib nama
+        // Trial tanpa NIP — wajib nama + email
         if (!nama) return UI.toast('Mohon isi nama lengkap (NIP dikosongkan).', 'danger');
+        if (!emailInput) return UI.toast('Mohon isi email (NIP dikosongkan). Email dipakai untuk login.', 'danger');
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput)) return UI.toast('Format email tidak valid.', 'danger');
+        const dup = Auth.listUsers().find(x => x.email && x.email.toLowerCase() === emailInput.toLowerCase());
+        if (dup) return UI.toast('Email ini sudah terdaftar. Silakan login atau pakai email lain.', 'danger');
       } else {
         if (nip.length < 15) return UI.toast('NIP tidak valid (minimal 15 digit angka), atau kosongkan untuk trial tanpa NIP.', 'danger');
         // Auto-lookup nama
@@ -141,7 +154,7 @@
         if (tier === 'trial') {
           trialExpiresAt = new Date(Date.now() + Tier.TRIAL_DAYS * 86400000).toISOString();
         }
-        const email = nip ? (nip + '@pengawas.local') : ('user_' + Date.now() + '@pengawas.local');
+        const email = nip ? (nip + '@pengawas.local') : emailInput.toLowerCase();
         await Auth.register({ nama, email, password: pw, nip, tier, trialExpiresAt, activatedWith });
 
         // Konsumsi kode random (master tidak dihabiskan, legacy juga tidak)
@@ -154,10 +167,13 @@
           }
         }
 
-        let pesan = 'Pendaftaran berhasil. Silakan login.';
-        if (tier === 'trial') pesan = '✅ Pendaftaran sukses sebagai TRIAL (' + Tier.TRIAL_DAYS + ' hari, max ' + Tier.TRIAL_MAX_KEGIATAN + ' kegiatan). Silakan login.';
-        else pesan = '🎉 Pendaftaran sukses sebagai FULL. Silakan login.';
+        const loginId = nip || email;
+        let pesan = 'Pendaftaran berhasil. Silakan login pakai ' + loginId + '.';
+        if (tier === 'trial') pesan = '✅ TRIAL sukses (' + Tier.TRIAL_DAYS + ' hari, max ' + Tier.TRIAL_MAX_KEGIATAN + ' kegiatan). Login pakai: ' + loginId;
+        else pesan = '🎉 FULL sukses. Login pakai: ' + loginId;
         UI.toast(pesan);
+        // Pre-fill login field via sessionStorage agar mudah
+        try { sessionStorage.setItem('erhk2026_last_login', loginId); } catch (e) {}
         Router.navigate('/login', true);
         Router.dispatch();
       } catch (err) {

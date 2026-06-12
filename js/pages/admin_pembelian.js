@@ -12,6 +12,12 @@
         Pakai placeholder <code>{KODE}</code>, <code>{APP}</code>, <code>{URL}</code>, <code>{NIP}</code>, <code>{NAMA}</code>.
       </div>
 
+      <div class="alert alert-secondary small py-2 mb-3">
+        <i class="bi bi-database"></i> <strong>Status tersimpan saat ini:</strong>
+        Nomor WA: <code>${s.waNumber ? U.escapeHtml(s.waNumber) : '(belum diatur)'}</code>
+        · Harga: <code>${s.harga ? U.escapeHtml(s.harga) : '(belum diatur)'}</code>
+      </div>
+
       <div class="card">
         <div class="card-body">
           <form id="frmPur">
@@ -67,9 +73,14 @@
       e.preventDefault();
       const fd = new FormData(e.target);
       const cur = Codes.getPurchaseSettings();
+      const rawWa = String(fd.get('waNumber') || '').trim();
+      const normWa = Codes.normalizeWa(rawWa);
+      if (rawWa && !normWa) {
+        return UI.toast('Nomor WA tidak valid (harus mengandung angka).', 'danger');
+      }
       const next = {
         ...cur,
-        waNumber: Codes.normalizeWa(String(fd.get('waNumber') || '').trim()),
+        waNumber: normWa,
         harga: String(fd.get('harga') || '').trim(),
         bankInfo: String(fd.get('bankInfo') || ''),
         appName: String(fd.get('appName') || '').trim() || cur.appName,
@@ -78,7 +89,16 @@
         sendTemplate: String(fd.get('sendTemplate') || ''),
       };
       Codes.savePurchaseSettings(next);
-      UI.toast('Pengaturan pembelian disimpan.');
+      // Verifikasi roundtrip dari localStorage
+      const verify = Codes.getPurchaseSettings();
+      if (verify.waNumber !== normWa) {
+        UI.toast('Gagal menyimpan: data tidak terbaca ulang dari storage.', 'danger');
+        console.error('[AdminPembelian] save mismatch', { saved: normWa, got: verify.waNumber });
+        return;
+      }
+      UI.toast('Pengaturan tersimpan. Nomor WA: ' + (verify.waNumber || '(kosong)'));
+      // Re-render form supaya menampilkan nilai ternormalisasi
+      Page.AdminPembelian();
     });
 
     document.getElementById('btnReset').addEventListener('click', async () => {

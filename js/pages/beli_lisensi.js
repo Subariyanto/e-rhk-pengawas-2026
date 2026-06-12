@@ -58,8 +58,12 @@
 
           <div class="d-grid gap-2 mb-3">
             ${s.waNumber
-              ? `<button class="btn btn-success btn-lg" id="btnWaOrder"><i class="bi bi-whatsapp"></i> Pesan via WhatsApp</button>`
-              : `<div class="alert alert-warning mb-0"><i class="bi bi-exclamation-triangle"></i> Nomor WA admin belum dikonfigurasi.</div>`
+              ? `<button class="btn btn-success btn-lg" id="btnWaOrder"><i class="bi bi-whatsapp"></i> Pesan via WhatsApp <span class="small opacity-75">(+${U.escapeHtml(s.waNumber)})</span></button>`
+              : `<div class="alert alert-warning mb-0">
+                  <i class="bi bi-exclamation-triangle"></i> <strong>Nomor WA admin belum dikonfigurasi.</strong>
+                  <div class="small mt-1">Kalau Anda <strong>admin</strong> dan sudah set nomor WA: tekan <kbd>Ctrl+F5</kbd> untuk hard reload (cache aplikasi mungkin belum sinkron).</div>
+                  <button class="btn btn-sm btn-outline-warning mt-2" id="btnReloadCfg"><i class="bi bi-arrow-clockwise"></i> Muat ulang konfigurasi</button>
+                </div>`
             }
             <button class="btn btn-outline-success" id="btnActivate"><i class="bi bi-key"></i> Aktivasi Kode FULL</button>
           </div>
@@ -74,6 +78,13 @@
       </div>
     `;
     UI.bareShell(html);
+
+    const btnReload = document.getElementById('btnReloadCfg');
+    if (btnReload) {
+      btnReload.addEventListener('click', () => {
+        Page.BeliLisensi();
+      });
+    }
 
     const btnWa = document.getElementById('btnWaOrder');
     if (btnWa) {

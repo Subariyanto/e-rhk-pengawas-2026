@@ -28,13 +28,20 @@
               <button class="btn btn-outline-warning btn-sm" id="btnGen10Trial"><i class="bi bi-collection"></i> 10 Kode TRIAL</button>
               <button class="btn btn-outline-secondary btn-sm ms-auto" id="btnClearUsed"><i class="bi bi-eraser"></i> Hapus Kode Terpakai/Cabut</button>
             </div>
-            <div class="alert alert-info mt-3 small mb-0">
+            <div class="alert alert-warning mt-3 small mb-0">
+              <i class="bi bi-exclamation-triangle"></i> <strong>Penting (cross-device):</strong> Kode random tersimpan di localStorage device ini saja. Supaya user bisa aktivasi dari HP / device lain, klik <strong>📤 Export untuk Bundled</strong> di bawah, lalu paste hasilnya ke file <code>js/data/purchase_default.js</code> (atau kirim via chat ke Bari) → commit + push gh-pages.
+            </div>
+            <div class="alert alert-info mt-2 small mb-0">
               <i class="bi bi-key"></i> Kode <strong>master</strong> (selalu aktif, hard-coded di source):
               <code style="font-family:monospace;font-weight:600;">${U.escapeHtml(Codes.MASTER_CODE)}</code>
               &mdash; ganti + redeploy kalau bocor.
             </div>
           </div></div>
           <div class="card"><div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+              <h6 class="mb-0"><i class="bi bi-list-check"></i> Daftar Kode Random</h6>
+              <button class="btn btn-sm btn-warning" id="btnExportBundle"><i class="bi bi-cloud-arrow-up"></i> Export untuk Bundled (cross-device)</button>
+            </div>
             <div id="randomList"></div>
           </div></div>
         </div>
@@ -552,6 +559,49 @@
       Codes.clearUsedAndRevoked();
       renderRandomList();
       UI.toast('Kode terpakai/dicabut dihapus.');
+    });
+
+    const btnExport = document.getElementById('btnExportBundle');
+    if (btnExport) btnExport.addEventListener('click', async () => {
+      const aktif = Codes.getCodes().filter(c => !c.usedBy && !c.revoked);
+      if (!aktif.length) return UI.toast('Tidak ada kode aktif untuk di-export.', 'warning');
+      const lines = aktif.map(c => `  { code: '${c.code}', tier: '${(c.tier || 'full')}', note: '' },`).join('\n');
+      const snippet = 'window.BUNDLED_CODES = [\n' + lines + '\n];';
+      // Tampilkan modal copy-paste
+      const modal = document.createElement('div');
+      modal.className = 'modal fade';
+      modal.innerHTML = `
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title"><i class="bi bi-cloud-arrow-up"></i> Export Bundled Codes</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              <p class="small mb-2">Salin blok di bawah, lalu paste ke file <code>js/data/purchase_default.js</code> di repo, ganti baris <code>window.BUNDLED_CODES = [ ... ];</code>. Commit + push ke <code>gh-pages</code>. Dalam ~1 menit semua device bisa aktivasi pakai kode ini.</p>
+              <p class="small mb-2">Atau kirim blok ini via chat ke Bari, nanti dia yang commit.</p>
+              <textarea class="form-control" rows="14" id="bundleSnippet" style="font-family:'Courier New',monospace;font-size:12px;" readonly>${snippet.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</textarea>
+              <div class="mt-2"><strong>${aktif.length}</strong> kode aktif di-export.</div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-success" id="btnCopyBundle"><i class="bi bi-clipboard"></i> Salin ke Clipboard</button>
+              <button class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+      const bsModal = new bootstrap.Modal(modal);
+      bsModal.show();
+      modal.addEventListener('hidden.bs.modal', () => modal.remove());
+      modal.querySelector('#btnCopyBundle').addEventListener('click', async () => {
+        try { await navigator.clipboard.writeText(snippet); UI.toast('Snippet tersalin.'); }
+        catch (_) {
+          modal.querySelector('#bundleSnippet').select();
+          document.execCommand('copy');
+          UI.toast('Snippet tersalin (fallback).');
+        }
+      });
     });
 
     renderRandomList();

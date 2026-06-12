@@ -26,7 +26,7 @@
     return pfx + blk(4) + '-' + blk(4) + '-' + blk(4);
   }
 
-  // Cari kode di list random codes; juga deteksi MASTER code hardcoded.
+  // Cari kode di list random codes; juga deteksi MASTER code hardcoded + BUNDLED codes.
   // Return: null kalau tidak ada / sudah revoked / sudah dipakai (untuk non-master).
   // Untuk konsistensi, MASTER code selalu valid (master=true, tier='full').
   function findCode(codeText) {
@@ -36,7 +36,20 @@
       return { code: MASTER_CODE, tier: 'full', master: true, usedBy: null };
     }
     const list = getCodes();
-    return list.find(x => normCode(x.code) === c && !x.usedBy && !x.revoked) || null;
+    const localHit = list.find(x => normCode(x.code) === c && !x.usedBy && !x.revoked);
+    if (localHit) return localHit;
+    // Cek bundled codes (dideploy via js/data/purchase_default.js).
+    // Bundled codes tidak punya state usedBy/revoked di file (selalu valid),
+    // tapi konsumsi per-user dilacak di localStorage list (consumeCode).
+    const bundled = (typeof window !== 'undefined' && Array.isArray(window.BUNDLED_CODES)) ? window.BUNDLED_CODES : [];
+    const bHit = bundled.find(x => normCode(x.code) === c);
+    if (bHit) {
+      // Cek apakah kode ini sudah di-consume di localStorage user current
+      const consumedHere = list.find(x => normCode(x.code) === c && x.usedBy);
+      if (consumedHere) return null;
+      return { code: bHit.code, tier: (bHit.tier || 'full').toLowerCase(), bundled: true, usedBy: null };
+    }
+    return null;
   }
 
   // Versi non-strict: cari kode tanpa filter usedBy/revoked (untuk admin tabel).
@@ -45,7 +58,12 @@
     if (!c) return null;
     if (c === MASTER_CODE) return { code: MASTER_CODE, tier: 'full', master: true, usedBy: null };
     const list = getCodes();
-    return list.find(x => normCode(x.code) === c) || null;
+    const localHit = list.find(x => normCode(x.code) === c);
+    if (localHit) return localHit;
+    const bundled = (typeof window !== 'undefined' && Array.isArray(window.BUNDLED_CODES)) ? window.BUNDLED_CODES : [];
+    const bHit = bundled.find(x => normCode(x.code) === c);
+    if (bHit) return { code: bHit.code, tier: (bHit.tier || 'full').toLowerCase(), bundled: true, usedBy: null };
+    return null;
   }
 
   function getTier(codeText) {
@@ -54,6 +72,7 @@
   }
 
   // Tandai kode sebagai dipakai. Master code tidak dihabiskan.
+  // Untuk bundled code: kalau belum ada di local list, push entry baru sebagai marker.
   function consumeCode(codeText, userId) {
     const c = normCode(codeText);
     if (!c || c === MASTER_CODE) return;
@@ -62,6 +81,22 @@
     if (idx >= 0) {
       list[idx].usedBy = userId;
       list[idx].usedAt = new Date().toISOString();
+      saveCodes(list);
+      return;
+    }
+    // Bundled code yang baru pertama dipakai — catat sebagai consumed di local
+    const bundled = (typeof window !== 'undefined' && Array.isArray(window.BUNDLED_CODES)) ? window.BUNDLED_CODES : [];
+    const bHit = bundled.find(x => normCode(x.code) === c);
+    if (bHit) {
+      list.unshift({
+        code: bHit.code,
+        tier: (bHit.tier || 'full').toLowerCase(),
+        bundled: true,
+        createdAt: new Date().toISOString(),
+        usedBy: userId,
+        usedAt: new Date().toISOString(),
+        revoked: false,
+      });
       saveCodes(list);
     }
   }

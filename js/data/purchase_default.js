@@ -29,3 +29,20 @@ window.PURCHASE_DEFAULT = {
     '4. Tempel kode di atas → selesai ✅\n\n' +
     'Kode ini sekali pakai. Simpan baik-baik.\n\nSalam,\nSubariyanto\nKetua Pokjawas Madrasah Kab. Jember',
 };
+
+// BUNDLED CODES — kode aktivasi yang ikut dideploy ke gh-pages.
+// Manfaatnya: admin generate kode di laptop, tapi user bisa aktivasi dari HP manapun
+// (localStorage HP user kosong, tapi codes ini ikut load dari file ini).
+//
+// Pemakaian:
+//   1. Admin login di laptop → Admin > Kode Aktivasi > Generate kode FULL
+//   2. Salin kode hasil generate, paste ke array di bawah dengan format:
+//        { code: 'FULL-XXXX-XXXX-XXXX', tier: 'full', note: 'untuk Pak Fulan' }
+//   3. Commit + push ke gh-pages → dalam ~1 menit semua device bisa pakai kode ini.
+//
+// Kode yang sudah di-consume akan ditandai di localStorage user (per-device).
+// Kode bundled ini SELALU valid lintas device sampai admin hapus dari array di bawah.
+window.BUNDLED_CODES = [
+  // Contoh:
+  // { code: 'FULL-AB12-CD34-EF56', tier: 'full', note: 'Pak Subariyanto' },
+];

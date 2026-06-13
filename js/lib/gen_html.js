@@ -810,9 +810,12 @@
   function genSuratKeteranganMadrasah(rhk, keg, idn) {
     const i = idn || Page.Identitas.get();
     const madrasahList = (Store && typeof Store.get === 'function') ? (Store.get('madrasah', []) || []) : [];
-    // Cari madrasah dari kegiatan kalau tempat-nya match nama madrasah, fallback ke item pertama list.
+    // Cari madrasah dari kegiatan: prioritas madrasah_id, lalu match nama dari tempat, lalu item pertama.
     let mad = null;
-    if (keg && keg.tempat) {
+    if (keg && keg.madrasah_id && keg.madrasah_id !== 'semua') {
+      mad = madrasahList.find(m => m && m.id === keg.madrasah_id);
+    }
+    if (!mad && keg && keg.tempat) {
       const tempat = String(keg.tempat).toLowerCase();
       mad = madrasahList.find(m => m && m.nama_madrasah && tempat.includes(String(m.nama_madrasah).toLowerCase()));
     }
@@ -831,7 +834,8 @@
 
     const tanggalKegiatan = (keg && keg.tanggal) ? U.fmtTanggal(keg.tanggal) : '............';
     const namaKegiatan = keg ? (keg.nama_kegiatan || rhk.nama_eviden) : rhk.nama_eviden;
-    const sasaran = keg ? (keg.sasaran || keg.peserta || 'Kepala Madrasah, guru, dan tenaga kependidikan') : 'Kepala Madrasah, guru, dan tenaga kependidikan';
+    const sasaranKeg = keg ? (keg.sasaran || keg.peserta || '') : '';
+    const sasaran = sasaranKeg || 'Kepala Madrasah, guru, dan tenaga kependidikan';
     const periode = rhk.triwulan === 'TAMBAHAN' ? 'Kinerja Tambahan' : 'Triwulan ' + rhk.triwulan + ' Tahun 2026';
     const tanggalSurat = (keg && keg.tanggal) ? U.fmtTanggal(keg.tanggal) : U.fmtTanggal(new Date());
     const kodeMad = npsnMad || (mad ? (String(mad.nama_madrasah || '').replace(/\s+/g, '').slice(0, 5).toUpperCase() || 'MAD') : 'MAD');

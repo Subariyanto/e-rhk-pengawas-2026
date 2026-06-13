@@ -146,6 +146,8 @@
                 ${madrasah.map(m => `<option value="${m.id}" ${k.madrasah_id === m.id ? 'selected' : ''}>${U.escapeHtml(m.nama_madrasah)} (${m.jenjang})</option>`).join('')}
               </select>
             </div>
+            <div class="col-md-6"><label class="form-label">Sasaran</label><input class="form-control" name="sasaran" value="${U.escapeHtml(k.sasaran || '')}" placeholder="Contoh: Kepala Madrasah dan Guru" /></div>
+            <div class="col-md-6"><label class="form-label">Peserta</label><input class="form-control" name="peserta" value="${U.escapeHtml(k.peserta || '')}" placeholder="Contoh: 25 orang (Kepala Madrasah, guru, tendik)" /></div>
             <div class="col-md-12"><label class="form-label">Narasumber/Pengawas</label><input class="form-control" name="narasumber" value="${U.escapeHtml(k.narasumber || '')}" /></div>
           </div>
         </div>

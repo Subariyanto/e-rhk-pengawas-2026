@@ -804,6 +804,98 @@
     `;
   }
 
+  // ===== Surat Keterangan dari Lembaga Binaan =====
+  // Madrasah binaan menerangkan bahwa Pengawas telah melaksanakan pendampingan/pengawasan.
+  // Ditandatangani oleh Kepala Madrasah binaan (data diambil dari menu Madrasah Binaan, default ke madrasah pertama).
+  function genSuratKeteranganMadrasah(rhk, keg, idn) {
+    const i = idn || Page.Identitas.get();
+    const madrasahList = (Store && typeof Store.get === 'function') ? (Store.get('madrasah', []) || []) : [];
+    // Cari madrasah dari kegiatan kalau tempat-nya match nama madrasah, fallback ke item pertama list.
+    let mad = null;
+    if (keg && keg.tempat) {
+      const tempat = String(keg.tempat).toLowerCase();
+      mad = madrasahList.find(m => m && m.nama_madrasah && tempat.includes(String(m.nama_madrasah).toLowerCase()));
+    }
+    if (!mad) mad = madrasahList[0] || null;
+
+    const namaMad     = mad ? (mad.nama_madrasah || '-') : '(Madrasah Binaan)';
+    const alamatMad   = mad ? (mad.alamat || '-') : '-';
+    const kecamatanMad = mad ? (mad.kecamatan || '') : '';
+    const teleponMad  = mad ? (mad.no_hp || mad.email || '') : '';
+    const npsnMad     = mad ? (mad.npsn || '') : '';
+    const nsmMad      = mad ? (mad.nsm || '') : '';
+    const namaKamad   = mad ? (mad.kepala_madrasah || '(Nama Kepala Madrasah)') : '(Nama Kepala Madrasah)';
+    const nipKamad    = mad ? (mad.nip_kepala || '-') : '-';
+    const jabatanKamad = 'Kepala ' + (mad ? (mad.nama_madrasah || 'Madrasah Binaan') : 'Madrasah Binaan');
+    const kotaSurat   = (mad && mad.kecamatan) ? mad.kecamatan : (i.pegawai.kabupaten || 'Jember');
+
+    const tanggalKegiatan = (keg && keg.tanggal) ? U.fmtTanggal(keg.tanggal) : '............';
+    const namaKegiatan = keg ? (keg.nama_kegiatan || rhk.nama_eviden) : rhk.nama_eviden;
+    const sasaran = keg ? (keg.sasaran || keg.peserta || 'Kepala Madrasah, guru, dan tenaga kependidikan') : 'Kepala Madrasah, guru, dan tenaga kependidikan';
+    const periode = rhk.triwulan === 'TAMBAHAN' ? 'Kinerja Tambahan' : 'Triwulan ' + rhk.triwulan + ' Tahun 2026';
+    const tanggalSurat = (keg && keg.tanggal) ? U.fmtTanggal(keg.tanggal) : U.fmtTanggal(new Date());
+    const kodeMad = npsnMad || (mad ? (String(mad.nama_madrasah || '').replace(/\s+/g, '').slice(0, 5).toUpperCase() || 'MAD') : 'MAD');
+    const nomorSurat = (keg && keg.no_surat_keterangan) ? keg.no_surat_keterangan : `....../SK/${kodeMad}/${new Date().getFullYear()}`;
+    const kontakLine = [npsnMad ? 'NPSN: ' + npsnMad : '', nsmMad ? 'NSM: ' + nsmMad : '', teleponMad ? 'Telp/HP: ' + teleponMad : ''].filter(Boolean).join(' — ');
+
+    return `
+      <div class="doc-page">
+        <table style="width:100%;border-collapse:collapse;border-bottom:3px double #000;margin-bottom:14pt;padding-bottom:6pt;">
+          <tr>
+            <td style="width:90px;border:none;vertical-align:middle;text-align:center;">${i.logo ? `<img src="${i.logo}" style="width:80px;height:80px;" />` : ''}</td>
+            <td style="border:none;text-align:center;vertical-align:middle;">
+              <div style="font-size:12pt;">KEMENTERIAN AGAMA REPUBLIK INDONESIA</div>
+              <div style="font-size:13pt;font-weight:700;">${U.escapeHtml(String(namaMad).toUpperCase())}</div>
+              <div style="font-size:11pt;">${U.escapeHtml(alamatMad)}${kecamatanMad ? ', Kec. ' + U.escapeHtml(kecamatanMad) : ''}</div>
+              ${kontakLine ? `<div style="font-size:11pt;">${U.escapeHtml(kontakLine)}</div>` : ''}
+            </td>
+            <td style="width:90px;border:none;"></td>
+          </tr>
+        </table>
+
+        <h3 style="text-align:center;text-decoration:underline;margin:18pt 0 6pt;">SURAT KETERANGAN</h3>
+        <p style="text-align:center;margin:0 0 18pt;">Nomor: ${U.escapeHtml(nomorSurat)}</p>
+
+        <p style="text-align:justify;">Yang bertanda tangan di bawah ini, Kepala ${U.escapeHtml(namaMad)}, dengan ini menerangkan bahwa:</p>
+
+        <table style="margin-left:18pt;margin-bottom:8pt;">
+          <tr><td style="padding:2pt 8pt;border:none;width:120pt;">Nama</td><td style="padding:2pt 8pt;border:none;">:</td><td style="padding:2pt 8pt;border:none;"><strong>${U.escapeHtml(i.pegawai.nama)}</strong></td></tr>
+          <tr><td style="padding:2pt 8pt;border:none;">NIP</td><td style="padding:2pt 8pt;border:none;">:</td><td style="padding:2pt 8pt;border:none;">${U.escapeHtml(i.pegawai.nip)}</td></tr>
+          <tr><td style="padding:2pt 8pt;border:none;">Pangkat/Gol.</td><td style="padding:2pt 8pt;border:none;">:</td><td style="padding:2pt 8pt;border:none;">${U.escapeHtml(i.pegawai.pangkat_gol || '-')}</td></tr>
+          <tr><td style="padding:2pt 8pt;border:none;">Jabatan</td><td style="padding:2pt 8pt;border:none;">:</td><td style="padding:2pt 8pt;border:none;">${U.escapeHtml(i.pegawai.jabatan)}</td></tr>
+          <tr><td style="padding:2pt 8pt;border:none;">Unit Kerja</td><td style="padding:2pt 8pt;border:none;">:</td><td style="padding:2pt 8pt;border:none;">${U.escapeHtml(i.pegawai.unit_kerja)}</td></tr>
+        </table>
+
+        <p style="text-align:justify;">Telah benar-benar melaksanakan kegiatan <strong>${U.escapeHtml(namaKegiatan)}</strong> pada ${U.escapeHtml(namaMad)} dengan rincian sebagai berikut:</p>
+
+        <table style="margin-left:18pt;margin-bottom:8pt;">
+          <tr><td style="padding:2pt 8pt;border:none;width:120pt;">Hari/Tanggal</td><td style="padding:2pt 8pt;border:none;">:</td><td style="padding:2pt 8pt;border:none;">${U.escapeHtml(tanggalKegiatan)}</td></tr>
+          <tr><td style="padding:2pt 8pt;border:none;">Tempat</td><td style="padding:2pt 8pt;border:none;">:</td><td style="padding:2pt 8pt;border:none;">${U.escapeHtml(keg ? (keg.tempat || namaMad) : namaMad)}</td></tr>
+          <tr><td style="padding:2pt 8pt;border:none;">Sasaran/Peserta</td><td style="padding:2pt 8pt;border:none;">:</td><td style="padding:2pt 8pt;border:none;">${U.escapeHtml(sasaran)}</td></tr>
+          <tr><td style="padding:2pt 8pt;border:none;">Periode</td><td style="padding:2pt 8pt;border:none;">:</td><td style="padding:2pt 8pt;border:none;">${U.escapeHtml(periode)}</td></tr>
+          <tr><td style="padding:2pt 8pt;border:none;vertical-align:top;">RHK Terkait</td><td style="padding:2pt 8pt;border:none;vertical-align:top;">:</td><td style="padding:2pt 8pt;border:none;">${U.escapeHtml(rhk.id)} — ${U.escapeHtml(rhk.nama_eviden)}</td></tr>
+        </table>
+
+        <p style="text-align:justify;">Kegiatan tersebut dilaksanakan dalam rangka pendampingan/pengawasan akademik dan manajerial sebagai bagian dari pelaksanaan tugas pokok Pengawas Madrasah pada satuan pendidikan binaan kami. Pengawas yang bersangkutan telah melaksanakan tugasnya dengan baik, profesional, dan bertanggung jawab.</p>
+
+        <p style="text-align:justify;">Demikian surat keterangan ini dibuat untuk dipergunakan sebagaimana mestinya.</p>
+
+        <table style="width:100%;border-collapse:collapse;margin-top:18pt;">
+          <tr>
+            <td style="width:50%;border:none;"></td>
+            <td style="width:50%;border:none;text-align:center;vertical-align:top;">
+              <div>${U.escapeHtml(kotaSurat)}, ${U.escapeHtml(tanggalSurat)}</div>
+              <div>${U.escapeHtml(jabatanKamad)},</div>
+              <div style="height:80px;"></div>
+              <div style="text-decoration:underline;font-weight:700;">${U.escapeHtml(namaKamad)}</div>
+              <div>NIP. ${U.escapeHtml(nipKamad)}</div>
+            </td>
+          </tr>
+        </table>
+      </div>
+    `;
+  }
+
   // ===== Program Pendampingan Tahunan (Program Kerja Pengawas) — khusus RHK-1 =====
   function genProgramPendampingan(rhk, keg, idn) {
     const i = idn || Page.Identitas.get();
@@ -1132,13 +1224,14 @@
     rekomendasi: { label: 'Rekomendasi Tindak Lanjut', gen: genRekomendasi },
     foto: { label: 'Dokumentasi Foto Kegiatan', gen: genFotoDok },
     link: { label: 'Link Bukti Dukung Google Drive', gen: genLinkBukti },
+    surat_keterangan_madrasah: { label: 'Surat Keterangan dari Madrasah Binaan', gen: genSuratKeteranganMadrasah },
   };
 
   function defaultTypesFor(rhk) {
     if (rhk && rhk.id === 'RHK-1') {
       return ['program_pendampingan','laporan_singkat','surat_tugas','undangan','daftar_hadir','notulen','berita_acara','foto','link'];
     }
-    return ['laporan_singkat','surat_tugas','undangan','daftar_hadir','notulen','berita_acara','instrumen','rekap','analisis','rekomendasi','foto','link'];
+    return ['laporan_singkat','surat_tugas','undangan','daftar_hadir','notulen','berita_acara','instrumen','rekap','analisis','rekomendasi','surat_keterangan_madrasah','foto','link'];
   }
 
   // Plain text version (for DOCX & PDF fallback) — strip HTML

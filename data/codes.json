@@ -1,6 +1,14 @@
 {
   "codes": [
     {
+      "code": "FULL-DMTZ-SPRJ-DJXB",
+      "tier": "full",
+      "createdAt": "2026-06-13T13:53:32.074Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
       "code": "FULL-4M57-ECVN-2ZUU",
       "tier": "full",
       "createdAt": "2026-06-13T11:01:31.781Z",
@@ -291,5 +299,5 @@
       "note": "Ya Salam"
     }
   ],
-  "updatedAt": "2026-06-13T12:03:48.241Z"
+  "updatedAt": "2026-06-13T13:53:39.169Z"
 }

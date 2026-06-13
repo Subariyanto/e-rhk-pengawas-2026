@@ -141,7 +141,18 @@
         return;
       }
       Tier.upgradeUserToFull(cur.id);
-      if (!found.master) Codes.consumeCode(c, cur.id);
+      if (!found.master) {
+        Codes.consumeCode(c, cur.id);
+        if (window.SupabaseSync && window.SupabaseSync.isConfigured()) {
+          window.SupabaseSync.reportActivation({
+            code: c,
+            nama: cur.nama || cur.email,
+            nip: cur.nip || null,
+            email: cur.email,
+            tier: 'full',
+          }).catch(() => {});
+        }
+      }
       UI.toast('🎉 Akun berhasil di-upgrade ke FULL. Selamat menikmati semua fitur!');
       Router.navigate('/dashboard', true);
       Router.dispatch();

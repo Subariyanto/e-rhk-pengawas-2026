@@ -128,7 +128,18 @@
         const cur = Auth.currentUser();
         if (!cur) return UI.toast('Sesi tidak ditemukan, silakan login ulang.', 'danger');
         Tier.upgradeUserToFull(cur.id);
-        if (!found.master) Codes.consumeCode(c, cur.id);
+        if (!found.master) {
+          Codes.consumeCode(c, cur.id);
+          if (window.SupabaseSync && window.SupabaseSync.isConfigured()) {
+            window.SupabaseSync.reportActivation({
+              code: c,
+              nama: cur.nama || cur.email,
+              nip: cur.nip || null,
+              email: cur.email,
+              tier: 'full',
+            }).catch(() => {});
+          }
+        }
         UI.toast('🎉 Akun di-upgrade ke FULL. Selamat menikmati semua fitur!');
         Page.Dashboard();
       });

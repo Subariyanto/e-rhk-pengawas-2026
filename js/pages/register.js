@@ -168,6 +168,17 @@
             // Cari user yang baru dibuat untuk consume berdasarkan id
             const u = Auth.listUsers().find(x => x.email === email);
             Codes.consumeCode(kode, u ? u.id : email);
+            // Best-effort relay ke Supabase supaya admin laptop bisa auto-update
+            // kolom "Dipakai Oleh". No-op kalau Supabase belum dikonfigurasi.
+            if (window.SupabaseSync && window.SupabaseSync.isConfigured()) {
+              window.SupabaseSync.reportActivation({
+                code: kode,
+                nama,
+                nip: nip || null,
+                email,
+                tier,
+              }).catch(() => {});
+            }
           }
         }
 

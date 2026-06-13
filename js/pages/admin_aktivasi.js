@@ -91,6 +91,12 @@
             <h6 class="mb-2"><i class="bi bi-info-circle"></i> Status saat ini</h6>
             <div id="syncInfo" class="small"></div>
           </div></div>
+          <div class="card mt-3" id="cardSupabase" style="display:none;"><div class="card-body">
+            <h6 class="mb-2"><i class="bi bi-inbox"></i> Inbox Aktivasi (Supabase)</h6>
+            <p class="small text-muted mb-2">User aktivasi dari HP otomatis melapor ke Supabase. Klik tombol di bawah untuk tarik laporan terbaru, merge ke daftar kode (auto-isi kolom "Dipakai Oleh" + Catatan), lalu push ke gh-pages.</p>
+            <button class="btn btn-sm btn-success" id="btnPullSupabase"><i class="bi bi-cloud-download"></i> Tarik Aktivasi Terbaru</button>
+            <div id="supabaseStatus" class="small mt-2"></div>
+          </div></div>
         </div>
 
         <div class="tab-pane fade" id="tabSingle">
@@ -549,6 +555,32 @@
         status.innerHTML = '<div class="alert alert-danger mb-0"><i class="bi bi-x-circle"></i> Gagal: ' + U.escapeHtml(r.error || r.reason) + '</div>';
       }
     });
+
+    // ===== Inbox Aktivasi (Supabase) =====
+    if (window.SupabaseSync && window.SupabaseSync.isConfigured()) {
+      const card = document.getElementById('cardSupabase');
+      if (card) card.style.display = '';
+      const btnPull = document.getElementById('btnPullSupabase');
+      if (btnPull) btnPull.addEventListener('click', async () => {
+        const st = document.getElementById('supabaseStatus');
+        st.innerHTML = '<span class="text-muted"><i class="bi bi-hourglass-split"></i> Tarik laporan dari Supabase...</span>';
+        try {
+          const r = await window.SupabaseSync.syncAdminInbox();
+          if (r.errors && r.errors.length && r.errors[0] === 'not-configured') {
+            st.innerHTML = '<span class="text-warning">Supabase belum dikonfigurasi.</span>';
+            return;
+          }
+          const parts = [];
+          parts.push('<i class="bi bi-check-circle"></i> Diproses ' + r.processed + ' laporan, merged ke ' + r.merged + ' kode.');
+          if (r.pushed) parts.push(' Auto-push gh-pages dijalankan.');
+          if (r.errors && r.errors.length) parts.push(' Error: ' + r.errors.join('; '));
+          st.innerHTML = '<span class="text-success">' + parts.join('') + '</span>';
+          if (r.merged > 0) renderRandomList();
+        } catch (e) {
+          st.innerHTML = '<span class="text-danger">Gagal: ' + U.escapeHtml(e.message || String(e)) + '</span>';
+        }
+      });
+    }
 
     // ===== Tab Kode Tier (Random) =====
     function renderRandomList() {

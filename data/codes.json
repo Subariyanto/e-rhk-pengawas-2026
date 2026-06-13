@@ -1,185 +1,17 @@
 {
   "codes": [
     {
-      "code": "FULL-BJK9-X679-EUH3",
+      "code": "FULL-DMTZ-SPRJ-DJXB",
       "tier": "full",
-      "createdAt": "2026-06-12T16:08:32.631Z",
+      "createdAt": "2026-06-13T13:53:32.074Z",
       "usedBy": null,
       "usedAt": null,
       "revoked": false
     },
     {
-      "code": "FULL-MQQA-YN4C-4S93",
+      "code": "FULL-4M57-ECVN-2ZUU",
       "tier": "full",
-      "createdAt": "2026-06-12T16:08:32.631Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
-    },
-    {
-      "code": "FULL-LZXP-TMF4-RXCB",
-      "tier": "full",
-      "createdAt": "2026-06-12T16:08:32.631Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
-    },
-    {
-      "code": "FULL-C4ZB-AZU5-R49M",
-      "tier": "full",
-      "createdAt": "2026-06-12T16:08:32.630Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
-    },
-    {
-      "code": "FULL-5SXE-MPVV-AYCS",
-      "tier": "full",
-      "createdAt": "2026-06-12T16:08:32.630Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
-    },
-    {
-      "code": "FULL-8PBK-UV74-DELY",
-      "tier": "full",
-      "createdAt": "2026-06-12T16:08:32.630Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
-    },
-    {
-      "code": "FULL-KEVJ-QZ76-TZMW",
-      "tier": "full",
-      "createdAt": "2026-06-12T16:08:32.629Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
-    },
-    {
-      "code": "FULL-WXVN-5SPR-GXVP",
-      "tier": "full",
-      "createdAt": "2026-06-12T16:08:32.629Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
-    },
-    {
-      "code": "FULL-9LHE-KM6Y-LKY3",
-      "tier": "full",
-      "createdAt": "2026-06-12T16:08:32.629Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
-    },
-    {
-      "code": "FULL-8LM4-9Q6R-8GPK",
-      "tier": "full",
-      "createdAt": "2026-06-12T16:08:32.629Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
-    },
-    {
-      "code": "FULL-EUW8-4MLL-SQ55",
-      "tier": "full",
-      "createdAt": "2026-06-12T16:08:30.645Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
-    },
-    {
-      "code": "FULL-HB8P-B7XP-F2WQ",
-      "tier": "full",
-      "createdAt": "2026-06-12T16:08:30.644Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
-    },
-    {
-      "code": "FULL-NJ3J-5BH9-NZ6Y",
-      "tier": "full",
-      "createdAt": "2026-06-12T16:08:30.644Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
-    },
-    {
-      "code": "FULL-K398-22AS-FV84",
-      "tier": "full",
-      "createdAt": "2026-06-12T16:08:30.643Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
-    },
-    {
-      "code": "FULL-8X72-ARGZ-WKMG",
-      "tier": "full",
-      "createdAt": "2026-06-12T16:08:30.643Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
-    },
-    {
-      "code": "FULL-37A4-2DDW-9CZW",
-      "tier": "full",
-      "createdAt": "2026-06-12T16:08:30.642Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
-    },
-    {
-      "code": "FULL-JYVC-JDTF-ZM9A",
-      "tier": "full",
-      "createdAt": "2026-06-12T16:08:30.642Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
-    },
-    {
-      "code": "FULL-JEFU-CPAB-P2RK",
-      "tier": "full",
-      "createdAt": "2026-06-12T16:08:30.641Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
-    },
-    {
-      "code": "FULL-JLNF-97D4-7Y2Z",
-      "tier": "full",
-      "createdAt": "2026-06-12T16:08:30.641Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
-    },
-    {
-      "code": "FULL-2YVN-VEVF-38EL",
-      "tier": "full",
-      "createdAt": "2026-06-12T16:08:30.640Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
-    },
-    {
-      "code": "FULL-G23C-J82D-E2KY",
-      "tier": "full",
-      "createdAt": "2026-06-12T16:08:23.807Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
-    },
-    {
-      "code": "FULL-K8BN-YBSK-QNXB",
-      "tier": "full",
-      "createdAt": "2026-06-12T16:08:23.806Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
-    },
-    {
-      "code": "FULL-3D2S-NBTZ-TCQA",
-      "tier": "full",
-      "createdAt": "2026-06-12T16:08:23.806Z",
+      "createdAt": "2026-06-13T11:01:31.781Z",
       "usedBy": null,
       "usedAt": null,
       "revoked": false
@@ -454,7 +286,8 @@
       "createdAt": "2026-06-12T16:08:05.562Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false
+      "revoked": false,
+      "note": "Widodo"
     },
     {
       "code": "FULL-FPX4-FH2F-74LK",
@@ -464,23 +297,7 @@
       "usedAt": null,
       "revoked": false,
       "note": "Ya Salam"
-    },
-    {
-      "code": "FULL-8Q38-UPD7-RFA4",
-      "tier": "full",
-      "createdAt": "2026-06-12T16:08:05.561Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
-    },
-    {
-      "code": "FULL-7J9G-JMT2-D33K",
-      "tier": "full",
-      "createdAt": "2026-06-12T16:08:05.561Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
     }
   ],
-  "updatedAt": "2026-06-12T17:24:07.524Z"
+  "updatedAt": "2026-06-13T13:53:39.169Z"
 }

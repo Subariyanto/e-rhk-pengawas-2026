@@ -1,9 +1,9 @@
 {
   "codes": [
     {
-      "code": "FULL-BJK9-X679-EUH3",
+      "code": "FULL-4M57-ECVN-2ZUU",
       "tier": "full",
-      "createdAt": "2026-06-12T16:08:32.631Z",
+      "createdAt": "2026-06-13T11:01:31.781Z",
       "usedBy": null,
       "usedAt": null,
       "revoked": false
@@ -475,5 +475,5 @@
       "revoked": false
     }
   ],
-  "updatedAt": "2026-06-13T10:48:26.064Z"
+  "updatedAt": "2026-06-13T11:05:16.170Z"
 }

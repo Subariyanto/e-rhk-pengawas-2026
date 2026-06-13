@@ -135,27 +135,84 @@
   }
 
   // ===== Word-HTML approach (MUCH lebih akurat untuk layout) =====
-  // Word native baca HTML+MS Office namespace dan render persis seperti tampilan
-  // cetak browser, termasuk KOP, table, image inline, dan spacing.
-  // File extension .doc supaya Word buka tanpa mode protected view.
+  // Word native baca HTML+MS Office namespace, tapi mesinnya pakai HTML 4 era —
+  // tidak support display:flex, grid, atau modern CSS. Solusinya: transform
+  // semua block flex/grid jadi table-based layout sebelum di-wrap.
+  function transformHtmlForWord(html) {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+
+    // 1. Transform KOP (.kop) jadi table 2-col supaya logo + teks align rapi.
+    tmp.querySelectorAll('.kop').forEach(kop => {
+      const logoImg = kop.querySelector('img.logo');
+      const textWrap = kop.querySelector('.text');
+      const logoSrc = logoImg ? logoImg.getAttribute('src') : '';
+      const lines = textWrap ? Array.from(textWrap.children).map(c => c.outerHTML).join('') : '';
+      const tbl = document.createElement('table');
+      tbl.setAttribute('style', 'width:100%;border-collapse:collapse;border-bottom:3px double #000;margin-bottom:12pt;padding-bottom:6pt;');
+      tbl.innerHTML = `
+        <tr>
+          <td style="width:90px;border:none;vertical-align:middle;text-align:center;">${logoSrc ? `<img src="${logoSrc}" style="width:80px;height:80px;" />` : ''}</td>
+          <td style="border:none;text-align:center;vertical-align:middle;">${lines}</td>
+          <td style="width:90px;border:none;"></td>
+        </tr>`;
+      kop.parentNode.replaceChild(tbl, kop);
+    });
+
+    // 2. Transform TTD blok (div berisi anak div text-align:center dengan signature-img)
+    //    biasanya: <div style="display:flex;justify-content:flex-end"><div style="width:50%;text-align:center;...">...</div></div>
+    //    → jadi table 2-col, kolom kiri kosong, kolom kanan center.
+    tmp.querySelectorAll('div').forEach(d => {
+      const style = d.getAttribute('style') || '';
+      if (!/display\s*:\s*flex/i.test(style)) return;
+      // Cari child blok TTD (yang punya text-align:center + signature)
+      const inner = d.querySelector('div[style*="text-align:center"], div[style*="text-align: center"]');
+      if (!inner) return;
+      // Skip kalau bukan blok TTD (heuristik: harus ada "Pengawas" / "NIP" / signature-img)
+      const innerHTML = inner.innerHTML;
+      if (!/NIP|Pengawas|Kepala|signature-img|Ketua/i.test(innerHTML)) return;
+      const tbl = document.createElement('table');
+      tbl.setAttribute('style', 'width:100%;border-collapse:collapse;margin-top:18pt;');
+      tbl.innerHTML = `
+        <tr>
+          <td style="width:50%;border:none;"></td>
+          <td style="width:50%;border:none;text-align:center;vertical-align:top;">${innerHTML}</td>
+        </tr>`;
+      d.parentNode.replaceChild(tbl, d);
+    });
+
+    // 3. Bersihkan display:grid, display:flex sisa di div lain.
+    tmp.querySelectorAll('[style*="display"]').forEach(el => {
+      let s = el.getAttribute('style') || '';
+      s = s.replace(/display\s*:\s*(flex|grid)\s*;?/gi, '');
+      s = s.replace(/place-items[^;]*;?/gi, '');
+      s = s.replace(/justify-content[^;]*;?/gi, '');
+      s = s.replace(/align-items[^;]*;?/gi, '');
+      el.setAttribute('style', s);
+    });
+
+    return tmp.innerHTML;
+  }
+
   function htmlToWordDocBlob(htmlList, title) {
     const css = `
       @page WordSection1 { size: 21cm 29.7cm; margin: 2.54cm 2cm 2.54cm 2cm; mso-page-orientation: portrait; }
       div.WordSection1 { page: WordSection1; }
-      body { font-family: 'Times New Roman', serif; font-size: 12pt; color: #000; }
+      body { font-family: 'Times New Roman', serif; font-size: 12pt; color: #000; line-height: 1.3; }
       h1, h2, h3, h4, h5, h6 { font-family: 'Times New Roman', serif; }
-      h3 { font-size: 14pt; }
-      h4 { font-size: 12pt; margin-top: 10pt; margin-bottom: 4pt; }
-      table { border-collapse: collapse; }
+      h3 { font-size: 14pt; font-weight: 700; text-align: center; margin: 12pt 0 8pt; }
+      h4 { font-size: 12pt; font-weight: 700; margin: 10pt 0 4pt; }
+      p { margin: 4pt 0; text-align: justify; }
+      table { border-collapse: collapse; mso-table-lspace: 0; mso-table-rspace: 0; }
       table.fmt { width: 100%; }
-      table.fmt td, table.fmt th { border: 1px solid #000; padding: 4pt; vertical-align: top; }
+      table.fmt td, table.fmt th { border: 1pt solid #000; padding: 4pt; vertical-align: top; }
       .doc-page { page-break-after: always; }
       .doc-page:last-child { page-break-after: auto; }
       .signature-img { max-height: 80px; }
       .no-print { display: none; }
       img { max-width: 100%; }
     `;
-    const body = htmlList.map(h => `<div class="WordSection1">${h}</div>`).join('');
+    const body = htmlList.map(h => `<div class="WordSection1">${transformHtmlForWord(h)}</div>`).join('');
     const html = `<!DOCTYPE html>
 <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
 <head>

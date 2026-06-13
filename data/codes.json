@@ -467,15 +467,6 @@
       "note": "Ya Salam"
     },
     {
-      "code": "FULL-8Q38-UPD7-RFA4",
-      "tier": "full",
-      "createdAt": "2026-06-12T16:08:05.561Z",
-      "usedBy": "subariyanto1@gmail.com",
-      "usedAt": "2026-06-13T03:50:26.589379+00:00",
-      "revoked": false,
-      "note": "Subariyanto"
-    },
-    {
       "code": "FULL-7J9G-JMT2-D33K",
       "tier": "full",
       "createdAt": "2026-06-12T16:08:05.561Z",
@@ -484,5 +475,5 @@
       "revoked": false
     }
   ],
-  "updatedAt": "2026-06-13T03:51:52.680Z"
+  "updatedAt": "2026-06-13T10:48:26.064Z"
 }

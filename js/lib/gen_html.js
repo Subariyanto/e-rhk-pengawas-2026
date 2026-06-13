@@ -846,14 +846,11 @@
       <div class="doc-page">
         <table style="width:100%;border-collapse:collapse;border-bottom:3px double #000;margin-bottom:14pt;padding-bottom:6pt;">
           <tr>
-            <td style="width:90px;border:none;vertical-align:middle;text-align:center;">${i.logo ? `<img src="${i.logo}" style="width:80px;height:80px;" />` : ''}</td>
             <td style="border:none;text-align:center;vertical-align:middle;">
-              <div style="font-size:12pt;">KEMENTERIAN AGAMA REPUBLIK INDONESIA</div>
               <div style="font-size:13pt;font-weight:700;">${U.escapeHtml(String(namaMad).toUpperCase())}</div>
               <div style="font-size:11pt;">${U.escapeHtml(alamatMad)}${kecamatanMad ? ', Kec. ' + U.escapeHtml(kecamatanMad) : ''}</div>
               ${kontakLine ? `<div style="font-size:11pt;">${U.escapeHtml(kontakLine)}</div>` : ''}
             </td>
-            <td style="width:90px;border:none;"></td>
           </tr>
         </table>
 
@@ -865,7 +862,7 @@
         <table style="margin-left:18pt;margin-bottom:8pt;">
           <tr><td style="padding:2pt 8pt;border:none;width:120pt;">Nama</td><td style="padding:2pt 8pt;border:none;">:</td><td style="padding:2pt 8pt;border:none;"><strong>${U.escapeHtml(i.pegawai.nama)}</strong></td></tr>
           <tr><td style="padding:2pt 8pt;border:none;">NIP</td><td style="padding:2pt 8pt;border:none;">:</td><td style="padding:2pt 8pt;border:none;">${U.escapeHtml(i.pegawai.nip)}</td></tr>
-          <tr><td style="padding:2pt 8pt;border:none;">Pangkat/Gol.</td><td style="padding:2pt 8pt;border:none;">:</td><td style="padding:2pt 8pt;border:none;">${U.escapeHtml(i.pegawai.pangkat_gol || '-')}</td></tr>
+          <tr><td style="padding:2pt 8pt;border:none;">Pangkat/Gol.</td><td style="padding:2pt 8pt;border:none;">:</td><td style="padding:2pt 8pt;border:none;">${U.escapeHtml(i.pegawai.pangkat_golongan || '-')}</td></tr>
           <tr><td style="padding:2pt 8pt;border:none;">Jabatan</td><td style="padding:2pt 8pt;border:none;">:</td><td style="padding:2pt 8pt;border:none;">${U.escapeHtml(i.pegawai.jabatan)}</td></tr>
           <tr><td style="padding:2pt 8pt;border:none;">Unit Kerja</td><td style="padding:2pt 8pt;border:none;">:</td><td style="padding:2pt 8pt;border:none;">${U.escapeHtml(i.pegawai.unit_kerja)}</td></tr>
         </table>

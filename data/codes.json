@@ -9,70 +9,6 @@
       "revoked": false
     },
     {
-      "code": "FULL-37A4-2DDW-9CZW",
-      "tier": "full",
-      "createdAt": "2026-06-12T16:08:30.642Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
-    },
-    {
-      "code": "FULL-JYVC-JDTF-ZM9A",
-      "tier": "full",
-      "createdAt": "2026-06-12T16:08:30.642Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
-    },
-    {
-      "code": "FULL-JEFU-CPAB-P2RK",
-      "tier": "full",
-      "createdAt": "2026-06-12T16:08:30.641Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
-    },
-    {
-      "code": "FULL-JLNF-97D4-7Y2Z",
-      "tier": "full",
-      "createdAt": "2026-06-12T16:08:30.641Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
-    },
-    {
-      "code": "FULL-2YVN-VEVF-38EL",
-      "tier": "full",
-      "createdAt": "2026-06-12T16:08:30.640Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
-    },
-    {
-      "code": "FULL-G23C-J82D-E2KY",
-      "tier": "full",
-      "createdAt": "2026-06-12T16:08:23.807Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
-    },
-    {
-      "code": "FULL-K8BN-YBSK-QNXB",
-      "tier": "full",
-      "createdAt": "2026-06-12T16:08:23.806Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
-    },
-    {
-      "code": "FULL-3D2S-NBTZ-TCQA",
-      "tier": "full",
-      "createdAt": "2026-06-12T16:08:23.806Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
-    },
-    {
       "code": "FULL-UJT6-8R6W-XFLP",
       "tier": "full",
       "createdAt": "2026-06-12T16:08:23.806Z",
@@ -353,15 +289,7 @@
       "usedAt": null,
       "revoked": false,
       "note": "Ya Salam"
-    },
-    {
-      "code": "FULL-7J9G-JMT2-D33K",
-      "tier": "full",
-      "createdAt": "2026-06-12T16:08:05.561Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
     }
   ],
-  "updatedAt": "2026-06-13T11:06:23.973Z"
+  "updatedAt": "2026-06-13T12:03:48.241Z"
 }

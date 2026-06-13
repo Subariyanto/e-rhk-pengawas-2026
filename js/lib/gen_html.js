@@ -691,6 +691,32 @@
     const i = idn || Page.Identitas.get();
     const N = getNarasi(rhk.id);
     const v = varsFor(rhk, keg, idn);
+    const hasKeg = !!keg;
+
+    // Faktor pendukung: ada default umum, bisa dilengkapi dari kegiatan kalau ada.
+    const pendukungHtml = '- Dukungan Kepala Madrasah dan dewan guru<br />- Ketersediaan dokumen pendukung<br />- Komitmen pemangku kepentingan';
+
+    // Faktor penghambat: prioritas keg.kendala > narasi.permasalahan > placeholder informatif.
+    const penghambatRaw = (hasKeg && String(keg.kendala || '').trim())
+      ? keg.kendala
+      : U.fillTemplate(N.permasalahan || '', v).trim();
+    const penghambatHtml = penghambatRaw
+      ? U.nl2br(penghambatRaw)
+      : 'Kendala teknis dan administratif yang muncul selama pelaksanaan akan diidentifikasi dan didokumentasikan oleh Pengawas Madrasah pada saat kegiatan dilaksanakan.';
+
+    // Strategi tindak lanjut: prioritas keg.tindak_lanjut > keg.solusi > narasi.tindak_lanjut+solusi > placeholder.
+    let tindakLanjutRaw = '';
+    if (hasKeg && String(keg.tindak_lanjut || '').trim()) tindakLanjutRaw = keg.tindak_lanjut;
+    else if (hasKeg && String(keg.solusi || '').trim()) tindakLanjutRaw = keg.solusi;
+    else {
+      const tl = U.fillTemplate(N.tindak_lanjut || '', v).trim();
+      const sol = U.fillTemplate(N.solusi || '', v).trim();
+      tindakLanjutRaw = [tl, sol].filter(Boolean).join('\n');
+    }
+    const tindakLanjutHtml = tindakLanjutRaw
+      ? U.nl2br(tindakLanjutRaw)
+      : 'Pengawas Madrasah akan menyusun rencana tindak lanjut berdasarkan hasil analisis di atas, meliputi pendampingan klinis, peningkatan kapasitas, serta monitoring berkelanjutan terhadap madrasah binaan.';
+
     return `
       <div class="doc-page">
         ${header(i)}
@@ -698,11 +724,11 @@
         <p>Kegiatan: <strong>${U.escapeHtml(keg ? keg.nama_kegiatan : rhk.nama_eviden)}</strong></p>
         <p style="text-align:justify;">${U.nl2br(U.fillTemplate(N.analisis, v))}</p>
         <h4>Faktor Pendukung</h4>
-        <p style="text-align:justify;">- Dukungan Kepala Madrasah dan dewan guru<br />- Ketersediaan dokumen pendukung<br />- Komitmen pemangku kepentingan</p>
+        <p style="text-align:justify;">${pendukungHtml}</p>
         <h4>Faktor Penghambat</h4>
-        <p style="text-align:justify;">${U.nl2br(keg ? (keg.kendala || '-') : '-')}</p>
+        <p style="text-align:justify;">${penghambatHtml}</p>
         <h4>Strategi Tindak Lanjut</h4>
-        <p style="text-align:justify;">${U.nl2br(keg ? (keg.tindak_lanjut || '-') : '-')}</p>
+        <p style="text-align:justify;">${tindakLanjutHtml}</p>
       </div>
     `;
   }

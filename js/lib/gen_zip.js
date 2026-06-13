@@ -27,11 +27,11 @@
     });
     // Combined HTML
     folder.file('00_LAPORAN_GABUNGAN.html', GenPDF.buildFullHTML(combinedHTML(parts)));
-    // DOCX combined
+    // DOCX combined (pakai Word-HTML wrapper supaya layout match cetak)
     try {
-      const docxBlob = await GenDOCX.htmlToDocxBlob(parts.map(p => p.html), rhk.id + ' ' + rhk.nama_eviden);
-      folder.file('00_LAPORAN_GABUNGAN.docx', docxBlob);
-    } catch (e) { console.warn('DOCX build failed:', e); }
+      const docBlob = GenDOCX.htmlToWordDocBlob(parts.map(p => p.html), rhk.id + ' ' + rhk.nama_eviden);
+      folder.file('00_LAPORAN_GABUNGAN.doc', docBlob);
+    } catch (e) { console.warn('DOC build failed:', e); }
     // README
     folder.file('README.txt', `Eviden ${rhk.id} — ${rhk.nama_eviden}\nTriwulan: ${rhk.triwulan}\nDibuat: ${new Date().toISOString()}\n\nDokumen yang disertakan:\n${parts.map((p, i) => (i+1) + '. ' + p.label).join('\n')}\n\nDicetak otomatis oleh E-RHK Pengawas Madrasah 2026.`);
     const blob = await zip.generateAsync({ type: 'blob' });

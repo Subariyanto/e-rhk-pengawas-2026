@@ -190,8 +190,9 @@
     document.getElementById('btnDocxAll').addEventListener('click', async (e) => {
       e.preventDefault();
       UI.toast('Membuat Word… mohon tunggu.');
-      const blob = await GenDOCX.htmlToDocxBlob(parts.map(p => p.html), rhk.id + ' ' + rhk.nama_eviden);
-      U.downloadBlob(blob, U.sanitizeFilename(rhk.id + '_' + rhk.nama_eviden) + '.docx');
+      // Pakai Word-HTML wrapper supaya layout match dengan tampilan cetak.
+      const blob = GenDOCX.htmlToWordDocBlob(parts.map(p => p.html), rhk.id + ' ' + rhk.nama_eviden);
+      U.downloadBlob(blob, U.sanitizeFilename(rhk.id + '_' + rhk.nama_eviden) + '.doc');
     });
     document.getElementById('btnPdfAll').addEventListener('click', async (e) => {
       e.preventDefault();

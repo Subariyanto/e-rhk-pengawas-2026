@@ -119,8 +119,8 @@
       UI.toast('Membuat Word… mohon tunggu.');
       try {
         const parts = splitDocPages(docHTML);
-        const blob = await GenDOCX.htmlToDocxBlob(parts, 'Laporan ' + labelTW(tw) + ' 2026');
-        U.downloadBlob(blob, U.sanitizeFilename('Laporan_' + labelTW(tw) + '_2026') + '.docx');
+        const blob = GenDOCX.htmlToWordDocBlob(parts, 'Laporan ' + labelTW(tw) + ' 2026');
+        U.downloadBlob(blob, U.sanitizeFilename('Laporan_' + labelTW(tw) + '_2026') + '.doc');
       } catch (err) {
         UI.toast('Gagal export Word: ' + err.message, 'danger');
       }

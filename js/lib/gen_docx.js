@@ -134,5 +134,42 @@
     return blob;
   }
 
-  window.GenDOCX = { htmlToDocxBlob, htmlToDocxBlocks };
+  // ===== Word-HTML approach (MUCH lebih akurat untuk layout) =====
+  // Word native baca HTML+MS Office namespace dan render persis seperti tampilan
+  // cetak browser, termasuk KOP, table, image inline, dan spacing.
+  // File extension .doc supaya Word buka tanpa mode protected view.
+  function htmlToWordDocBlob(htmlList, title) {
+    const css = `
+      @page WordSection1 { size: 21cm 29.7cm; margin: 2.54cm 2cm 2.54cm 2cm; mso-page-orientation: portrait; }
+      div.WordSection1 { page: WordSection1; }
+      body { font-family: 'Times New Roman', serif; font-size: 12pt; color: #000; }
+      h1, h2, h3, h4, h5, h6 { font-family: 'Times New Roman', serif; }
+      h3 { font-size: 14pt; }
+      h4 { font-size: 12pt; margin-top: 10pt; margin-bottom: 4pt; }
+      table { border-collapse: collapse; }
+      table.fmt { width: 100%; }
+      table.fmt td, table.fmt th { border: 1px solid #000; padding: 4pt; vertical-align: top; }
+      .doc-page { page-break-after: always; }
+      .doc-page:last-child { page-break-after: auto; }
+      .signature-img { max-height: 80px; }
+      .no-print { display: none; }
+      img { max-width: 100%; }
+    `;
+    const body = htmlList.map(h => `<div class="WordSection1">${h}</div>`).join('');
+    const html = `<!DOCTYPE html>
+<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+<meta charset="utf-8" />
+<title>${(title || 'Eviden RHK').replace(/[<>&]/g, '')}</title>
+<!--[if gte mso 9]><xml>
+<w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom><w:DoNotOptimizeForBrowser/></w:WordDocument>
+</xml><![endif]-->
+<style>${css}</style>
+</head>
+<body>${body}</body>
+</html>`;
+    return new Blob(['\ufeff', html], { type: 'application/msword' });
+  }
+
+  window.GenDOCX = { htmlToDocxBlob, htmlToDocxBlocks, htmlToWordDocBlob };
 })();

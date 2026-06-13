@@ -640,6 +640,27 @@
 
   function genRekap(rhk, keg, idn) {
     const i = idn || Page.Identitas.get();
+    const hasKeg = !!keg;
+    const hasHasil = hasKeg && String(keg.hasil || '').trim();
+    const tglPelaksana = (hasKeg && keg.tanggal) ? U.fmtTanggal(keg.tanggal) : '';
+
+    // Auto-derive isi kolom dari data kegiatan + target RHK.
+    const capaianKuantitas = hasHasil ? (rhk.target_kuantitas || 'Tercapai sesuai target') : '-';
+    const capaianWaktu     = tglPelaksana || (rhk.target_waktu || '-');
+    const persenKuantitas  = hasHasil ? '100%' : '-';
+    const persenWaktu      = tglPelaksana ? '100%' : '-';
+    const catatanKuantitas = hasKeg
+      ? (String(keg.kendala || '').trim() ? U.escapeHtml(keg.kendala) : 'Sesuai target')
+      : 'Belum ada kegiatan terkait';
+    const catatanWaktu     = hasKeg ? 'Dilaksanakan sesuai jadwal' : 'Belum ada kegiatan terkait';
+
+    // Catatan Hasil: prioritas keg.hasil > keg.uraian > narasi default kegiatan terlaksana.
+    const catatanHasil = hasHasil
+      ? keg.hasil
+      : (hasKeg && String(keg.uraian || '').trim()
+          ? keg.uraian
+          : 'Hasil pelaksanaan akan diperbarui setelah kegiatan dilaksanakan dan dilaporkan oleh Pengawas Madrasah.');
+
     return `
       <div class="doc-page">
         ${header(i)}
@@ -648,12 +669,12 @@
         <table class="fmt" style="width:100%">
           <thead><tr><th>Aspek</th><th>Indikator</th><th>Target</th><th>Capaian</th><th>%</th><th>Catatan</th></tr></thead>
           <tbody>
-            <tr><td>Kuantitas</td><td>${U.escapeHtml(rhk.indikator_kuantitas || '')}</td><td>${U.escapeHtml(rhk.target_kuantitas || '')}</td><td></td><td></td><td></td></tr>
-            <tr><td>Waktu</td><td>${U.escapeHtml(rhk.indikator_waktu || '')}</td><td>${U.escapeHtml(rhk.target_waktu || '')}</td><td></td><td></td><td></td></tr>
+            <tr><td>Kuantitas</td><td>${U.escapeHtml(rhk.indikator_kuantitas || '')}</td><td>${U.escapeHtml(rhk.target_kuantitas || '')}</td><td>${U.escapeHtml(capaianKuantitas)}</td><td>${U.escapeHtml(persenKuantitas)}</td><td>${catatanKuantitas}</td></tr>
+            <tr><td>Waktu</td><td>${U.escapeHtml(rhk.indikator_waktu || '')}</td><td>${U.escapeHtml(rhk.target_waktu || '')}</td><td>${U.escapeHtml(capaianWaktu)}</td><td>${U.escapeHtml(persenWaktu)}</td><td>${U.escapeHtml(catatanWaktu)}</td></tr>
           </tbody>
         </table>
         <h4 class="mt-3">Catatan Hasil</h4>
-        <p style="text-align:justify;">${U.nl2br(keg ? (keg.hasil || '-') : '-')}</p>
+        <p style="text-align:justify;">${U.nl2br(catatanHasil)}</p>
         <div style="display:flex;justify-content:flex-end;margin-top:24px;">
           <div style="width:50%;text-align:center;padding-right:6%;">
             <div>Pengawas Madrasah,</div>

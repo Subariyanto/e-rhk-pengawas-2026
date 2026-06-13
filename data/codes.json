@@ -454,7 +454,8 @@
       "createdAt": "2026-06-12T16:08:05.562Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false
+      "revoked": false,
+      "note": "Widodo"
     },
     {
       "code": "FULL-FPX4-FH2F-74LK",
@@ -469,9 +470,10 @@
       "code": "FULL-8Q38-UPD7-RFA4",
       "tier": "full",
       "createdAt": "2026-06-12T16:08:05.561Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
+      "usedBy": "subariyanto1@gmail.com",
+      "usedAt": "2026-06-13T03:50:26.589379+00:00",
+      "revoked": false,
+      "note": "auto: Subariyanto · subariyanto1@gmail.com · auto 13/6/2026"
     },
     {
       "code": "FULL-7J9G-JMT2-D33K",
@@ -482,5 +484,5 @@
       "revoked": false
     }
   ],
-  "updatedAt": "2026-06-12T17:24:07.524Z"
+  "updatedAt": "2026-06-13T03:50:47.858Z"
 }

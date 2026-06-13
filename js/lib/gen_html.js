@@ -720,8 +720,8 @@
     return `
       <div class="doc-page">
         ${header(i)}
-        <h3 style="text-align:center;text-decoration:underline;">ANALISIS HASIL KEGIATAN</h3>
-        <p>Kegiatan: <strong>${U.escapeHtml(keg ? keg.nama_kegiatan : rhk.nama_eviden)}</strong></p>
+        <h3 style="text-align:center;text-decoration:underline;margin-bottom:24px;">ANALISIS HASIL KEGIATAN</h3>
+        <p style="margin-top:24px;">Kegiatan: <strong>${U.escapeHtml(keg ? keg.nama_kegiatan : rhk.nama_eviden)}</strong></p>
         <p style="text-align:justify;">${U.nl2br(U.fillTemplate(N.analisis, v))}</p>
         <h4>Faktor Pendukung</h4>
         <p style="text-align:justify;">${pendukungHtml}</p>

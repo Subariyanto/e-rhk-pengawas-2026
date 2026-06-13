@@ -410,7 +410,7 @@
 
         <div style="display:flex;justify-content:flex-end;margin-top:24px;">
           <div style="width:50%;text-align:center;padding-right:6%;">
-            <div>${tanggalKota(i)}</div>
+            <div>${keg && keg.tanggal ? U.escapeHtml((i.pegawai.kabupaten || 'Jember') + ', ' + U.fmtTanggal(keg.tanggal)) : tanggalKota(i)}</div>
             <div>Pengawas Madrasah,</div>
             <div style="height:80px;display:grid;place-items:center;">${i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : ''}</div>
             <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>

@@ -4,9 +4,10 @@
       "code": "FULL-DMTZ-SPRJ-DJXB",
       "tier": "full",
       "createdAt": "2026-06-13T13:53:32.074Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
+      "usedBy": "admin",
+      "usedAt": "2026-06-13T13:54:10.965Z",
+      "revoked": false,
+      "note": "auto: Administrator · admin@local · auto 13/6/2026"
     },
     {
       "code": "FULL-4M57-ECVN-2ZUU",
@@ -299,5 +300,5 @@
       "note": "Ya Salam"
     }
   ],
-  "updatedAt": "2026-06-13T13:53:39.169Z"
+  "updatedAt": "2026-06-14T11:58:38.818Z"
 }

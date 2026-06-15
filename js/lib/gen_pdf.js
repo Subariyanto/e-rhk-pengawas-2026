@@ -65,6 +65,7 @@
 
   // Use jsPDF.html() to convert single HTML element to PDF. We render to off-DOM and return blob.
   async function htmlToPdfBlob(htmlBody, filename) {
+    if (window.Tier && Tier.blockExportIfTrial && Tier.blockExportIfTrial('Download PDF')) return null;
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
     const tmp = document.createElement('div');

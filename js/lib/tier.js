@@ -31,6 +31,15 @@
     return (user.tier || 'full') === 'trial';
   }
 
+  // Guard: cek tier user. Kalau TRIAL, tampilkan toast & return true (blocked).
+  // Kalau FULL/admin: return false (boleh lanjut).
+  function blockExportIfTrial(label) {
+    if (!isTrialUser()) return false;
+    var msg = (label ? label + ': ' : '') + 'Fitur Export hanya tersedia untuk akun FULL. Cetak/Print Preview (Ctrl+P) tetap bisa, dengan watermark TRIAL.';
+    try { (window.UI && UI.toast) ? UI.toast(msg, 'warning') : alert(msg); } catch (_) { try { alert(msg); } catch (e) {} }
+    return true;
+  }
+
   // Status lisensi FULL (sisa hari, expired, dst).
   function getFullStatus(user) {
     user = user || (window.Auth && Auth.currentUser ? Auth.currentUser() : null);
@@ -239,6 +248,7 @@
     getTier,
     isAdmin,
     isTrialUser,
+    blockExportIfTrial,
     getTrialStatus,
     getFullStatus,
     canCreateKegiatan,

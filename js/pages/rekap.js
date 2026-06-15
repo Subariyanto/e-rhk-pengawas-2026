@@ -106,6 +106,7 @@
     });
 
     async function exportExcel() {
+      if (window.Tier && Tier.blockExportIfTrial && Tier.blockExportIfTrial('Export Excel')) return;
       const wb = new ExcelJS.Workbook();
       const ws = wb.addWorksheet('Per RHK');
       ws.columns = [

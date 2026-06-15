@@ -114,6 +114,7 @@
   }
 
   async function htmlToDocxBlob(htmlList, title) {
+    if (window.Tier && Tier.blockExportIfTrial && Tier.blockExportIfTrial('Export DOCX')) return null;
     const { Document, Packer } = window.docx;
     const sections = [];
     for (const html of htmlList) {
@@ -195,6 +196,7 @@
   }
 
   function htmlToWordDocBlob(htmlList, title) {
+    if (window.Tier && Tier.blockExportIfTrial && Tier.blockExportIfTrial('Export Word')) return null;
     const css = `
       @page WordSection1 { size: 21cm 29.7cm; margin: 2.54cm 2cm 2.54cm 2cm; mso-page-orientation: portrait; }
       div.WordSection1 { page: WordSection1; }

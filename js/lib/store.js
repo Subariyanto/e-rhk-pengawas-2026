@@ -62,6 +62,28 @@
     });
   }
 
+  function isTrialLockedNow() {
+    try {
+      var u = (window.Auth && Auth.currentUser) ? Auth.currentUser() : null;
+      if (!u) return false;
+      if (u.role === 'admin') return false;
+      if ((u.tier || 'full') !== 'trial') return false;
+      if (!u.trialExpiresAt) return false;
+      return new Date(u.trialExpiresAt).getTime() <= Date.now();
+    } catch (e) { return false; }
+  }
+  var _lastLockToast = 0;
+  function notifyTrialLockedNow() {
+    var now = Date.now();
+    if (now - _lastLockToast < 1500) return;
+    _lastLockToast = now;
+    var msg = 'Trial sudah habis. Aktivasi kode FULL untuk menyimpan / mengubah data.';
+    try {
+      if (window.UI && UI.toast) { UI.toast(msg, 'error'); return; }
+    } catch (e) {}
+    try { alert(msg); } catch (e) {}
+  }
+
   function get(scope, fallback) {
     try {
       const raw = localStorage.getItem(userKey(scope));
@@ -69,7 +91,9 @@
     } catch (e) { return fallback === undefined ? null : fallback; }
   }
   function set(scope, value) {
+    if (isTrialLockedNow()) { notifyTrialLockedNow(); return false; }
     localStorage.setItem(userKey(scope), JSON.stringify(value));
+    return true;
   }
   function getGlobal(scope, fallback) {
     try {
@@ -77,7 +101,11 @@
       return raw ? JSON.parse(raw) : (fallback === undefined ? null : fallback);
     } catch (e) { return fallback === undefined ? null : fallback; }
   }
-  function setGlobal(scope, value) { localStorage.setItem(PREFIX + scope, JSON.stringify(value)); }
+  function setGlobal(scope, value) {
+    if (isTrialLockedNow()) { notifyTrialLockedNow(); return false; }
+    localStorage.setItem(PREFIX + scope, JSON.stringify(value));
+    return true;
+  }
   function removeGlobal(scope) { localStorage.removeItem(PREFIX + scope); }
 
   // Hapus seluruh data periode tertentu (master_rhk_<year>, kegiatan_<year>, eviden_<year>)
@@ -131,5 +159,7 @@
     get, set, getGlobal, setGlobal, removeGlobal, uid, PREFIX, SESSION_KEY,
     exportAllForUser, importAllForUser,
     activePeriode, setActivePeriode, listPeriode, deletePeriode, clonePeriode, migrateLegacy,
+    isTrialLocked: isTrialLockedNow,
+    notifyTrialLocked: notifyTrialLockedNow,
   };
 })();

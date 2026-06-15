@@ -142,6 +142,7 @@
       }
       const wasFull = (cur.tier === 'full') && cur.fullExpiresAt;
       Tier.upgradeUserToFull(cur.id);
+      try { window.applyTrialWatermark && window.applyTrialWatermark(); } catch (_) {}
       if (!found.master) {
         Codes.consumeCode(c, cur.id);
         if (window.SupabaseSync && window.SupabaseSync.isConfigured()) {

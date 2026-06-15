@@ -24,6 +24,13 @@
 
   function isAdmin(user) { return user && user.role === 'admin'; }
 
+  function isTrialUser(user) {
+    user = user || (window.Auth && Auth.currentUser ? Auth.currentUser() : null);
+    if (!user) return false;
+    if (isAdmin(user)) return false;
+    return (user.tier || 'full') === 'trial';
+  }
+
   // Status lisensi FULL (sisa hari, expired, dst).
   function getFullStatus(user) {
     user = user || (window.Auth && Auth.currentUser ? Auth.currentUser() : null);
@@ -231,6 +238,7 @@
     FULL_WARNING_DAYS,
     getTier,
     isAdmin,
+    isTrialUser,
     getTrialStatus,
     getFullStatus,
     canCreateKegiatan,

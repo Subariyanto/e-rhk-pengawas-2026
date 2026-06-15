@@ -158,8 +158,13 @@
         if (tier === 'trial') {
           trialExpiresAt = new Date(Date.now() + Tier.TRIAL_DAYS * 86400000).toISOString();
         }
+        // Lisensi FULL dari registrasi langsung (kode FULL/legacy/master) berlaku 1 tahun sejak hari ini
+        let fullExpiresAt = null;
+        if (tier === 'full') {
+          fullExpiresAt = new Date(Date.now() + Tier.LICENSE_DAYS * 86400000).toISOString();
+        }
         const email = nip ? (nip + '@pengawas.local') : emailInput.toLowerCase();
-        await Auth.register({ nama, email, password: pw, nip, tier, trialExpiresAt, activatedWith });
+        await Auth.register({ nama, email, password: pw, nip, tier, trialExpiresAt, fullExpiresAt, activatedWith });
 
         // Konsumsi kode random (master tidak dihabiskan, legacy juga tidak)
         if (kode) {
@@ -185,7 +190,7 @@
         const loginId = nip || email;
         let pesan = 'Pendaftaran berhasil. Silakan login pakai ' + loginId + '.';
         if (tier === 'trial') pesan = '✅ TRIAL sukses (' + Tier.TRIAL_DAYS + ' hari, max ' + Tier.TRIAL_MAX_KEGIATAN + ' kegiatan). Login pakai: ' + loginId;
-        else pesan = '🎉 FULL sukses. Login pakai: ' + loginId;
+        else pesan = '🎉 FULL sukses (berlaku ' + Tier.LICENSE_DAYS + ' hari = 1 tahun). Login pakai: ' + loginId;
         UI.toast(pesan);
         // Pre-fill login field via sessionStorage agar mudah
         try { sessionStorage.setItem('erhk2026_last_login', loginId); } catch (e) {}

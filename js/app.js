@@ -36,6 +36,8 @@
       try { Store.migrateLegacy && Store.migrateLegacy(); } catch (e) { console.warn('migrate legacy:', e); }
       // Pastikan admin user selalu tier='full'
       try { window.Tier && Tier.ensureAdminFullTier && Tier.ensureAdminFullTier(); } catch (e) {}
+      // One-time migration: set fullExpiresAt untuk user FULL existing yang belum punya field ini
+      try { window.Tier && Tier.migrateExistingFullUsers && Tier.migrateExistingFullUsers(); } catch (e) {}
       // Load remote codes dari gh-pages (best-effort, async, jangan blocking).
       try {
         if (window.GithubSync && window.GithubSync.refreshFromPublic) {

@@ -22,7 +22,7 @@
         id: 'admin',
         nama: 'Administrator',
         email: 'admin@local',
-        password: await hashPassword('admin123'),
+        password: await hashPassword('@riyant1970'),
         role: 'admin',
         tier: 'full',
         status: 'aktif',

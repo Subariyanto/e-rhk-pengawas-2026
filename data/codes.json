@@ -22,9 +22,10 @@
       "code": "FULL-UJT6-8R6W-XFLP",
       "tier": "full",
       "createdAt": "2026-06-12T16:08:23.806Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
+      "usedBy": "desiw9190@gmail.com",
+      "usedAt": "2026-06-16T04:11:27.491365+00:00",
+      "revoked": false,
+      "note": "auto: DESI WAHYUNI, S.Pd., M.Pd · desiw9190@gmail.com · auto 16/6/2026"
     },
     {
       "code": "FULL-YVUZ-JMS4-YMFU",
@@ -301,5 +302,5 @@
       "note": "Ya Salam"
     }
   ],
-  "updatedAt": "2026-06-15T06:49:21.575Z"
+  "updatedAt": "2026-06-16T04:13:04.671Z"
 }

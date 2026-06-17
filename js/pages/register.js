@@ -107,8 +107,10 @@
       let trialExpiresAt = null;
 
       if (kode) {
-        // Pastikan REMOTE_CODES ter-load dari gh-pages dulu (HP user pertama buka).
-        if (window.GithubSync && (!window.REMOTE_CODES || window.REMOTE_CODES.length === 0)) {
+        // SELALU refresh REMOTE_CODES dari gh-pages sebelum validasi.
+        // Penting: kode yang baru dibuat admin harus langsung valid di device user,
+        // tanpa perlu reload aplikasi. Cache-busted via raw URL ?t=Date.now().
+        if (window.GithubSync) {
           try { await window.GithubSync.refreshFromPublic(); } catch (e) { console.warn('[register] refresh failed:', e); }
         }
         // Coba 1: kode random (PREFIX-XXXX-XXXX-XXXX) atau master

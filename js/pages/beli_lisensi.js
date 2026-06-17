@@ -109,8 +109,9 @@
       if (kode == null) return;
       const c = String(kode).trim();
       if (!c) return;
-      // Pastikan REMOTE_CODES ter-load dari gh-pages sebelum lookup (HP user mungkin baru pertama buka).
-      if (window.GithubSync && (!window.REMOTE_CODES || window.REMOTE_CODES.length === 0)) {
+      // SELALU refresh REMOTE_CODES dari gh-pages sebelum lookup. Kode baru
+      // dari admin harus langsung valid tanpa perlu reload aplikasi.
+      if (window.GithubSync) {
         UI.toast('Memuat daftar kode terbaru...', 'info');
         try { await window.GithubSync.refreshFromPublic(); } catch (e) { console.warn('refresh failed:', e); }
       }

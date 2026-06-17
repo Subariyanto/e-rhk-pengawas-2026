@@ -1,6 +1,166 @@
 {
   "codes": [
     {
+      "code": "FULL-XY9A-FS7T-TL6W",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:01:25.384Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-5J7R-CBSK-GA8D",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:01:25.384Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-6MCC-ZQSH-LZ7K",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:01:25.384Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-W95S-PC2V-UJAL",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:01:25.384Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-HKNZ-HGX5-TNE3",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:01:25.383Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-VCKX-H8CQ-2QUM",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:01:25.383Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-7BJF-BZ35-XKV5",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:01:25.383Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-B28V-WPKT-T8XE",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:01:25.383Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-ZQ27-5VQZ-T2J4",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:01:25.383Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-7NCJ-LUEW-DLJ2",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:01:25.383Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-DA6A-2G98-R55Y",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:00:26.191Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-ZYMP-AJXU-94WV",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:00:26.191Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-LYHV-9GLU-VC9W",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:00:26.191Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-DMZL-Z6FG-89WX",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:00:26.191Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-HCRY-A488-YAHN",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:00:26.191Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-84XW-JSX3-NBCF",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:00:26.191Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-L8AX-6WFH-Z2QH",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:00:26.191Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-DY8G-P6CB-Y2TX",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:00:26.191Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-75WJ-F3RH-VM7E",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:00:26.191Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-U6VG-JM6X-AN3K",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:00:26.191Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
       "code": "FULL-M3A6-GHBA-WUL8",
       "tier": "full",
       "createdAt": "2026-06-17T12:00:07.377Z",
@@ -162,5 +322,5 @@
       "revoked": false
     }
   ],
-  "updatedAt": "2026-06-17T12:00:08.956Z"
+  "updatedAt": "2026-06-17T12:01:26.730Z"
 }

@@ -1,14 +1,6 @@
 {
   "codes": [
     {
-      "code": "FULL-VTDW-LGVT-V3K5",
-      "tier": "full",
-      "createdAt": "2026-06-17T11:35:28.684Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
-    },
-    {
       "code": "FULL-9E53-B8M6-2UNX",
       "tier": "full",
       "createdAt": "2026-06-17T11:03:51.835Z",
@@ -17,5 +9,5 @@
       "revoked": false
     }
   ],
-  "updatedAt": "2026-06-17T11:45:13.643Z"
+  "updatedAt": "2026-06-17T11:46:51.429Z"
 }

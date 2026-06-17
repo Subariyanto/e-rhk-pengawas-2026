@@ -36,6 +36,10 @@
       try { Store.migrateLegacy && Store.migrateLegacy(); } catch (e) { console.warn('migrate legacy:', e); }
       // Pastikan admin user selalu tier='full'
       try { window.Tier && Tier.ensureAdminFullTier && Tier.ensureAdminFullTier(); } catch (e) {}
+      // One-time migration: set fullExpiresAt untuk user FULL existing yang belum punya field ini
+      try { window.Tier && Tier.migrateExistingFullUsers && Tier.migrateExistingFullUsers(); } catch (e) {}
+      // Toggle body.trial-mode + inject watermark element supaya CSS print watermark aktif
+      try { applyTrialWatermark(); } catch (e) {}
       // Load remote codes dari gh-pages (best-effort, async, jangan blocking).
       try {
         if (window.GithubSync && window.GithubSync.refreshFromPublic) {
@@ -78,6 +82,39 @@
   });
 
   document.addEventListener('DOMContentLoaded', boot);
+
+  // Watermark TRIAL untuk cetak in-app (window.print()).
+  // Mengandalkan CSS body.trial-mode + element .trial-watermark / .trial-watermark-band.
+  function applyTrialWatermark() {
+    const isTrial = !!(window.Tier && Tier.isTrialUser && Tier.isTrialUser());
+    document.body.classList.toggle('trial-mode', isTrial);
+    let band = document.getElementById('trialWmBand');
+    let main = document.getElementById('trialWmMain');
+    if (isTrial) {
+      if (!band) {
+        band = document.createElement('div');
+        band.id = 'trialWmBand';
+        band.className = 'trial-watermark-band';
+        band.textContent = 'DOKUMEN VERSI TRIAL — TIDAK SAH UNTUK PENGGUNAAN RESMI';
+        document.body.appendChild(band);
+      }
+      if (!main) {
+        main = document.createElement('div');
+        main.id = 'trialWmMain';
+        main.className = 'trial-watermark';
+        document.body.appendChild(main);
+      }
+    } else {
+      band && band.remove();
+      main && main.remove();
+    }
+  }
+  window.applyTrialWatermark = applyTrialWatermark;
+
+  // Refresh status watermark setiap kali user login/logout/upgrade
+  window.addEventListener('storage', applyTrialWatermark);
+  // Hook ke window.print untuk pastikan watermark up-to-date saat user pencet Ctrl+P
+  window.addEventListener('beforeprint', applyTrialWatermark);
 
   window.Page = window.Page || {};
 })();

@@ -14,7 +14,7 @@ Atau gunakan Live Server / static server pilihan Anda.
 
 ## Login default
 
-- Admin: `admin@local` / `admin123`
+- Admin: `admin@local` / `@riyant1970`
 - Pengawas: daftar sendiri di halaman Register
 
 ## Fitur Utama

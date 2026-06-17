@@ -24,9 +24,10 @@
     const totTW = { I: 0, II: 0, III: 0, IV: 0, TAMBAHAN: 0 };
     masterRhk.forEach(r => { totTW[r.triwulan] = (totTW[r.triwulan] || 0) + 1; });
 
-    // ===== Trial banner =====
+    // ===== Trial / FULL banner =====
     const u = Auth.currentUser();
     const t = Tier.getTrialStatus(u);
+    const f = Tier.getFullStatus(u);
     let trialBanner = '';
     let blockTambah = false;
     if (t.isTrial) {
@@ -44,6 +45,22 @@
         trialBanner = `<div class="alert alert-warning d-flex flex-wrap gap-2 align-items-center mb-3">
           <span class="flex-grow-1"><i class="bi bi-hourglass-split"></i> Mode <strong>TRIAL</strong> &mdash; sisa <strong>${t.daysLeft} hari</strong> &middot; sudah pakai <strong>${t.kegiatanCount}/${Tier.TRIAL_MAX_KEGIATAN}</strong> kegiatan.</span>
           <a href="#/beli-lisensi" class="btn btn-sm btn-success"><i class="bi bi-cart"></i> Beli Lisensi</a>
+          <button id="btnInputKodeFull" class="btn btn-sm btn-outline-success"><i class="bi bi-key"></i> Masukkan Kode FULL</button>
+        </div>`;
+      }
+    } else if (f.hasLicense) {
+      const tglFmt = (iso) => new Date(iso).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+      if (f.isExpired) {
+        blockTambah = true;
+        trialBanner = `<div class="alert alert-danger d-flex flex-wrap gap-2 align-items-center mb-3">
+          <span class="flex-grow-1"><i class="bi bi-x-circle"></i> <strong>Lisensi FULL berakhir</strong> pada ${tglFmt(f.expiresAt)}. Hubungi admin untuk perpanjangan (kode baru = +1 tahun).</span>
+          <a href="#/beli-lisensi" class="btn btn-sm btn-success"><i class="bi bi-cart"></i> Perpanjang</a>
+          <button id="btnInputKodeFull" class="btn btn-sm btn-outline-success"><i class="bi bi-key"></i> Masukkan Kode FULL</button>
+        </div>`;
+      } else if (f.isExpiringSoon) {
+        trialBanner = `<div class="alert alert-warning d-flex flex-wrap gap-2 align-items-center mb-3">
+          <span class="flex-grow-1"><i class="bi bi-exclamation-triangle"></i> Lisensi FULL akan berakhir dalam <strong>${f.daysLeft} hari</strong> (${tglFmt(f.expiresAt)}). Siapkan perpanjangan agar layanan tidak terputus.</span>
+          <a href="#/beli-lisensi" class="btn btn-sm btn-success"><i class="bi bi-cart"></i> Perpanjang</a>
           <button id="btnInputKodeFull" class="btn btn-sm btn-outline-success"><i class="bi bi-key"></i> Masukkan Kode FULL</button>
         </div>`;
       }
@@ -117,7 +134,7 @@
     const btnKodeFull = document.getElementById('btnInputKodeFull');
     if (btnKodeFull) {
       btnKodeFull.addEventListener('click', () => {
-        const kode = prompt('Masukkan Kode Aktivasi FULL untuk upgrade akun ini:');
+        const kode = prompt('Masukkan Kode Aktivasi FULL untuk upgrade/perpanjang akun ini:');
         if (kode == null) return;
         const c = String(kode).trim();
         if (!c) return;
@@ -127,7 +144,9 @@
         }
         const cur = Auth.currentUser();
         if (!cur) return UI.toast('Sesi tidak ditemukan, silakan login ulang.', 'danger');
+        const wasFull = (cur.tier === 'full') && cur.fullExpiresAt;
         Tier.upgradeUserToFull(cur.id);
+        try { window.applyTrialWatermark && window.applyTrialWatermark(); } catch (_) {}
         if (!found.master) {
           Codes.consumeCode(c, cur.id);
           if (window.SupabaseSync && window.SupabaseSync.isConfigured()) {
@@ -140,7 +159,12 @@
             }).catch(() => {});
           }
         }
-        UI.toast('🎉 Akun di-upgrade ke FULL. Selamat menikmati semua fitur!');
+        const after = Auth.currentUser();
+        const tgl = after.fullExpiresAt ? new Date(after.fullExpiresAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) : '-';
+        const pesan = wasFull
+          ? '🎉 Lisensi FULL diperpanjang. Berlaku sampai ' + tgl + '.'
+          : '🎉 Akun di-upgrade ke FULL. Berlaku sampai ' + tgl + '.';
+        UI.toast(pesan);
         Page.Dashboard();
       });
     }

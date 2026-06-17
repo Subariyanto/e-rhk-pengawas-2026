@@ -140,7 +140,9 @@
         Router.dispatch();
         return;
       }
+      const wasFull = (cur.tier === 'full') && cur.fullExpiresAt;
       Tier.upgradeUserToFull(cur.id);
+      try { window.applyTrialWatermark && window.applyTrialWatermark(); } catch (_) {}
       if (!found.master) {
         Codes.consumeCode(c, cur.id);
         if (window.SupabaseSync && window.SupabaseSync.isConfigured()) {
@@ -153,7 +155,12 @@
           }).catch(() => {});
         }
       }
-      UI.toast('🎉 Akun berhasil di-upgrade ke FULL. Selamat menikmati semua fitur!');
+      const after = Auth.currentUser();
+      const tgl = after.fullExpiresAt ? new Date(after.fullExpiresAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) : '-';
+      const pesan = wasFull
+        ? '🎉 Lisensi FULL diperpanjang. Berlaku sampai ' + tgl + '.'
+        : '🎉 Akun berhasil di-upgrade ke FULL. Berlaku sampai ' + tgl + '.';
+      UI.toast(pesan);
       Router.navigate('/dashboard', true);
       Router.dispatch();
     });

@@ -45,6 +45,7 @@
       const fd = new FormData(e.target);
       try {
         await Auth.login({ email: fd.get('email'), password: fd.get('password') });
+        try { window.applyTrialWatermark && window.applyTrialWatermark(); } catch (_) {}
         history.replaceState(null, '', '#/dashboard');
         Router.dispatch();
       } catch (err) {

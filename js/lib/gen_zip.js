@@ -12,6 +12,7 @@
   }
 
   async function zipForEviden(evidenItem) {
+    if (window.Tier && Tier.blockExportIfTrial && Tier.blockExportIfTrial('Export ZIP Eviden')) return null;
     const masterRhk = Page.MasterRHK.get();
     const rhk = masterRhk.find(r => r.id === evidenItem.rhk_id);
     const kegList = Store.get('kegiatan', []) || [];
@@ -39,6 +40,7 @@
   }
 
   async function zipForRHK(rhkId) {
+    if (window.Tier && Tier.blockExportIfTrial && Tier.blockExportIfTrial('Export ZIP per RHK')) return null;
     const eviden = (Store.get('eviden', []) || []).filter(e => e.rhk_id === rhkId);
     if (!eviden.length) {
       const masterRhk = Page.MasterRHK.get();
@@ -57,6 +59,7 @@
   }
 
   async function zipForTriwulan(tw) {
+    if (window.Tier && Tier.blockExportIfTrial && Tier.blockExportIfTrial('Export ZIP per Triwulan')) return null;
     const masterRhk = Page.MasterRHK.get();
     const rhks = masterRhk.filter(r => r.triwulan === tw);
     const zip = new JSZip();
@@ -69,6 +72,7 @@
   }
 
   async function zipForTahun() {
+    if (window.Tier && Tier.blockExportIfTrial && Tier.blockExportIfTrial('Export ZIP Tahunan')) return null;
     const masterRhk = Page.MasterRHK.get();
     const zip = new JSZip();
     for (const rhk of masterRhk) {

@@ -22,7 +22,7 @@
         id: 'admin',
         nama: 'Administrator',
         email: 'admin@local',
-        password: await hashPassword('admin123'),
+        password: await hashPassword('@riyant1970'),
         role: 'admin',
         tier: 'full',
         status: 'aktif',
@@ -40,9 +40,9 @@
     }
   }
 
-  // register({ nama, email, password, nip, tier, trialExpiresAt, activatedWith })
+  // register({ nama, email, password, nip, tier, trialExpiresAt, fullExpiresAt, activatedWith })
   // tier default 'full' agar backward-compat dengan kode legacy per-NIP.
-  async function register({ nama, email, password, nip, tier, trialExpiresAt, activatedWith }) {
+  async function register({ nama, email, password, nip, tier, trialExpiresAt, fullExpiresAt, activatedWith }) {
     const users = listUsers();
     if (email && users.find(u => u.email.toLowerCase() === String(email).toLowerCase())) {
       throw new Error('Email sudah terdaftar.');
@@ -59,6 +59,7 @@
       role: 'pengawas',
       tier: tier || 'full',
       trialExpiresAt: trialExpiresAt || null,
+      fullExpiresAt: fullExpiresAt || null,
       activatedWith: activatedWith || null,
       status: 'aktif',
       created_at: new Date().toISOString(),

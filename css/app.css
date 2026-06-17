@@ -460,6 +460,15 @@ a:hover { color: var(--primary-dark); }
   body.print-landscape @page { size: A4 landscape; margin: 0; }
 }
 
+/* ===== Trial watermark (cetak & screen saat dipreview) ===== */
+body.trial-mode .trial-watermark-band{position:fixed;top:6px;left:0;right:0;text-align:center;font-family:"Times New Roman",serif;font-size:9pt;color:rgba(220,53,69,.75);font-weight:700;letter-spacing:.1em;z-index:9999;pointer-events:none;display:none}
+body.trial-mode .trial-watermark{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;display:none;align-items:center;justify-content:center;overflow:hidden}
+body.trial-mode .trial-watermark::before{content:"TRIAL \2022  e-RHK Pengawas 2026";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);font-size:84pt;font-family:"Times New Roman",serif;font-weight:900;color:rgba(220,53,69,.18);white-space:nowrap;letter-spacing:.05em;text-transform:uppercase}
+@media print{
+  body.trial-mode .trial-watermark-band{display:block !important}
+  body.trial-mode .trial-watermark{display:flex !important}
+}
+
 /* ===== Document preview ===== */
 .doc-page {
   background: #fff;

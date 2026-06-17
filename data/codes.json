@@ -1,13 +1,166 @@
 {
   "codes": [
     {
-      "code": "FULL-9E53-B8M6-2UNX",
+      "code": "FULL-M3A6-GHBA-WUL8",
       "tier": "full",
-      "createdAt": "2026-06-17T11:03:51.835Z",
+      "createdAt": "2026-06-17T12:00:07.377Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-HUZX-8BED-K8PH",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:00:07.377Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-SSYN-9RDT-VY74",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:00:07.377Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-BDV8-L7ZS-SHNQ",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:00:07.376Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-9KZT-ZFUP-G2YA",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:00:07.376Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-E9LT-Q73Q-2EVZ",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:00:07.376Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-AKM3-SE9K-AR8Q",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:00:07.376Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-G56A-GAJF-ML6C",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:00:07.376Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-EFEK-P2JR-8AM5",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:00:07.376Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-MU6M-52AB-K3M2",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:00:07.376Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-DPE8-K667-MS29",
+      "tier": "full",
+      "createdAt": "2026-06-17T11:46:56.886Z",
+      "usedBy": "196906112005011005@pengawas.local",
+      "usedAt": "2026-06-17T11:57:30.016183+00:00",
+      "revoked": false,
+      "note": "auto: Pengawas 1005 · NIP 196906112005011005 · 196906112005011005@pengawas.local · auto 17/6/2026"
+    },
+    {
+      "code": "FULL-ELV6-VQJA-AKH3",
+      "tier": "full",
+      "createdAt": "2026-06-17T11:46:56.886Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-3ANH-WKTY-NACB",
+      "tier": "full",
+      "createdAt": "2026-06-17T11:46:56.885Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-QPZ4-DFS6-QNNH",
+      "tier": "full",
+      "createdAt": "2026-06-17T11:46:56.885Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-5CXD-B37W-4ALR",
+      "tier": "full",
+      "createdAt": "2026-06-17T11:46:56.885Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-8LNQ-P2Q8-SUE4",
+      "tier": "full",
+      "createdAt": "2026-06-17T11:46:56.885Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-6S3U-3BBY-J2GA",
+      "tier": "full",
+      "createdAt": "2026-06-17T11:46:56.885Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-E9GQ-942A-ANRA",
+      "tier": "full",
+      "createdAt": "2026-06-17T11:46:56.885Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-NF2X-TN5C-QKBP",
+      "tier": "full",
+      "createdAt": "2026-06-17T11:46:56.885Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-H6MG-VSGD-9B6X",
+      "tier": "full",
+      "createdAt": "2026-06-17T11:46:56.885Z",
       "usedBy": null,
       "usedAt": null,
       "revoked": false
     }
   ],
-  "updatedAt": "2026-06-17T11:46:51.429Z"
+  "updatedAt": "2026-06-17T12:00:08.956Z"
 }

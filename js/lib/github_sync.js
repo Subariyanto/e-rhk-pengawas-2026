@@ -37,7 +37,32 @@
     }
   }
 
+  // Helper: fetch SHA + remote codes terbaru dari gh-pages.
+  // Return { sha, remoteCodes }. sha=null kalau file belum ada (first create).
+  async function fetchCurrentSha(headers) {
+    const r = await fetch(apiUrl() + '?ref=' + REPO_BRANCH + '&t=' + Date.now(), { headers, cache: 'no-store' });
+    if (r.ok) {
+      const j = await r.json();
+      let remoteCodes = null;
+      try {
+        if (j.content && j.encoding === 'base64') {
+          const decoded = decodeURIComponent(escape(atob(j.content.replace(/\n/g, ''))));
+          const parsed = JSON.parse(decoded);
+          if (parsed && Array.isArray(parsed.codes)) remoteCodes = parsed.codes;
+        }
+      } catch (e) { /* ignore decode errors */ }
+      return { sha: j.sha || null, remoteCodes };
+    } else if (r.status === 404) {
+      return { sha: null, remoteCodes: null };
+    } else if (r.status === 401 || r.status === 403) {
+      throw new Error('PAT tidak valid atau tidak punya permission "Contents: write" di repo. Silakan generate PAT baru.');
+    } else {
+      throw new Error('GET ' + r.status + ' ' + (await r.text()));
+    }
+  }
+
   // Write codes.json via GitHub API. Butuh PAT.
+  // Auto-retry sekali kalau kena 409 Conflict (re-fetch SHA terbaru lalu PUT ulang).
   async function writeAuth(codesArray, message) {
     const pat = getPAT();
     if (!pat) throw new Error('GitHub PAT belum diset. Setup di Admin → Kode Aktivasi → Sinkronisasi.');
@@ -46,44 +71,49 @@
       Accept: 'application/vnd.github.v3+json',
       'Content-Type': 'application/json',
     };
-    // Get current SHA (untuk update). Kalau 404 (file belum ada), sha=null.
+
+    // Step 1: ambil SHA terbaru.
     let sha = null;
     try {
-      const r = await fetch(apiUrl() + '?ref=' + REPO_BRANCH, { headers });
-      if (r.ok) {
-        const j = await r.json();
-        sha = j.sha || null;
-      } else if (r.status === 404) {
-        sha = null; // first time create
-      } else {
-        throw new Error('GET ' + r.status + ' ' + (await r.text()));
-      }
+      const cur = await fetchCurrentSha(headers);
+      sha = cur.sha;
     } catch (e) {
-      // Network atau auth error
-      if (e.message.includes('401') || e.message.includes('403')) {
-        throw new Error('PAT tidak valid atau tidak punya permission "Contents: write" di repo. Silakan generate PAT baru.');
-      }
       throw e;
     }
-    // PUT new content
+
+    // Step 2: build payload + body.
     const payload = {
       codes: codesArray,
       updatedAt: new Date().toISOString(),
     };
     const contentB64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2))));
-    const body = {
-      message: message || 'sync codes.json ' + new Date().toISOString(),
-      content: contentB64,
-      branch: REPO_BRANCH,
+    const buildBody = (currentSha) => {
+      const body = {
+        message: message || 'sync codes.json ' + new Date().toISOString(),
+        content: contentB64,
+        branch: REPO_BRANCH,
+      };
+      if (currentSha) body.sha = currentSha;
+      return JSON.stringify(body);
     };
-    if (sha) body.sha = sha;
 
-    const r = await fetch(apiUrl(), { method: 'PUT', headers, body: JSON.stringify(body) });
+    // Step 3: PUT — kalau 409 Conflict, re-fetch SHA lalu retry sekali.
+    let r = await fetch(apiUrl(), { method: 'PUT', headers, body: buildBody(sha) });
+    if (r.status === 409) {
+      console.warn('[GithubSync] 409 Conflict, refetching SHA + retry...');
+      try {
+        const cur2 = await fetchCurrentSha(headers);
+        sha = cur2.sha;
+      } catch (e) {
+        throw new Error('Konflik: gagal ambil SHA terbaru saat retry. ' + e.message);
+      }
+      r = await fetch(apiUrl(), { method: 'PUT', headers, body: buildBody(sha) });
+    }
     if (!r.ok) {
       const txt = await r.text();
       if (r.status === 401) throw new Error('PAT salah atau expired.');
       if (r.status === 403) throw new Error('PAT tidak punya scope "Contents: write" di repo ini.');
-      if (r.status === 409) throw new Error('Konflik: kode di gh-pages diubah dari device lain. Refresh halaman lalu coba lagi.');
+      if (r.status === 409) throw new Error('Konflik berulang: kode di gh-pages terus diubah dari device lain selama proses push. Refresh halaman lalu coba lagi.');
       throw new Error('PUT gagal: ' + r.status + ' ' + txt);
     }
     return await r.json();

@@ -1,6 +1,86 @@
 {
   "codes": [
     {
+      "code": "FULL-M3A6-GHBA-WUL8",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:00:07.377Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-HUZX-8BED-K8PH",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:00:07.377Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-SSYN-9RDT-VY74",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:00:07.377Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-BDV8-L7ZS-SHNQ",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:00:07.376Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-9KZT-ZFUP-G2YA",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:00:07.376Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-E9LT-Q73Q-2EVZ",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:00:07.376Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-AKM3-SE9K-AR8Q",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:00:07.376Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-G56A-GAJF-ML6C",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:00:07.376Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-EFEK-P2JR-8AM5",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:00:07.376Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-MU6M-52AB-K3M2",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:00:07.376Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
       "code": "FULL-DPE8-K667-MS29",
       "tier": "full",
       "createdAt": "2026-06-17T11:46:56.886Z",
@@ -82,5 +162,5 @@
       "revoked": false
     }
   ],
-  "updatedAt": "2026-06-17T11:58:56.488Z"
+  "updatedAt": "2026-06-17T12:00:08.956Z"
 }

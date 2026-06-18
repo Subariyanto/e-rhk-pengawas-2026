@@ -6,7 +6,8 @@
       "createdAt": "2026-06-18T04:29:13.231Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false
+      "revoked": false,
+      "note": "Neneng"
     },
     {
       "code": "FULL-UL3E-XSQW-2GNS",
@@ -515,5 +516,5 @@
       "note": "Heriyah"
     }
   ],
-  "updatedAt": "2026-06-18T04:29:29.764Z"
+  "updatedAt": "2026-06-18T04:30:09.630Z"
 }

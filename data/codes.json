@@ -4,17 +4,19 @@
       "code": "FULL-UL3E-XSQW-2GNS",
       "tier": "full",
       "createdAt": "2026-06-17T12:02:03.198Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
+      "usedBy": "197904172005012008@pengawas.local",
+      "usedAt": "2026-06-18T04:02:08.95111+00:00",
+      "revoked": false,
+      "note": "auto: Pengawas 2008 · NIP 197904172005012008 · 197904172005012008@pengawas.local · auto 18/6/2026"
     },
     {
       "code": "FULL-8JUQ-PESD-SGEG",
       "tier": "full",
       "createdAt": "2026-06-17T12:02:03.198Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
+      "usedBy": "197402082005011009@pengawas.local",
+      "usedAt": "2026-06-18T04:06:07.706928+00:00",
+      "revoked": false,
+      "note": "auto: Pengawas 1009 · NIP 197402082005011009 · 197402082005011009@pengawas.local · auto 18/6/2026"
     },
     {
       "code": "FULL-F5JX-HS5B-K6P4",
@@ -92,9 +94,10 @@
       "code": "FULL-BXTY-25MS-NCB5",
       "tier": "full",
       "createdAt": "2026-06-17T12:01:39.070Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
+      "usedBy": "197001052005011002@pengawas.local",
+      "usedAt": "2026-06-18T04:07:05.89544+00:00",
+      "revoked": false,
+      "note": "auto: Pengawas 1002 · NIP 197001052005011002 · 197001052005011002@pengawas.local · auto 18/6/2026"
     },
     {
       "code": "FULL-8MXW-L4AX-NM96",
@@ -116,25 +119,28 @@
       "code": "FULL-NUR8-LSUM-C282",
       "tier": "full",
       "createdAt": "2026-06-17T12:01:39.070Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
+      "usedBy": "197611222005012002@pengawas.local",
+      "usedAt": "2026-06-18T04:18:41.306394+00:00",
+      "revoked": false,
+      "note": "auto: Pengawas 2002 · NIP 197611222005012002 · 197611222005012002@pengawas.local · auto 18/6/2026"
     },
     {
       "code": "FULL-PK8R-PBBG-YZQX",
       "tier": "full",
       "createdAt": "2026-06-17T12:01:39.070Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
+      "usedBy": "197304122003121002@pengawas.local",
+      "usedAt": "2026-06-18T04:23:48.558413+00:00",
+      "revoked": false,
+      "note": "auto: Pengawas 1002 · NIP 197304122003121002 · 197304122003121002@pengawas.local · auto 18/6/2026"
     },
     {
       "code": "FULL-WY6F-WSUB-UQXJ",
       "tier": "full",
       "createdAt": "2026-06-17T12:01:39.070Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
+      "usedBy": "19710102197031002@pengawas.local",
+      "usedAt": "2026-06-18T04:21:13.267809+00:00",
+      "revoked": false,
+      "note": "auto: Pengawas 1002 · NIP 197101021997031002 · 197101021997031002@pengawas.local · auto 18/6/2026"
     },
     {
       "code": "FULL-JRUK-QZ6R-735X",
@@ -220,9 +226,10 @@
       "code": "FULL-B28V-WPKT-T8XE",
       "tier": "full",
       "createdAt": "2026-06-17T12:01:25.383Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
+      "usedBy": "198108222005011008@pengawas.local",
+      "usedAt": "2026-06-18T04:21:56.118559+00:00",
+      "revoked": false,
+      "note": "auto: Pengawas 1008 · NIP 198108222005011008 · 198108222005011008@pengawas.local · auto 18/6/2026"
     },
     {
       "code": "FULL-ZQ27-5VQZ-T2J4",
@@ -236,9 +243,10 @@
       "code": "FULL-7NCJ-LUEW-DLJ2",
       "tier": "full",
       "createdAt": "2026-06-17T12:01:25.383Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
+      "usedBy": "196801111994031002@pengawas.local",
+      "usedAt": "2026-06-18T04:26:16.701476+00:00",
+      "revoked": false,
+      "note": "auto: Pengawas 1002 · NIP 196801111994031002 · 196801111994031002@pengawas.local · auto 18/6/2026"
     },
     {
       "code": "FULL-DA6A-2G98-R55Y",
@@ -252,9 +260,10 @@
       "code": "FULL-ZYMP-AJXU-94WV",
       "tier": "full",
       "createdAt": "2026-06-17T12:00:26.191Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
+      "usedBy": "196901172005011003@pengawas.local",
+      "usedAt": "2026-06-18T04:06:52.428796+00:00",
+      "revoked": false,
+      "note": "auto: Pengawas 1003 · NIP 196901172005011003 · 196901172005011003@pengawas.local · auto 18/6/2026"
     },
     {
       "code": "FULL-LYHV-9GLU-VC9W",
@@ -276,17 +285,19 @@
       "code": "FULL-HCRY-A488-YAHN",
       "tier": "full",
       "createdAt": "2026-06-17T12:00:26.191Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
+      "usedBy": "198002222005012012@pengawas.local",
+      "usedAt": "2026-06-18T04:07:11.754503+00:00",
+      "revoked": false,
+      "note": "auto: Pengawas 2012 · NIP 198002222005012012 · 198002222005012012@pengawas.local · auto 18/6/2026"
     },
     {
       "code": "FULL-84XW-JSX3-NBCF",
       "tier": "full",
       "createdAt": "2026-06-17T12:00:26.191Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
+      "usedBy": "197501062005012001@pengawas.local",
+      "usedAt": "2026-06-18T04:07:59.801123+00:00",
+      "revoked": false,
+      "note": "auto: Pengawas 2001 · NIP 197501062005012001 · 197501062005012001@pengawas.local · auto 18/6/2026"
     },
     {
       "code": "FULL-L8AX-6WFH-Z2QH",
@@ -308,17 +319,19 @@
       "code": "FULL-75WJ-F3RH-VM7E",
       "tier": "full",
       "createdAt": "2026-06-17T12:00:26.191Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
+      "usedBy": "198112242005011005@pengawas.local",
+      "usedAt": "2026-06-18T04:11:10.368744+00:00",
+      "revoked": false,
+      "note": "auto: Pengawas 1005 · NIP 198112242005011005 · 198112242005011005@pengawas.local · auto 18/6/2026"
     },
     {
       "code": "FULL-U6VG-JM6X-AN3K",
       "tier": "full",
       "createdAt": "2026-06-17T12:00:26.191Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
+      "usedBy": "197204102005011004@pengawas.local",
+      "usedAt": "2026-06-18T04:06:51.50113+00:00",
+      "revoked": false,
+      "note": "auto: Pengawas 1004 · NIP 197204102005011004 · 197204102005011004@pengawas.local · auto 18/6/2026"
     },
     {
       "code": "FULL-M3A6-GHBA-WUL8",
@@ -356,17 +369,19 @@
       "code": "FULL-9KZT-ZFUP-G2YA",
       "tier": "full",
       "createdAt": "2026-06-17T12:00:07.376Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
+      "usedBy": "196908082000032001@pengawas.local",
+      "usedAt": "2026-06-18T04:11:58.245929+00:00",
+      "revoked": false,
+      "note": "auto: Pengawas 2001 · NIP 196908082000032001 · 196908082000032001@pengawas.local · auto 18/6/2026"
     },
     {
       "code": "FULL-E9LT-Q73Q-2EVZ",
       "tier": "full",
       "createdAt": "2026-06-17T12:00:07.376Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
+      "usedBy": "197203192005012002@pengawas.local",
+      "usedAt": "2026-06-18T03:25:49.841211+00:00",
+      "revoked": false,
+      "note": "auto: Pengawas 2002 · NIP 197203192005012002 · 197203192005012002@pengawas.local · auto 18/6/2026"
     },
     {
       "code": "FULL-AKM3-SE9K-AR8Q",
@@ -380,9 +395,10 @@
       "code": "FULL-G56A-GAJF-ML6C",
       "tier": "full",
       "createdAt": "2026-06-17T12:00:07.376Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
+      "usedBy": "197408171998031003@pengawas.local",
+      "usedAt": "2026-06-18T04:06:39.641611+00:00",
+      "revoked": false,
+      "note": "auto: Pengawas 1003 · NIP 197408171998031003 · 197408171998031003@pengawas.local · auto 18/6/2026"
     },
     {
       "code": "FULL-EFEK-P2JR-8AM5",
@@ -396,9 +412,10 @@
       "code": "FULL-MU6M-52AB-K3M2",
       "tier": "full",
       "createdAt": "2026-06-17T12:00:07.376Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
+      "usedBy": "197108072005011002@pengawas.local",
+      "usedAt": "2026-06-18T04:08:20.148699+00:00",
+      "revoked": false,
+      "note": "auto: Pengawas 1002 · NIP 197108072005011002 · 197108072005011002@pengawas.local · auto 18/6/2026"
     },
     {
       "code": "FULL-DPE8-K667-MS29",
@@ -421,49 +438,55 @@
       "code": "FULL-3ANH-WKTY-NACB",
       "tier": "full",
       "createdAt": "2026-06-17T11:46:56.885Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
+      "usedBy": "197105261997031003@pengawas.local",
+      "usedAt": "2026-06-18T04:24:54.502135+00:00",
+      "revoked": false,
+      "note": "auto: Pengawas 1003 · NIP 197105261997031003 · 197105261997031003@pengawas.local · auto 18/6/2026"
     },
     {
       "code": "FULL-QPZ4-DFS6-QNNH",
       "tier": "full",
       "createdAt": "2026-06-17T11:46:56.885Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
+      "usedBy": "197405122005012005@pengawas.local",
+      "usedAt": "2026-06-18T03:28:56.74658+00:00",
+      "revoked": false,
+      "note": "auto: Pengawas 2005 · NIP 197405122005012005 · 197405122005012005@pengawas.local · auto 18/6/2026"
     },
     {
       "code": "FULL-5CXD-B37W-4ALR",
       "tier": "full",
       "createdAt": "2026-06-17T11:46:56.885Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
+      "usedBy": "197203032005012002@pengawas.local",
+      "usedAt": "2026-06-18T04:15:38.363212+00:00",
+      "revoked": false,
+      "note": "auto: Pengawas 2002 · NIP 197203032005012002 · 197203032005012002@pengawas.local · auto 18/6/2026"
     },
     {
       "code": "FULL-8LNQ-P2Q8-SUE4",
       "tier": "full",
       "createdAt": "2026-06-17T11:46:56.885Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
+      "usedBy": "197307082006042008@pengawas.local",
+      "usedAt": "2026-06-18T04:13:41.54447+00:00",
+      "revoked": false,
+      "note": "auto: Pengawas 2008 · NIP 197307082006042008 · 197307082006042008@pengawas.local · auto 18/6/2026"
     },
     {
       "code": "FULL-6S3U-3BBY-J2GA",
       "tier": "full",
       "createdAt": "2026-06-17T11:46:56.885Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
+      "usedBy": "197305102005011003@pengawas.local",
+      "usedAt": "2026-06-18T04:10:57.266491+00:00",
+      "revoked": false,
+      "note": "auto: Pengawas 1003 · NIP 197305102005011003 · 197305102005011003@pengawas.local · auto 18/6/2026"
     },
     {
       "code": "FULL-E9GQ-942A-ANRA",
       "tier": "full",
       "createdAt": "2026-06-17T11:46:56.885Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
+      "usedBy": "197001011997031002@pengawas.local",
+      "usedAt": "2026-06-18T04:15:56.681233+00:00",
+      "revoked": false,
+      "note": "auto: Pengawas 1002 · NIP 197001011997031002 · 197001011997031002@pengawas.local · auto 18/6/2026"
     },
     {
       "code": "FULL-NF2X-TN5C-QKBP",
@@ -484,5 +507,5 @@
       "note": "Heriyah"
     }
   ],
-  "updatedAt": "2026-06-18T04:26:52.924Z"
+  "updatedAt": "2026-06-18T04:28:25.484Z"
 }

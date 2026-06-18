@@ -1,6 +1,14 @@
 {
   "codes": [
     {
+      "code": "FULL-VFAW-9TXL-73NR",
+      "tier": "full",
+      "createdAt": "2026-06-18T04:29:13.231Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
       "code": "FULL-UL3E-XSQW-2GNS",
       "tier": "full",
       "createdAt": "2026-06-17T12:02:03.198Z",
@@ -507,5 +515,5 @@
       "note": "Heriyah"
     }
   ],
-  "updatedAt": "2026-06-18T04:28:25.484Z"
+  "updatedAt": "2026-06-18T04:29:15.556Z"
 }

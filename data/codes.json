@@ -15,7 +15,8 @@
       "createdAt": "2026-06-19T00:19:42.610Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false
+      "revoked": false,
+      "note": "Novita"
     },
     {
       "code": "FULL-VFAW-9TXL-73NR",
@@ -539,5 +540,5 @@
       "note": "Heriyah"
     }
   ],
-  "updatedAt": "2026-06-19T00:21:30.831Z"
+  "updatedAt": "2026-06-19T00:21:36.291Z"
 }

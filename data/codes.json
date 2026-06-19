@@ -1,6 +1,14 @@
 {
   "codes": [
     {
+      "code": "FULL-RH63-8BXR-WVQ8",
+      "tier": "full",
+      "createdAt": "2026-06-19T00:20:53.504Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
       "code": "FULL-C3DW-AXPC-MR39",
       "tier": "full",
       "createdAt": "2026-06-19T00:19:42.610Z",
@@ -530,5 +538,5 @@
       "note": "Heriyah"
     }
   ],
-  "updatedAt": "2026-06-19T00:19:44.670Z"
+  "updatedAt": "2026-06-19T00:20:55.628Z"
 }

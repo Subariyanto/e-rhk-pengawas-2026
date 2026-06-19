@@ -1,6 +1,14 @@
 {
   "codes": [
     {
+      "code": "FULL-C3DW-AXPC-MR39",
+      "tier": "full",
+      "createdAt": "2026-06-19T00:19:42.610Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
       "code": "FULL-VFAW-9TXL-73NR",
       "tier": "full",
       "createdAt": "2026-06-18T04:29:13.231Z",
@@ -522,5 +530,5 @@
       "note": "Heriyah"
     }
   ],
-  "updatedAt": "2026-06-19T00:19:12.067Z"
+  "updatedAt": "2026-06-19T00:19:44.670Z"
 }

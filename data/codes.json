@@ -57,8 +57,8 @@
       "code": "FULL-F5JX-HS5B-K6P4",
       "tier": "full",
       "createdAt": "2026-06-17T12:02:03.198Z",
-      "usedBy": null,
-      "usedAt": null,
+      "usedBy": "rowiyana22@gmail.com",
+      "usedAt": "2026-06-19T05:38:00.711175+00:00",
       "revoked": false,
       "note": "Rowiyana"
     },
@@ -114,9 +114,10 @@
       "code": "FULL-CCEP-8A9C-VZRT",
       "tier": "full",
       "createdAt": "2026-06-17T12:02:03.198Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
+      "usedBy": "197504292005011001@pengawas.local",
+      "usedAt": "2026-06-19T01:46:29.531877+00:00",
+      "revoked": false,
+      "note": "auto: Pengawas 1001 · NIP 197504292005011001 · 197504292005011001@pengawas.local · auto 19/6/2026"
     },
     {
       "code": "FULL-M3XR-8Z54-CBL3",
@@ -191,9 +192,10 @@
       "code": "FULL-4UCT-ZSMS-VH24",
       "tier": "full",
       "createdAt": "2026-06-17T12:01:39.069Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
+      "usedBy": "197002232005012001@pengawas.local",
+      "usedAt": "2026-06-19T06:03:01.980964+00:00",
+      "revoked": false,
+      "note": "auto: Pengawas 2001 · NIP 197002232005012001 · 197002232005012001@pengawas.local · auto 19/6/2026"
     },
     {
       "code": "FULL-R7PL-7YYG-ECA6",
@@ -549,5 +551,5 @@
       "note": "Heriyah"
     }
   ],
-  "updatedAt": "2026-06-19T06:34:07.656Z"
+  "updatedAt": "2026-06-19T06:34:15.574Z"
 }

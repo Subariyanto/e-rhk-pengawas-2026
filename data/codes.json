@@ -51,7 +51,8 @@
       "createdAt": "2026-06-17T12:02:03.198Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false
+      "revoked": false,
+      "note": "Rowiyana"
     },
     {
       "code": "FULL-E6S6-YMZJ-6G6R",
@@ -540,5 +541,5 @@
       "note": "Heriyah"
     }
   ],
-  "updatedAt": "2026-06-19T00:21:36.291Z"
+  "updatedAt": "2026-06-19T05:22:02.701Z"
 }

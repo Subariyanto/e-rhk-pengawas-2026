@@ -4,9 +4,10 @@
       "code": "FULL-ESJK-EW2G-AJZ7",
       "tier": "full",
       "createdAt": "2026-06-19T06:34:37.367Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
+      "usedBy": "197109191998032002@pengawas.local",
+      "usedAt": "2026-06-19T06:45:38.384997+00:00",
+      "revoked": false,
+      "note": "auto: Pengawas 2002 · NIP 197109191998032002 · 197109191998032002@pengawas.local · auto 19/6/2026"
     },
     {
       "code": "FULL-ET9R-59RR-N7E4",
@@ -560,5 +561,5 @@
       "note": "Heriyah"
     }
   ],
-  "updatedAt": "2026-06-19T06:49:17.454Z"
+  "updatedAt": "2026-06-19T06:49:28.457Z"
 }

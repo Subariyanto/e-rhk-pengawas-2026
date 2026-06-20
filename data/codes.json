@@ -19,24 +19,6 @@
       "note": "Novita"
     },
     {
-      "code": "FULL-E6S6-YMZJ-6G6R",
-      "tier": "full",
-      "createdAt": "2026-06-17T12:02:03.198Z",
-      "usedBy": "197307082006042008@pengawas.local",
-      "usedAt": "2026-06-19T12:28:16.450421+00:00",
-      "revoked": false,
-      "note": "Tri Nur Umi"
-    },
-    {
-      "code": "FULL-R4CE-9SAQ-P8J9",
-      "tier": "full",
-      "createdAt": "2026-06-17T12:02:03.198Z",
-      "usedBy": "197002232005012001@pengawas.local",
-      "usedAt": "2026-06-19T12:05:42.540258+00:00",
-      "revoked": false,
-      "note": "Lisbinantin"
-    },
-    {
       "code": "FULL-5AF9-8H29-8MD7",
       "tier": "full",
       "createdAt": "2026-06-17T12:02:03.198Z",
@@ -230,5 +212,5 @@
       "note": "Heriyah"
     }
   ],
-  "updatedAt": "2026-06-20T13:42:43.531Z"
+  "updatedAt": "2026-06-20T13:43:10.039Z"
 }

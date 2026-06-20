@@ -22,8 +22,8 @@
       "code": "FULL-E6S6-YMZJ-6G6R",
       "tier": "full",
       "createdAt": "2026-06-17T12:02:03.198Z",
-      "usedBy": null,
-      "usedAt": null,
+      "usedBy": "197307082006042008@pengawas.local",
+      "usedAt": "2026-06-19T12:28:16.450421+00:00",
       "revoked": false,
       "note": "Tri Nur Umi"
     },
@@ -31,8 +31,8 @@
       "code": "FULL-R4CE-9SAQ-P8J9",
       "tier": "full",
       "createdAt": "2026-06-17T12:02:03.198Z",
-      "usedBy": null,
-      "usedAt": null,
+      "usedBy": "197002232005012001@pengawas.local",
+      "usedAt": "2026-06-19T12:05:42.540258+00:00",
       "revoked": false,
       "note": "Lisbinantin"
     },
@@ -230,5 +230,5 @@
       "note": "Heriyah"
     }
   ],
-  "updatedAt": "2026-06-19T11:55:46.277Z"
+  "updatedAt": "2026-06-20T13:42:43.531Z"
 }

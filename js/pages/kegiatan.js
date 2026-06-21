@@ -374,6 +374,24 @@
       }
     }
 
+    // Auto-fill Tempat dari Madrasah Sasaran
+    const selMadrasah = document.querySelector('select[name="madrasah_id"]');
+    const inputTempat = document.querySelector('input[name="tempat"]');
+    if (selMadrasah && inputTempat) {
+      selMadrasah.addEventListener('change', () => {
+        if (selMadrasah.value === 'semua') {
+          if (!inputTempat.value || !inputTempat.value.trim()) {
+            inputTempat.value = 'KKMA 04 Jember';
+          }
+        } else if (selMadrasah.value) {
+          const m = madrasah.find(x => x.id === selMadrasah.value);
+          if (m && (!inputTempat.value || !inputTempat.value.trim())) {
+            inputTempat.value = m.nama_madrasah + ' (' + m.jenjang + ')';
+          }
+        }
+      });
+    }
+
     const btnGenAll = document.getElementById('btnGenAll');
     if (btnGenAll) btnGenAll.addEventListener('click', () => genAll(0));
     const btnGenAllVar2 = document.getElementById('btnGenAllVar2');

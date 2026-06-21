@@ -4,8 +4,8 @@
       "code": "FULL-RH63-8BXR-WVQ8",
       "tier": "full",
       "createdAt": "2026-06-19T00:20:53.504Z",
-      "usedBy": null,
-      "usedAt": null,
+      "usedBy": "196801111994031002@pengawas.local",
+      "usedAt": "2026-06-20T01:10:55.364252+00:00",
       "revoked": false,
       "note": "Moh. Slamet"
     },
@@ -158,9 +158,10 @@
       "code": "FULL-DMZL-Z6FG-89WX",
       "tier": "full",
       "createdAt": "2026-06-17T12:00:26.191Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
+      "usedBy": "196810071998031001@pengawas.local",
+      "usedAt": "2026-06-21T00:41:08.848853+00:00",
+      "revoked": false,
+      "note": "auto: Pengawas 1001 · NIP 196810071998031001 · 196810071998031001@pengawas.local · auto 21/6/2026"
     },
     {
       "code": "FULL-L8AX-6WFH-Z2QH",
@@ -212,5 +213,5 @@
       "note": "Heriyah"
     }
   ],
-  "updatedAt": "2026-06-20T13:43:10.039Z"
+  "updatedAt": "2026-06-21T06:21:06.257Z"
 }

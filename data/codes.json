@@ -1,4 +1,85 @@
 {
-  "codes": [],
-  "updatedAt": "2026-06-22T08:33:23.263Z"
+  "codes": [
+    {
+      "code": "FULL-8Y28-AE7T-J4XU",
+      "tier": "full",
+      "createdAt": "2026-06-22T08:57:01.374Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-TDW4-ZX3L-84GF",
+      "tier": "full",
+      "createdAt": "2026-06-22T08:57:01.374Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-ZX9C-2MVH-FU4B",
+      "tier": "full",
+      "createdAt": "2026-06-22T08:57:01.374Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-RSWH-MCX6-6PYD",
+      "tier": "full",
+      "createdAt": "2026-06-22T08:57:01.374Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-QSE4-MRSF-VZQS",
+      "tier": "full",
+      "createdAt": "2026-06-22T08:57:01.374Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-RME3-PCJP-X58E",
+      "tier": "full",
+      "createdAt": "2026-06-22T08:57:01.374Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-HMJJ-LYTV-4UF7",
+      "tier": "full",
+      "createdAt": "2026-06-22T08:57:01.374Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-2K38-5S5W-89Q9",
+      "tier": "full",
+      "createdAt": "2026-06-22T08:57:01.374Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-98PZ-6AQV-TKG6",
+      "tier": "full",
+      "createdAt": "2026-06-22T08:57:01.373Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-CYMX-BJ46-FJM2",
+      "tier": "full",
+      "createdAt": "2026-06-22T08:57:01.336Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    }
+  ],
+  "updatedAt": "2026-06-22T08:57:03.180Z"
 }

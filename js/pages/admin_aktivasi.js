@@ -79,7 +79,8 @@
             <div class="mt-2 d-flex gap-2 flex-wrap">
               <button class="btn btn-sm btn-outline-secondary" id="btnRevealPat"><i class="bi bi-eye"></i> Tampilkan/Sembunyikan</button>
               <button class="btn btn-sm btn-outline-danger" id="btnClearPat"><i class="bi bi-trash"></i> Hapus PAT</button>
-              <button class="btn btn-sm btn-outline-success ms-auto" id="btnSyncNow"><i class="bi bi-arrow-clockwise"></i> Push Sekarang</button>
+              <button class="btn btn-sm btn-outline-primary ms-auto" id="btnPullFromGh"><i class="bi bi-cloud-download"></i> Tarik dari gh-pages</button>
+              <button class="btn btn-sm btn-outline-success" id="btnSyncNow"><i class="bi bi-arrow-clockwise"></i> Push Sekarang</button>
             </div>
             <div id="syncStatus" class="mt-3"></div>
           </div></div>
@@ -342,6 +343,33 @@
       refreshSyncInfo();
       UI.toast('PAT dihapus.');
     });
+    const btnPullFromGh = document.getElementById('btnPullFromGh');
+    if (btnPullFromGh) btnPullFromGh.addEventListener('click', async () => {
+      const status = document.getElementById('syncStatus');
+      status.innerHTML = '<div class="alert alert-info mb-0"><i class="bi bi-cloud-download"></i> Tarik kode dari gh-pages...</div>';
+      try {
+        const r = await window.GithubSync.refreshFromPublic();
+        const remote = (r && Array.isArray(r.codes)) ? r.codes : [];
+        if (!remote.length) {
+          status.innerHTML = '<div class="alert alert-warning mb-0"><i class="bi bi-exclamation-triangle"></i> Tidak ada kode di gh-pages atau gagal fetch.</div>';
+          return;
+        }
+        const localCount = Codes.getCodes().length;
+        const ok = await UI.confirmDialog('Ditemukan ' + remote.length + ' kode di gh-pages. Local saat ini: ' + localCount + ' kode.\n\nTimpa daftar lokal dengan data dari gh-pages?\n\n(Aman: data di gh-pages tetap utuh, ini cuma copy ke device ini.)');
+        if (!ok) {
+          status.innerHTML = '<div class="alert alert-secondary mb-0"><i class="bi bi-info-circle"></i> Dibatalkan.</div>';
+          return;
+        }
+        Store.setGlobal(Codes.STORE_KEY, remote);
+        status.innerHTML = '<div class="alert alert-success mb-0"><i class="bi bi-check-circle"></i> Berhasil restore ' + remote.length + ' kode dari gh-pages.</div>';
+        UI.toast('Restore berhasil: ' + remote.length + ' kode.');
+        renderRandomList();
+        refreshSyncInfo();
+      } catch (e) {
+        status.innerHTML = '<div class="alert alert-danger mb-0"><i class="bi bi-x-circle"></i> Gagal: ' + U.escapeHtml(e.message || String(e)) + '</div>';
+      }
+    });
+
     const btnSyncNow = document.getElementById('btnSyncNow');
     if (btnSyncNow) btnSyncNow.addEventListener('click', async () => {
       if (!window.GithubSync.hasPAT()) return UI.toast('Set PAT dulu sebelum push.', 'warning');

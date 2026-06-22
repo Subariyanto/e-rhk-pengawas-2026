@@ -375,6 +375,31 @@
       if (!window.GithubSync.hasPAT()) return UI.toast('Set PAT dulu sebelum push.', 'warning');
       const status = document.getElementById('syncStatus');
       const list = Codes.getCodes();
+      // Safety: kalau local kosong / lebih sedikit dari remote, konfirmasi keras dulu.
+      const remoteCount = (window.REMOTE_CODES || []).length;
+      if (list.length === 0 && remoteCount > 0) {
+        const confirmWipe = await UI.confirmDialog(
+          '⚠️ BAHAYA!\n\n' +
+          'Daftar kode lokal di device ini KOSONG (0 kode), tapi di gh-pages ada ' + remoteCount + ' kode.\n\n' +
+          'Kalau push sekarang, ' + remoteCount + ' kode di gh-pages akan TERHAPUS dan diganti dengan kosong.\n\n' +
+          'Sebaiknya klik "Tarik dari gh-pages" dulu untuk download data dari cloud, baru push.\n\n' +
+          'Tetap mau push (akan menghapus kode di gh-pages)?'
+        );
+        if (!confirmWipe) {
+          status.innerHTML = '<div class="alert alert-secondary mb-0"><i class="bi bi-info-circle"></i> Push dibatalkan untuk mencegah data hilang.</div>';
+          return;
+        }
+      } else if (list.length < remoteCount && remoteCount > 0) {
+        const confirmShrink = await UI.confirmDialog(
+          '⚠️ Daftar lokal (' + list.length + ' kode) lebih sedikit dari gh-pages (' + remoteCount + ' kode).\n\n' +
+          'Push akan mengganti data gh-pages dengan data lokal. ' + (remoteCount - list.length) + ' kode di gh-pages akan hilang.\n\n' +
+          'Tetap lanjut?'
+        );
+        if (!confirmShrink) {
+          status.innerHTML = '<div class="alert alert-secondary mb-0"><i class="bi bi-info-circle"></i> Push dibatalkan.</div>';
+          return;
+        }
+      }
       status.innerHTML = '<div class="alert alert-info mb-0"><i class="bi bi-arrow-up-circle"></i> Push ' + list.length + ' kode lokal ke gh-pages...</div>';
       const r = await window.GithubSync.pushIfConfigured(list, 'manual push from admin');
       if (r.synced) {

@@ -21,6 +21,13 @@
     if (_syncTimer) clearTimeout(_syncTimer);
     _syncTimer = setTimeout(async () => {
       _syncTimer = null;
+      // Safety: jangan auto-push kalau local kosong tapi remote berisi (anti-wipe).
+      const localCodes = getCodes();
+      const remoteCodes = (typeof window !== 'undefined' && Array.isArray(window.REMOTE_CODES)) ? window.REMOTE_CODES : [];
+      if (localCodes.length === 0 && remoteCodes.length > 0) {
+        console.warn('[codes] auto-sync diblokir: local kosong tapi remote ada', remoteCodes.length, 'kode. Pakai tombol "Tarik dari gh-pages" dulu.');
+        return;
+      }
       // Kalau ada push yang masih jalan, mark queued biar dijalankan setelahnya.
       if (_syncInFlight) { _syncQueued = true; return; }
       try {

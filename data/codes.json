@@ -1,85 +1,217 @@
 {
   "codes": [
     {
-      "code": "FULL-8Y28-AE7T-J4XU",
+      "code": "FULL-RH63-8BXR-WVQ8",
       "tier": "full",
-      "createdAt": "2026-06-22T08:57:01.374Z",
+      "createdAt": "2026-06-19T00:20:53.504Z",
+      "usedBy": "196801111994031002@pengawas.local",
+      "usedAt": "2026-06-20T01:10:55.364252+00:00",
+      "revoked": false,
+      "note": "Moh. Slamet"
+    },
+    {
+      "code": "FULL-C3DW-AXPC-MR39",
+      "tier": "full",
+      "createdAt": "2026-06-19T00:19:42.610Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false,
+      "note": "Novita"
+    },
+    {
+      "code": "FULL-5AF9-8H29-8MD7",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:02:03.198Z",
       "usedBy": null,
       "usedAt": null,
       "revoked": false
     },
     {
-      "code": "FULL-TDW4-ZX3L-84GF",
+      "code": "FULL-EPZD-YUH4-Q32M",
       "tier": "full",
-      "createdAt": "2026-06-22T08:57:01.374Z",
+      "createdAt": "2026-06-17T12:02:03.198Z",
       "usedBy": null,
       "usedAt": null,
       "revoked": false
     },
     {
-      "code": "FULL-ZX9C-2MVH-FU4B",
+      "code": "FULL-4QS5-7TXQ-5WDZ",
       "tier": "full",
-      "createdAt": "2026-06-22T08:57:01.374Z",
+      "createdAt": "2026-06-17T12:02:03.198Z",
       "usedBy": null,
       "usedAt": null,
       "revoked": false
     },
     {
-      "code": "FULL-RSWH-MCX6-6PYD",
+      "code": "FULL-B4TV-ER8C-PWEV",
       "tier": "full",
-      "createdAt": "2026-06-22T08:57:01.374Z",
+      "createdAt": "2026-06-17T12:02:03.198Z",
       "usedBy": null,
       "usedAt": null,
       "revoked": false
     },
     {
-      "code": "FULL-QSE4-MRSF-VZQS",
+      "code": "FULL-M3XR-8Z54-CBL3",
       "tier": "full",
-      "createdAt": "2026-06-22T08:57:01.374Z",
+      "createdAt": "2026-06-17T12:01:39.070Z",
       "usedBy": null,
       "usedAt": null,
       "revoked": false
     },
     {
-      "code": "FULL-RME3-PCJP-X58E",
+      "code": "FULL-8MXW-L4AX-NM96",
       "tier": "full",
-      "createdAt": "2026-06-22T08:57:01.374Z",
+      "createdAt": "2026-06-17T12:01:39.070Z",
       "usedBy": null,
       "usedAt": null,
       "revoked": false
     },
     {
-      "code": "FULL-HMJJ-LYTV-4UF7",
+      "code": "FULL-82RJ-4CBQ-X44D",
       "tier": "full",
-      "createdAt": "2026-06-22T08:57:01.374Z",
+      "createdAt": "2026-06-17T12:01:39.070Z",
       "usedBy": null,
       "usedAt": null,
       "revoked": false
     },
     {
-      "code": "FULL-2K38-5S5W-89Q9",
+      "code": "FULL-R7PL-7YYG-ECA6",
       "tier": "full",
-      "createdAt": "2026-06-22T08:57:01.374Z",
+      "createdAt": "2026-06-17T12:01:39.069Z",
       "usedBy": null,
       "usedAt": null,
       "revoked": false
     },
     {
-      "code": "FULL-98PZ-6AQV-TKG6",
+      "code": "FULL-XY9A-FS7T-TL6W",
       "tier": "full",
-      "createdAt": "2026-06-22T08:57:01.373Z",
+      "createdAt": "2026-06-17T12:01:25.384Z",
       "usedBy": null,
       "usedAt": null,
       "revoked": false
     },
     {
-      "code": "FULL-CYMX-BJ46-FJM2",
+      "code": "FULL-5J7R-CBSK-GA8D",
       "tier": "full",
-      "createdAt": "2026-06-22T08:57:01.336Z",
+      "createdAt": "2026-06-17T12:01:25.384Z",
       "usedBy": null,
       "usedAt": null,
       "revoked": false
+    },
+    {
+      "code": "FULL-6MCC-ZQSH-LZ7K",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:01:25.384Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-W95S-PC2V-UJAL",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:01:25.384Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-VCKX-H8CQ-2QUM",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:01:25.383Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-7BJF-BZ35-XKV5",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:01:25.383Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-ZQ27-5VQZ-T2J4",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:01:25.383Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-DA6A-2G98-R55Y",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:00:26.191Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-LYHV-9GLU-VC9W",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:00:26.191Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-DMZL-Z6FG-89WX",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:00:26.191Z",
+      "usedBy": "196810071998031001@pengawas.local",
+      "usedAt": "2026-06-21T00:41:08.848853+00:00",
+      "revoked": false,
+      "note": "auto: Pengawas 1001 · NIP 196810071998031001 · 196810071998031001@pengawas.local · auto 21/6/2026"
+    },
+    {
+      "code": "FULL-L8AX-6WFH-Z2QH",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:00:26.191Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-DY8G-P6CB-Y2TX",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:00:26.191Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-HUZX-8BED-K8PH",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:00:07.377Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-SSYN-9RDT-VY74",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:00:07.377Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-EFEK-P2JR-8AM5",
+      "tier": "full",
+      "createdAt": "2026-06-17T12:00:07.376Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-H6MG-VSGD-9B6X",
+      "tier": "full",
+      "createdAt": "2026-06-17T11:46:56.885Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false,
+      "note": "Heriyah"
     }
   ],
-  "updatedAt": "2026-06-22T08:57:11.264Z"
+  "updatedAt": "2026-06-21T06:21:06.257Z"
 }

@@ -39,7 +39,7 @@
         <div class="ttd-block">
           <div>${U.escapeHtml(kota)}, ${U.fmtTanggal(new Date())}</div>
           <div>Pengawas Madrasah,</div>
-          <div style="height:80px;display:flex;align-items:center;justify-content:center;overflow:hidden;">${sigImg}</div>
+          <div style="height:auto;min-height:70px;display:flex;align-items:center;justify-content:center;">${sigImg}</div>
           <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
           <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
         </div>
@@ -73,7 +73,7 @@
         <div class="ttd-block">
           <div>${U.escapeHtml(kota)}, ${U.fmtTanggal(new Date())}</div>
           <div>Pengawas Madrasah,</div>
-          <div style="height:80px;display:flex;align-items:center;justify-content:center;overflow:hidden;">${sigImg}</div>
+          <div style="height:auto;min-height:70px;display:flex;align-items:center;justify-content:center;">${sigImg}</div>
           <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
           <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
         </div>
@@ -91,7 +91,7 @@
         <div style="width:50%;text-align:center;padding-right:6%;">
           <div>${U.escapeHtml(kota)}, ${U.fmtTanggal(new Date())}</div>
           <div>Pengawas Madrasah,</div>
-          <div style="height:80px;display:flex;align-items:center;justify-content:center;overflow:hidden;">${sigImg}</div>
+          <div style="height:auto;min-height:70px;display:flex;align-items:center;justify-content:center;">${sigImg}</div>
           <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
           <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
         </div>
@@ -109,7 +109,7 @@
         <div style="width:50%;text-align:center;padding-right:6%;">
           <div>${U.escapeHtml(kota)}, ${U.fmtTanggal(new Date())}</div>
           <div>Pengawas Madrasah,</div>
-          <div style="height:80px;display:flex;align-items:center;justify-content:center;overflow:hidden;">${sigImg}</div>
+          <div style="height:auto;min-height:70px;display:flex;align-items:center;justify-content:center;">${sigImg}</div>
           <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
           <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
         </div>
@@ -412,7 +412,7 @@
           <div style="width:50%;text-align:center;padding-right:6%;">
             <div>${keg && keg.tanggal ? U.escapeHtml((i.pegawai.kabupaten || 'Jember') + ', ' + U.fmtTanggal(keg.tanggal)) : tanggalKota(i)}</div>
             <div>Pengawas Madrasah,</div>
-            <div style="height:80px;display:grid;place-items:center;">${i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : ''}</div>
+            <div style="height:auto;min-height:70px;display:flex;align-items:center;justify-content:center;">${i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : ''}</div>
             <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
             <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
           </div>
@@ -481,7 +481,7 @@
         <div style="display:flex;justify-content:flex-end;margin-top:24px;">
           <div style="width:50%;text-align:center;padding-right:6%;">
             <div>Pengawas Madrasah,</div>
-            <div style="height:80px;display:grid;place-items:center;">${i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : ''}</div>
+            <div style="height:auto;min-height:70px;display:flex;align-items:center;justify-content:center;">${i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : ''}</div>
             <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
             <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
           </div>
@@ -538,7 +538,7 @@
           <div style="width:50%;text-align:center;padding-right:6%;">
             <div>Mengetahui,</div>
             <div>Pengawas Madrasah,</div>
-            <div style="height:80px"></div>
+            <div style="height:auto;min-height:70px;display:flex;align-items:center;justify-content:center;">${i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : ''}</div>
             <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
             <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
           </div>
@@ -601,7 +601,7 @@
           </div>
           <div class="ttd-block">
             <div>Pengawas Madrasah,</div>
-            <div style="height:80px;display:grid;place-items:center;">${i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : ''}</div>
+            <div style="height:auto;min-height:70px;display:flex;align-items:center;justify-content:center;">${i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : ''}</div>
             <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
             <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
           </div>
@@ -733,7 +733,7 @@
           <div style="width:50%;text-align:center;padding-right:6%;">
             <div>${keg && keg.tanggal ? U.escapeHtml((i.pegawai.kabupaten || 'Jember') + ', ' + U.fmtTanggal(keg.tanggal)) : tanggalKota(i)}</div>
             <div>Pengawas Madrasah,</div>
-            <div style="height:80px;display:grid;place-items:center;">${i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : ''}</div>
+            <div style="height:auto;min-height:70px;display:flex;align-items:center;justify-content:center;">${i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : ''}</div>
             <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
             <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
           </div>
@@ -756,7 +756,7 @@
           <div style="width:50%;text-align:center;padding-right:6%;">
             <div>${keg && keg.tanggal ? U.escapeHtml((i.pegawai.kabupaten || 'Jember') + ', ' + U.fmtTanggal(keg.tanggal)) : tanggalKota(i)}</div>
             <div>Pengawas Madrasah,</div>
-            <div style="height:80px;display:grid;place-items:center;">${i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : ''}</div>
+            <div style="height:auto;min-height:70px;display:flex;align-items:center;justify-content:center;">${i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : ''}</div>
             <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
             <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
           </div>

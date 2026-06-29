@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Test Tanda Tangan</title>
+  <link rel="stylesheet" href="css/app.css">
+  <style>
+    body { padding: 20px; font-family: Arial; }
+    .test-section { margin: 40px 0; padding: 20px; border: 2px solid #ccc; }
+  </style>
+</head>
+<body>
+  <h1>Test Posisi Tanda Tangan</h1>
+  
+  <div class="test-section">
+    <h2>1. TTD Triwulan (2 kolom: Ketua Pokjawas & Pengawas)</h2>
+    <div class="doc-page">
+      <div class="ttd" style="margin-top:24px;">
+        <div class="ttd-block">
+          <div>&nbsp;</div>
+          <div>Ketua Pokjawas Madrasah,</div>
+          <div style="height:80px; border: 1px dashed red;"></div>
+          <div style="text-decoration:underline;font-weight:700">SUBARIYANTO, S.Pd, M.Pd.I</div>
+          <div>NIP. 197002122005011004</div>
+        </div>
+        <div class="ttd-block">
+          <div>Jember, 29 Juni 2026</div>
+          <div>Pengawas Madrasah,</div>
+          <div style="height:80px; border: 1px dashed blue; display:grid; place-items:center;">
+            <img class="signature-img" src="https://via.placeholder.com/150x60/4a90e2/ffffff?text=TTD" />
+          </div>
+          <div style="text-decoration:underline;font-weight:700">ANANG SUPRIYADI, S.Ag, M.Pd</div>
+          <div>NIP. 196810071998031001</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="test-section">
+    <h2>2. TTD Standar (3 bagian: Ketua Pokjawas, Pengawas, Mengetahui Kepala)</h2>
+    <div class="doc-page">
+      <div class="ttd" style="margin-top:24px;">
+        <div class="ttd-block">
+          <div>&nbsp;</div>
+          <div>Ketua Pokjawas Madrasah,</div>
+          <div style="height:80px; border: 1px dashed red;"></div>
+          <div style="text-decoration:underline;font-weight:700">SUBARIYANTO, S.Pd, M.Pd.I</div>
+          <div>NIP. 197002122005011004</div>
+        </div>
+        <div class="ttd-block">
+          <div>Jember, 29 Juni 2026</div>
+          <div>Pengawas Madrasah,</div>
+          <div style="height:80px; border: 1px dashed blue; display:grid; place-items:center;">
+            <img class="signature-img" src="https://via.placeholder.com/150x60/4a90e2/ffffff?text=TTD" />
+          </div>
+          <div style="text-decoration:underline;font-weight:700">ANANG SUPRIYADI, S.Ag, M.Pd</div>
+          <div>NIP. 196810071998031001</div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:30px;">
+        <div>Mengetahui,</div>
+        <div>Kepala Kantor Kementerian Agama Kabupaten Jember,</div>
+        <div style="height:80px; border: 1px dashed green;"></div>
+        <div style="text-decoration:underline;font-weight:700">Dr. SANTOSO, S.Ag, M.Pd.</div>
+        <div>NIP. 196908251991031003</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="test-section">
+    <h2>CSS Signature Info</h2>
+    <pre>.doc-page .ttd .signature-img {
+  max-height: 70px;
+  max-width: 120px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  margin: 0 auto;
+  display: block;
+}</pre>
+  </div>
+
+</body>
+</html>

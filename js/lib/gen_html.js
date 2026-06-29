@@ -574,7 +574,7 @@
           </div>
           <div class="ttd-block">
             <div>Pemimpin Rapat,</div>
-            <div style="height:80px"></div>
+            <div style="height:auto;min-height:70px;display:flex;align-items:center;justify-content:center;">${i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : ''}</div>
             <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
             <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
           </div>
@@ -629,7 +629,7 @@
         <div style="display:flex;justify-content:flex-end;margin-top:24px;">
           <div style="width:50%;text-align:center;padding-right:6%;">
             <div>Pengawas Madrasah,</div>
-            <div style="height:80px"></div>
+            <div style="height:auto;min-height:70px;display:flex;align-items:center;justify-content:center;">${i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : ''}</div>
             <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
             <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
           </div>
@@ -678,7 +678,7 @@
         <div style="display:flex;justify-content:flex-end;margin-top:24px;">
           <div style="width:50%;text-align:center;padding-right:6%;">
             <div>Pengawas Madrasah,</div>
-            <div style="height:80px"></div>
+            <div style="height:auto;min-height:70px;display:flex;align-items:center;justify-content:center;">${i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : ''}</div>
             <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
             <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
           </div>

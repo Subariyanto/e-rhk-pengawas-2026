@@ -9,6 +9,7 @@
       jabatan: 'Pengawas Madrasah Madya Tingkat Menengah Pada MA',
       unit_kerja: 'Kantor Kementerian Agama Kab. Jember',
       kabupaten: 'Jember',
+      wilayah_binaan: 'KKMA 04 Jember (Kecamatan Sukowono)',
     },
     pejabat_penilai: {
       nama: 'Dr. SANTOSO, S.Ag, M.Pd.',
@@ -99,7 +100,10 @@
         { name: 'jabatan', label: 'Jabatan' },
         { name: 'unit_kerja', label: 'Unit Kerja' },
       ];
-      if (withKabupaten) fields.push({ name: 'kabupaten', label: 'Kabupaten' });
+      if (withKabupaten) {
+        fields.push({ name: 'kabupaten', label: 'Kabupaten' });
+        fields.push({ name: 'wilayah_binaan', label: 'Wilayah Binaan' });
+      }
       return fields.map(f => `
         <div class="col-md-6">
           <label class="form-label">${f.label}</label>

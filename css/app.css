@@ -446,7 +446,7 @@ a:hover { color: var(--primary-dark); }
   body { background: #fff; }
   .doc-page {
     page-break-after: always;
-    padding: 0.8in;
+    padding: 0.8in 0.8in 1.2in 0.8in;
     margin: 0;
     box-shadow: none;
     max-width: none;
@@ -454,10 +454,11 @@ a:hover { color: var(--primary-dark); }
     transform: scale(var(--print-scale, 1));
     transform-origin: top left;
   }
-  .doc-cover { padding: 0.8in; }
+  .doc-page:last-child { padding-bottom: 0.8in; }
+  .doc-cover { padding: 0.8in 0.8in 1.2in 0.8in; }
   /* @page margin set ke 0 supaya padding .doc-page yang kontrol jarak */
   @page { size: A4 portrait; margin: 0; }
-  body.print-landscape @page { size: A4 landscape; margin: 0; }
+  @page :first { margin-top: 0; }
 }
 
 /* ===== Trial watermark (cetak & screen saat dipreview) ===== */
@@ -504,7 +505,7 @@ body.trial-mode .trial-watermark::before{content:"TRIAL \2022  e-RHK Pengawas 20
 .doc-page .kop .text .l4 { font-size: 12pt; }
 .doc-page .ttd { display: flex; justify-content: space-between; margin-top: 36px; }
 .doc-page .ttd .ttd-block { width: 45%; text-align: center; }
-.doc-page .ttd .signature-img { max-height: 75px; max-width: 110px; width: auto; height: auto; object-fit: contain; object-position: center; display: block; }
+.doc-page .signature-img, .doc-page .ttd .signature-img { max-height: 120px; max-width: 200px; width: auto; height: auto; object-fit: contain; object-position: center; display: block; margin: 0 auto; }
 .doc-page table.fmt { width: 100%; border-collapse: collapse; }
 .doc-page table.fmt th, .doc-page table.fmt td { border: 1px solid #000; padding: 4px 6px; }
 

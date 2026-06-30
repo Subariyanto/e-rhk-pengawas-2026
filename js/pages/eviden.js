@@ -157,9 +157,11 @@
             <li><a class="dropdown-item" href="#" id="btnZipOne"><i class="bi bi-file-zip"></i> ZIP (paket lengkap)</a></li>
           </ul>
         </div>
+        ${rhk.link_bukti_dukung ? `<a class="btn btn-outline-primary" href="${U.escapeHtml(rhk.link_bukti_dukung)}" target="_blank" rel="noopener" title="Buka folder Google Drive untuk upload eviden"><i class="bi bi-folder2-open"></i> Buka Drive</a>` : ''}
         <button class="btn btn-outline-success" id="btnFinal" ${ev.status === 'final' ? 'disabled' : ''}><i class="bi bi-check2-circle"></i> Tandai Final</button>
         <button class="btn btn-outline-danger ms-auto" id="btnDel"><i class="bi bi-trash"></i> Hapus Eviden</button>
       </div>
+      ${rhk.link_bukti_dukung ? `<div class="alert alert-info py-2 small no-print mb-3"><i class="bi bi-cloud-upload"></i> Setelah download, file otomatis siap diupload ke folder: <a href="${U.escapeHtml(rhk.link_bukti_dukung)}" target="_blank" rel="noopener">${U.escapeHtml(rhk.link_bukti_dukung)}</a></div>` : ''}
 
       <div class="alert alert-light border no-print">
         <strong>${U.escapeHtml(rhk.nama_eviden)}</strong> · ${ev.status} · ${parts.length} dokumen ·
@@ -171,28 +173,156 @@
       </ul>
 
       <div id="docContainer">
-        ${parts.map((p, i) => `<div data-doc="${i}" class="${i === 0 ? '' : 'd-none'}">${p.html}</div>`).join('')}
+        ${parts.map((p, i) => `<div data-doc="${i}" class="doc-pane ${i === 0 ? '' : 'd-none'}">
+          <div class="d-flex gap-2 mb-3 no-print doc-actions">
+            <button class="btn btn-sm btn-success doc-print" data-idx="${i}"><i class="bi bi-printer"></i> Cetak</button>
+            <div class="dropdown">
+              <button class="btn btn-sm btn-success dropdown-toggle" data-bs-toggle="dropdown"><i class="bi bi-download"></i> Download</button>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item doc-docx" data-idx="${i}" href="#"><i class="bi bi-file-earmark-word"></i> Word</a></li>
+                <li><a class="dropdown-item doc-pdf" data-idx="${i}" href="#"><i class="bi bi-file-earmark-pdf"></i> PDF</a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="doc-body">${p.html}</div>
+        </div>`).join('')}
       </div>
     `);
 
     document.querySelectorAll('#navDoc button').forEach(btn => btn.addEventListener('click', () => {
       document.querySelectorAll('#navDoc button').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      document.querySelectorAll('#docContainer > div').forEach(d => d.classList.add('d-none'));
-      document.querySelector(`#docContainer > div[data-doc="${btn.dataset.tab}"]`).classList.remove('d-none');
+      document.querySelectorAll('#docContainer > .doc-pane').forEach(d => d.classList.add('d-none'));
+      document.querySelector(`#docContainer > .doc-pane[data-doc="${btn.dataset.tab}"]`).classList.remove('d-none');
+    }));
+
+    // Per-document print
+    const showPrintDialog = (() => { /* defined inline below */ })();
+    (function setupPrintDialog() { window._showPrintDialog = function() {
+      window.print();
+      document.body.classList.remove('print-landscape');
+      document.documentElement.style.removeProperty('--print-scale');
+      document.querySelectorAll('#docContainer > .doc-pane').forEach(d => {
+        if (!d.dataset.wasVisible) d.classList.add('d-none');
+        delete d.dataset.wasVisible;
+      });
+    }; })();
+    document.querySelectorAll('.doc-print').forEach(btn => btn.addEventListener('click', () => {
+      const idx = btn.dataset.idx;
+      // Show only this doc, hide others, remember which were visible
+      document.querySelectorAll('#docContainer > .doc-pane').forEach(d => {
+        if (d.dataset.doc === idx) { d.dataset.wasVisible = 'true'; d.classList.remove('d-none'); }
+        else { d.dataset.wasVisible = d.classList.contains('d-none') ? '' : 'true'; d.classList.add('d-none'); }
+      });
+      // Modal orientasi
+      const modal = document.createElement('div');
+      modal.className = 'modal fade';
+      modal.id = 'modalOrientasiSingle';
+      modal.innerHTML = `<div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+        <div class="modal-header"><h5 class="modal-title">Cetak: ${U.escapeHtml(parts[idx].label)}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+          <label class="form-label fw-bold">Orientasi Kertas</label>
+          <div class="form-check mb-2"><input class="form-check-input" type="radio" name="orientasi" value="portrait" checked><label class="form-check-label">Portrait (tegak)</label></div>
+          <div class="form-check mb-3"><input class="form-check-input" type="radio" name="orientasi" value="landscape"><label class="form-check-label">Landscape (mendatar)</label></div>
+          <label class="form-label fw-bold">Skala Cetak</label>
+          <select class="form-select" id="selScaleSingle"><option value="1">100% (normal)</option><option value="0.9">90%</option><option value="0.8">80%</option><option value="0.7">70%</option></select>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+          <button type="button" class="btn btn-success" id="btnDoPrintSingle">Cetak</button>
+        </div>
+      </div></div>`;
+      document.body.appendChild(modal);
+      const bsModal = new bootstrap.Modal(modal);
+      bsModal.show();
+      modal.addEventListener('hidden.bs.modal', () => modal.remove());
+      modal.querySelector('#btnDoPrintSingle').addEventListener('click', () => {
+        const orientasi = modal.querySelector('input[name="orientasi"]:checked').value;
+        const scale = modal.querySelector('#selScaleSingle').value;
+        document.body.classList.toggle('print-landscape', orientasi === 'landscape');
+        document.documentElement.style.setProperty('--print-scale', scale);
+        bsModal.hide();
+        setTimeout(() => {
+          window.print();
+          document.body.classList.remove('print-landscape');
+          document.documentElement.style.removeProperty('--print-scale');
+          document.querySelectorAll('#docContainer > .doc-pane').forEach(d => {
+            if (!d.dataset.wasVisible) d.classList.add('d-none');
+            delete d.dataset.wasVisible;
+          });
+        }, 300);
+      });
+    }));
+    // Per-document download handlers
+    document.querySelectorAll('.doc-docx').forEach(btn => btn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const idx = btn.dataset.idx;
+      const p = parts[idx];
+      UI.toast('Membuat Word… mohon tunggu.');
+      const blob = GenDOCX.htmlToWordDocBlob([p.html], rhk.id + ' ' + p.label);
+      U.downloadBlob(blob, U.sanitizeFilename(rhk.id + '_' + p.label) + '.doc');
+      openDriveLink();
+    }));
+    document.querySelectorAll('.doc-pdf').forEach(btn => btn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const idx = btn.dataset.idx;
+      const p = parts[idx];
+      UI.toast('Membuat PDF… mohon tunggu.');
+      try {
+        const blob = await GenPDF.htmlToPdfBlob(p.html);
+        U.downloadBlob(blob, U.sanitizeFilename(rhk.id + '_' + p.label) + '.pdf');
+      } catch (err) {
+        UI.toast('PDF gagal, fallback ke print: ' + err.message, 'warning');
+        GenPDF.printHTML(p.html);
+      }
+      openDriveLink();
     }));
 
     document.getElementById('btnPrint').addEventListener('click', () => {
-      // Show all docs then print
-      document.querySelectorAll('#docContainer > div').forEach(d => d.classList.remove('d-none'));
-      showPrintDialog();
+      // Modal pilih orientasi
+      const modal = document.createElement('div');
+      modal.className = 'modal fade';
+      modal.id = 'modalOrientasi';
+      modal.innerHTML = `<div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+        <div class="modal-header"><h5 class="modal-title">Pengaturan Cetak</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+          <label class="form-label fw-bold">Orientasi Kertas</label>
+          <div class="form-check mb-2"><input class="form-check-input" type="radio" name="orientasi" id="oriPortrait" value="portrait" checked><label class="form-check-label" for="oriPortrait">Portrait (tegak)</label></div>
+          <div class="form-check mb-3"><input class="form-check-input" type="radio" name="orientasi" id="oriLandscape" value="landscape"><label class="form-check-label" for="oriLandscape">Landscape (mendatar)</label></div>
+          <label class="form-label fw-bold">Skala Cetak</label>
+          <select class="form-select" id="selScale"><option value="1">100% (normal)</option><option value="0.9">90%</option><option value="0.8">80%</option><option value="0.7">70%</option></select>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+          <button type="button" class="btn btn-success" id="btnDoPrint">Cetak</button>
+        </div>
+      </div></div>`;
+      document.body.appendChild(modal);
+      const bsModal = new bootstrap.Modal(modal);
+      bsModal.show();
+      modal.addEventListener('hidden.bs.modal', () => modal.remove());
+      modal.querySelector('#btnDoPrint').addEventListener('click', () => {
+        const orientasi = modal.querySelector('input[name="orientasi"]:checked').value;
+        const scale = modal.querySelector('#selScale').value;
+        document.body.classList.toggle('print-landscape', orientasi === 'landscape');
+        document.documentElement.style.setProperty('--print-scale', scale);
+        document.querySelectorAll('#docContainer > div').forEach(d => d.classList.remove('d-none'));
+        bsModal.hide();
+        setTimeout(() => showPrintDialog(), 300);
+      });
     });
+    const openDriveLink = () => {
+      if (rhk.link_bukti_dukung) {
+        setTimeout(() => window.open(rhk.link_bukti_dukung, '_blank', 'noopener'), 800);
+      }
+    };
     document.getElementById('btnDocxAll').addEventListener('click', async (e) => {
       e.preventDefault();
       UI.toast('Membuat Word… mohon tunggu.');
       // Pakai Word-HTML wrapper supaya layout match dengan tampilan cetak.
       const blob = GenDOCX.htmlToWordDocBlob(parts.map(p => p.html), rhk.id + ' ' + rhk.nama_eviden);
       U.downloadBlob(blob, U.sanitizeFilename(rhk.id + '_' + rhk.nama_eviden) + '.doc');
+      openDriveLink();
     });
     document.getElementById('btnPdfAll').addEventListener('click', async (e) => {
       e.preventDefault();
@@ -206,17 +336,20 @@
         const combined = parts.map(p => p.html).join('\n');
         GenPDF.printHTML(combined);
       }
+      openDriveLink();
     });
     document.getElementById('btnHtmlAll').addEventListener('click', (e) => {
       e.preventDefault();
       const combined = parts.map(p => p.html).join('\n');
       GenPDF.htmlAsPrintable(combined, rhk.id + '_' + rhk.nama_eviden);
+      openDriveLink();
     });
     document.getElementById('btnZipOne').addEventListener('click', async (e) => {
       e.preventDefault();
       UI.toast('Membuat paket ZIP…');
       const { blob, filename } = await GenZIP.zipForEviden(ev);
       U.downloadBlob(blob, filename);
+      openDriveLink();
     });
     document.getElementById('btnFinal').addEventListener('click', () => {
       const list2 = Store.get('eviden', []) || [];

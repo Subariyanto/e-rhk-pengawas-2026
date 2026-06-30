@@ -173,15 +173,109 @@
       </ul>
 
       <div id="docContainer">
-        ${parts.map((p, i) => `<div data-doc="${i}" class="${i === 0 ? '' : 'd-none'}">${p.html}</div>`).join('')}
+        ${parts.map((p, i) => `<div data-doc="${i}" class="doc-pane ${i === 0 ? '' : 'd-none'}">
+          <div class="d-flex gap-2 mb-3 no-print doc-actions">
+            <button class="btn btn-sm btn-success doc-print" data-idx="${i}"><i class="bi bi-printer"></i> Cetak</button>
+            <div class="dropdown">
+              <button class="btn btn-sm btn-success dropdown-toggle" data-bs-toggle="dropdown"><i class="bi bi-download"></i> Download</button>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item doc-docx" data-idx="${i}" href="#"><i class="bi bi-file-earmark-word"></i> Word</a></li>
+                <li><a class="dropdown-item doc-pdf" data-idx="${i}" href="#"><i class="bi bi-file-earmark-pdf"></i> PDF</a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="doc-body">${p.html}</div>
+        </div>`).join('')}
       </div>
     `);
 
     document.querySelectorAll('#navDoc button').forEach(btn => btn.addEventListener('click', () => {
       document.querySelectorAll('#navDoc button').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      document.querySelectorAll('#docContainer > div').forEach(d => d.classList.add('d-none'));
-      document.querySelector(`#docContainer > div[data-doc="${btn.dataset.tab}"]`).classList.remove('d-none');
+      document.querySelectorAll('#docContainer > .doc-pane').forEach(d => d.classList.add('d-none'));
+      document.querySelector(`#docContainer > .doc-pane[data-doc="${btn.dataset.tab}"]`).classList.remove('d-none');
+    }));
+
+    // Per-document print
+    const showPrintDialog = (() => { /* defined inline below */ })();
+    (function setupPrintDialog() { window._showPrintDialog = function() {
+      window.print();
+      document.body.classList.remove('print-landscape');
+      document.documentElement.style.removeProperty('--print-scale');
+      document.querySelectorAll('#docContainer > .doc-pane').forEach(d => {
+        if (!d.dataset.wasVisible) d.classList.add('d-none');
+        delete d.dataset.wasVisible;
+      });
+    }; })();
+    document.querySelectorAll('.doc-print').forEach(btn => btn.addEventListener('click', () => {
+      const idx = btn.dataset.idx;
+      // Show only this doc, hide others, remember which were visible
+      document.querySelectorAll('#docContainer > .doc-pane').forEach(d => {
+        if (d.dataset.doc === idx) { d.dataset.wasVisible = 'true'; d.classList.remove('d-none'); }
+        else { d.dataset.wasVisible = d.classList.contains('d-none') ? '' : 'true'; d.classList.add('d-none'); }
+      });
+      // Modal orientasi
+      const modal = document.createElement('div');
+      modal.className = 'modal fade';
+      modal.id = 'modalOrientasiSingle';
+      modal.innerHTML = `<div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+        <div class="modal-header"><h5 class="modal-title">Cetak: ${U.escapeHtml(parts[idx].label)}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+          <label class="form-label fw-bold">Orientasi Kertas</label>
+          <div class="form-check mb-2"><input class="form-check-input" type="radio" name="orientasi" value="portrait" checked><label class="form-check-label">Portrait (tegak)</label></div>
+          <div class="form-check mb-3"><input class="form-check-input" type="radio" name="orientasi" value="landscape"><label class="form-check-label">Landscape (mendatar)</label></div>
+          <label class="form-label fw-bold">Skala Cetak</label>
+          <select class="form-select" id="selScaleSingle"><option value="1">100% (normal)</option><option value="0.9">90%</option><option value="0.8">80%</option><option value="0.7">70%</option></select>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+          <button type="button" class="btn btn-success" id="btnDoPrintSingle">Cetak</button>
+        </div>
+      </div></div>`;
+      document.body.appendChild(modal);
+      const bsModal = new bootstrap.Modal(modal);
+      bsModal.show();
+      modal.addEventListener('hidden.bs.modal', () => modal.remove());
+      modal.querySelector('#btnDoPrintSingle').addEventListener('click', () => {
+        const orientasi = modal.querySelector('input[name="orientasi"]:checked').value;
+        const scale = modal.querySelector('#selScaleSingle').value;
+        document.body.classList.toggle('print-landscape', orientasi === 'landscape');
+        document.documentElement.style.setProperty('--print-scale', scale);
+        bsModal.hide();
+        setTimeout(() => {
+          window.print();
+          document.body.classList.remove('print-landscape');
+          document.documentElement.style.removeProperty('--print-scale');
+          document.querySelectorAll('#docContainer > .doc-pane').forEach(d => {
+            if (!d.dataset.wasVisible) d.classList.add('d-none');
+            delete d.dataset.wasVisible;
+          });
+        }, 300);
+      });
+    }));
+    // Per-document download handlers
+    document.querySelectorAll('.doc-docx').forEach(btn => btn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const idx = btn.dataset.idx;
+      const p = parts[idx];
+      UI.toast('Membuat Word… mohon tunggu.');
+      const blob = GenDOCX.htmlToWordDocBlob([p.html], rhk.id + ' ' + p.label);
+      U.downloadBlob(blob, U.sanitizeFilename(rhk.id + '_' + p.label) + '.doc');
+      openDriveLink();
+    }));
+    document.querySelectorAll('.doc-pdf').forEach(btn => btn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const idx = btn.dataset.idx;
+      const p = parts[idx];
+      UI.toast('Membuat PDF… mohon tunggu.');
+      try {
+        const blob = await GenPDF.htmlToPdfBlob(p.html);
+        U.downloadBlob(blob, U.sanitizeFilename(rhk.id + '_' + p.label) + '.pdf');
+      } catch (err) {
+        UI.toast('PDF gagal, fallback ke print: ' + err.message, 'warning');
+        GenPDF.printHTML(p.html);
+      }
+      openDriveLink();
     }));
 
     document.getElementById('btnPrint').addEventListener('click', () => {

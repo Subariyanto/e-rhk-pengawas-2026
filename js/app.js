@@ -4,6 +4,7 @@
     Router.on('/login', () => Page.Login());
     Router.on('/register', () => Page.Register());
     Router.on('/beli-lisensi', () => Page.BeliLisensi());
+    Router.on('/verify', () => Page.Verify());
     Router.on('/panduan', () => Page.Panduan(), { requireAuth: true });
     Router.on('/', () => Page.Dashboard(), { requireAuth: true });
     Router.on('/dashboard', () => Page.Dashboard(), { requireAuth: true });

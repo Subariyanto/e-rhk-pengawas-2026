@@ -19,14 +19,85 @@
     return `${i.pegawai.kabupaten || 'Jember'}, ${U.fmtTanggal(new Date())}`;
   }
 
+  // ===== Helper: Get current signature mode =====
+  function getSigMode() {
+    if (window.Signature) {
+      const s = Signature.getSettings();
+      return s.default_mode || 'scan_signature';
+    }
+    return 'scan_signature';
+  }
+
+  // ===== Helper: Pengawas TTD block based on mode =====
+  function pengawasTTDHtml(i, mode, rhkId) {
+    const kota = i.pegawai.kabupaten || 'Jember';
+    const tanggal = U.fmtTanggal(new Date());
+    if (mode === 'qrcode_tte' && window.Signature) {
+      const record = Signature.createTTERecord(i, rhkId || '', '');
+      const verUrl = Signature.getVerificationUrl(record.verification_code);
+      const qrId = 'qr_' + record.id;
+      return `
+        <div class="tte-block" style="margin-top:20px;padding:16px;border:2px solid #1E2A5A;border-radius:8px;background:#f8f9fa;">
+          <div style="text-align:center;margin-bottom:8px;">
+            <div style="font-weight:600;color:#1E2A5A;font-size:10pt;">Telah Ditandatangani Secara Elektronik</div>
+          </div>
+          <div style="display:flex;gap:16px;align-items:flex-start;">
+            <div style="flex:1;">
+              <div style="font-weight:700;">${U.escapeHtml(i.pegawai.nama)}</div>
+              <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
+              <div>${U.escapeHtml(i.pegawai.jabatan || '')}</div>
+              <div>${U.escapeHtml(i.pegawai.unit_kerja || '')}</div>
+              <div style="font-size:8pt;color:#666;margin-top:8px;">
+                <div>Tanggal TTE: ${tanggal} ${new Date().toLocaleTimeString('id-ID')}</div>
+                <div>No. Dokumen: ${record.nomor_dokumen}</div>
+                <div>Kode Verifikasi: <code>${record.verification_code}</code></div>
+              </div>
+            </div>
+            <div style="text-align:center;">
+              <div id="${qrId}" class="qr-container" data-qr-url="${verUrl}" style="width:120px;height:120px;"></div>
+              <div style="font-size:7pt;margin-top:4px;color:#888;">Pindai untuk verifikasi</div>
+            </div>
+          </div>
+          <div style="margin-top:8px;font-size:7pt;color:#999;text-align:center;border-top:1px solid #dee2e6;padding-top:6px;">
+            Verifikasi: ${verUrl}
+          </div>
+        </div>
+      `;
+    } else if (mode === 'blank_manual') {
+      return `
+        <div style="display:flex;justify-content:flex-end;margin-top:30px;">
+          <div style="width:50%;text-align:center;padding-right:6%;">
+            <div>${U.escapeHtml(kota)}, ${tanggal}</div>
+            <div>Pengawas Madrasah,</div>
+            <div style="height:100px;"></div>
+            <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
+            <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
+          </div>
+        </div>
+      `;
+    }
+    // Default: scan_signature
+    const sigImg = i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : '';
+    return `
+      <div style="display:flex;justify-content:flex-end;margin-top:30px;">
+        <div style="width:50%;text-align:center;padding-right:6%;">
+          <div>${U.escapeHtml(kota)}, ${tanggal}</div>
+          <div>Pengawas Madrasah,</div>
+          <div style="height:auto;min-height:70px;display:flex;align-items:center;justify-content:center;">${sigImg}</div>
+          <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
+          <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
+        </div>
+      </div>
+    `;
+  }
+
   // ===== TTD Layout standar (Kanan: Pengawas, Kiri: Ketua Pokjawas, Bawah: Kepala Kankemenag) =====
   // Default Ketua Pokjawas Kab Jember (sesuai MEMORY): SUBARIYANTO, S.Pd, M.Pd.I (NIP 197002122005011004)
-  function ttdBlokStandar(idn) {
+  function ttdBlokStandar(idn, rhkId) {
     const i = idn || Page.Identitas.get();
-    const kota = i.pegawai.kabupaten || 'Jember';
+    const mode = getSigMode();
     const ketuaPokjawasNama = (i.ketua_pokjawas && i.ketua_pokjawas.nama) || 'SUBARIYANTO, S.Pd, M.Pd.I';
     const ketuaPokjawasNIP  = (i.ketua_pokjawas && i.ketua_pokjawas.nip) || '197002122005011004';
-    const sigImg = i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : '';
     return `
       <div class="ttd" style="margin-top:24px;">
         <div class="ttd-block">
@@ -37,11 +108,7 @@
           <div>NIP. ${U.escapeHtml(ketuaPokjawasNIP)}</div>
         </div>
         <div class="ttd-block">
-          <div>${U.escapeHtml(kota)}, ${U.fmtTanggal(new Date())}</div>
-          <div>Pengawas Madrasah,</div>
-          <div style="height:auto;min-height:70px;display:flex;align-items:center;justify-content:center;">${sigImg}</div>
-          <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
-          <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
+          ${pengawasTTDHtml(i, mode, rhkId)}
         </div>
       </div>
       <div style="text-align:center;margin-top:30px;">

@@ -446,7 +446,7 @@ a:hover { color: var(--primary-dark); }
   body { background: #fff; }
   .doc-page {
     page-break-after: always;
-    padding: 0.8in;
+    padding: 0.8in 0.8in 1.2in 0.8in;
     margin: 0;
     box-shadow: none;
     max-width: none;
@@ -454,10 +454,11 @@ a:hover { color: var(--primary-dark); }
     transform: scale(var(--print-scale, 1));
     transform-origin: top left;
   }
-  .doc-cover { padding: 0.8in; }
+  .doc-page:last-child { padding-bottom: 0.8in; }
+  .doc-cover { padding: 0.8in 0.8in 1.2in 0.8in; }
   /* @page margin set ke 0 supaya padding .doc-page yang kontrol jarak */
   @page { size: A4 portrait; margin: 0; }
-  body.print-landscape @page { size: A4 landscape; margin: 0; }
+  @page :first { margin-top: 0; }
 }
 
 /* ===== Trial watermark (cetak & screen saat dipreview) ===== */

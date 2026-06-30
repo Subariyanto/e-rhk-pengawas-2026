@@ -122,12 +122,11 @@
   }
 
   // TTD untuk Laporan Triwulan: Kiri Ketua Pokjawas, Kanan Pengawas + Kota & Tanggal (sejajar, tanpa Mengetahui)
-  function ttdTriwulan(idn) {
+  function ttdTriwulan(idn, rhkId) {
     const i = idn || Page.Identitas.get();
-    const kota = i.pegawai.kabupaten || 'Jember';
+    const mode = getSigMode();
     const ketuaPokjawasNama = (i.ketua_pokjawas && i.ketua_pokjawas.nama) || 'SUBARIYANTO, S.Pd, M.Pd.I';
     const ketuaPokjawasNIP  = (i.ketua_pokjawas && i.ketua_pokjawas.nip) || '197002122005011004';
-    const sigImg = i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : '';
     return `
       <div class="ttd" style="margin-top:24px;">
         <div class="ttd-block">
@@ -138,50 +137,24 @@
           <div>NIP. ${U.escapeHtml(ketuaPokjawasNIP)}</div>
         </div>
         <div class="ttd-block">
-          <div>${U.escapeHtml(kota)}, ${U.fmtTanggal(new Date())}</div>
-          <div>Pengawas Madrasah,</div>
-          <div style="height:auto;min-height:70px;display:flex;align-items:center;justify-content:center;">${sigImg}</div>
-          <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
-          <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
+          ${pengawasTTDHtml(i, mode, rhkId)}
         </div>
       </div>
     `;
   }
 
   // TTD versi sederhana (cuma pengawas, posisi center agak ke kanan)
-  function ttdPengawas(idn) {
+  function ttdPengawas(idn, rhkId) {
     const i = idn || Page.Identitas.get();
-    const kota = i.pegawai.kabupaten || 'Jember';
-    const sigImg = i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : '';
-    return `
-      <div style="display:flex;justify-content:flex-end;margin-top:30px;">
-        <div style="width:50%;text-align:center;padding-right:6%;">
-          <div>${U.escapeHtml(kota)}, ${U.fmtTanggal(new Date())}</div>
-          <div>Pengawas Madrasah,</div>
-          <div style="height:auto;min-height:70px;display:flex;align-items:center;justify-content:center;">${sigImg}</div>
-          <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
-          <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
-        </div>
-      </div>
-    `;
+    const mode = getSigMode();
+    return pengawasTTDHtml(i, mode, rhkId);
   }
 
   // TTD untuk halaman Penutup / Kata Pengantar: hanya Pengawas, posisi center agak ke kanan
-  function ttdBlokPenutup(idn) {
+  function ttdBlokPenutup(idn, rhkId) {
     const i = idn || Page.Identitas.get();
-    const kota = i.pegawai.kabupaten || 'Jember';
-    const sigImg = i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : '';
-    return `
-      <div style="display:flex;justify-content:flex-end;margin-top:30px;">
-        <div style="width:50%;text-align:center;padding-right:6%;">
-          <div>${U.escapeHtml(kota)}, ${U.fmtTanggal(new Date())}</div>
-          <div>Pengawas Madrasah,</div>
-          <div style="height:auto;min-height:70px;display:flex;align-items:center;justify-content:center;">${sigImg}</div>
-          <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
-          <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
-        </div>
-      </div>
-    `;
+    const mode = getSigMode();
+    return pengawasTTDHtml(i, mode, rhkId);
   }
 
   // Variables for narasi templates

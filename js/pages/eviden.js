@@ -157,9 +157,11 @@
             <li><a class="dropdown-item" href="#" id="btnZipOne"><i class="bi bi-file-zip"></i> ZIP (paket lengkap)</a></li>
           </ul>
         </div>
+        ${rhk.link_bukti_dukung ? `<a class="btn btn-outline-primary" href="${U.escapeHtml(rhk.link_bukti_dukung)}" target="_blank" rel="noopener" title="Buka folder Google Drive untuk upload eviden"><i class="bi bi-folder2-open"></i> Buka Drive</a>` : ''}
         <button class="btn btn-outline-success" id="btnFinal" ${ev.status === 'final' ? 'disabled' : ''}><i class="bi bi-check2-circle"></i> Tandai Final</button>
         <button class="btn btn-outline-danger ms-auto" id="btnDel"><i class="bi bi-trash"></i> Hapus Eviden</button>
       </div>
+      ${rhk.link_bukti_dukung ? `<div class="alert alert-info py-2 small no-print mb-3"><i class="bi bi-cloud-upload"></i> Setelah download, file otomatis siap diupload ke folder: <a href="${U.escapeHtml(rhk.link_bukti_dukung)}" target="_blank" rel="noopener">${U.escapeHtml(rhk.link_bukti_dukung)}</a></div>` : ''}
 
       <div class="alert alert-light border no-print">
         <strong>${U.escapeHtml(rhk.nama_eviden)}</strong> · ${ev.status} · ${parts.length} dokumen ·
@@ -183,16 +185,50 @@
     }));
 
     document.getElementById('btnPrint').addEventListener('click', () => {
-      // Show all docs then print
-      document.querySelectorAll('#docContainer > div').forEach(d => d.classList.remove('d-none'));
-      showPrintDialog();
+      // Modal pilih orientasi
+      const modal = document.createElement('div');
+      modal.className = 'modal fade';
+      modal.id = 'modalOrientasi';
+      modal.innerHTML = `<div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+        <div class="modal-header"><h5 class="modal-title">Pengaturan Cetak</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+          <label class="form-label fw-bold">Orientasi Kertas</label>
+          <div class="form-check mb-2"><input class="form-check-input" type="radio" name="orientasi" id="oriPortrait" value="portrait" checked><label class="form-check-label" for="oriPortrait">Portrait (tegak)</label></div>
+          <div class="form-check mb-3"><input class="form-check-input" type="radio" name="orientasi" id="oriLandscape" value="landscape"><label class="form-check-label" for="oriLandscape">Landscape (mendatar)</label></div>
+          <label class="form-label fw-bold">Skala Cetak</label>
+          <select class="form-select" id="selScale"><option value="1">100% (normal)</option><option value="0.9">90%</option><option value="0.8">80%</option><option value="0.7">70%</option></select>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+          <button type="button" class="btn btn-success" id="btnDoPrint">Cetak</button>
+        </div>
+      </div></div>`;
+      document.body.appendChild(modal);
+      const bsModal = new bootstrap.Modal(modal);
+      bsModal.show();
+      modal.addEventListener('hidden.bs.modal', () => modal.remove());
+      modal.querySelector('#btnDoPrint').addEventListener('click', () => {
+        const orientasi = modal.querySelector('input[name="orientasi"]:checked').value;
+        const scale = modal.querySelector('#selScale').value;
+        document.body.classList.toggle('print-landscape', orientasi === 'landscape');
+        document.documentElement.style.setProperty('--print-scale', scale);
+        document.querySelectorAll('#docContainer > div').forEach(d => d.classList.remove('d-none'));
+        bsModal.hide();
+        setTimeout(() => showPrintDialog(), 300);
+      });
     });
+    const openDriveLink = () => {
+      if (rhk.link_bukti_dukung) {
+        setTimeout(() => window.open(rhk.link_bukti_dukung, '_blank', 'noopener'), 800);
+      }
+    };
     document.getElementById('btnDocxAll').addEventListener('click', async (e) => {
       e.preventDefault();
       UI.toast('Membuat Word… mohon tunggu.');
       // Pakai Word-HTML wrapper supaya layout match dengan tampilan cetak.
       const blob = GenDOCX.htmlToWordDocBlob(parts.map(p => p.html), rhk.id + ' ' + rhk.nama_eviden);
       U.downloadBlob(blob, U.sanitizeFilename(rhk.id + '_' + rhk.nama_eviden) + '.doc');
+      openDriveLink();
     });
     document.getElementById('btnPdfAll').addEventListener('click', async (e) => {
       e.preventDefault();
@@ -206,17 +242,20 @@
         const combined = parts.map(p => p.html).join('\n');
         GenPDF.printHTML(combined);
       }
+      openDriveLink();
     });
     document.getElementById('btnHtmlAll').addEventListener('click', (e) => {
       e.preventDefault();
       const combined = parts.map(p => p.html).join('\n');
       GenPDF.htmlAsPrintable(combined, rhk.id + '_' + rhk.nama_eviden);
+      openDriveLink();
     });
     document.getElementById('btnZipOne').addEventListener('click', async (e) => {
       e.preventDefault();
       UI.toast('Membuat paket ZIP…');
       const { blob, filename } = await GenZIP.zipForEviden(ev);
       U.downloadBlob(blob, filename);
+      openDriveLink();
     });
     document.getElementById('btnFinal').addEventListener('click', () => {
       const list2 = Store.get('eviden', []) || [];

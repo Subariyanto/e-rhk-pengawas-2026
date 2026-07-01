@@ -95,7 +95,7 @@
     const mode = getSigMode();
     const ketuaPokjawasNama = (i.ketua_pokjawas && i.ketua_pokjawas.nama) || 'SUBARIYANTO, S.Pd, M.Pd.I';
     const ketuaPokjawasNIP  = (i.ketua_pokjawas && i.ketua_pokjawas.nip) || '197002122005011004';
-    const stempelImg = i.stempel ? `<img src="${i.stempel}" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);max-height:90px;opacity:0.8;z-index:2;pointer-events:none;mix-blend-mode:multiply;" />` : '';
+    const stempelImg = i.stempel ? `<img src="${i.stempel}" style="position:absolute;top:50%;left:25%;transform:translate(-50%,-50%);max-height:110px;opacity:0.85;z-index:2;pointer-events:none;mix-blend-mode:multiply;" />` : '';
     const ketuaTTDImg = (i.ttd_ketua_pokjawas) ? `<img class="signature-img" src="${i.ttd_ketua_pokjawas}" style="max-height:100px;position:absolute;top:-10px;left:50%;transform:translateX(-50%);z-index:1;mix-blend-mode:multiply;background:transparent;" />` : '<div style="height:80px;"></div>';
     const stempelBlock = stempelImg ? `<div style="height:80px;display:flex;align-items:center;justify-content:center;position:relative;overflow:visible;">${ketuaTTDImg}${stempelImg}</div>` : `<div style="height:80px;display:flex;align-items:center;justify-content:center;position:relative;overflow:visible;">${ketuaTTDImg}</div>`;
     return `
@@ -130,7 +130,7 @@
     const ketuaPokjawasNama = (i.ketua_pokjawas && i.ketua_pokjawas.nama) || 'SUBARIYANTO, S.Pd, M.Pd.I';
     const ketuaPokjawasNIP  = (i.ketua_pokjawas && i.ketua_pokjawas.nip) || '197002122005011004';
     const sigImg = i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : '';
-    const stempelImg = i.stempel ? `<img src="${i.stempel}" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);max-height:90px;opacity:0.8;z-index:2;pointer-events:none;mix-blend-mode:multiply;" />` : '';
+    const stempelImg = i.stempel ? `<img src="${i.stempel}" style="position:absolute;top:50%;left:25%;transform:translate(-50%,-50%);max-height:110px;opacity:0.85;z-index:2;pointer-events:none;mix-blend-mode:multiply;" />` : '';
     const ketuaTTDImg = (i.ttd_ketua_pokjawas) ? `<img class="signature-img" src="${i.ttd_ketua_pokjawas}" style="max-height:100px;position:absolute;top:-10px;left:50%;transform:translateX(-50%);z-index:1;mix-blend-mode:multiply;background:transparent;" />` : '';
     const stempelBlock = stempelImg ? `${ketuaTTDImg}${stempelImg}` : ketuaTTDImg;
     // Both columns share identical line structure → nama always sejajar

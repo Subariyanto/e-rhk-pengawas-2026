@@ -63,33 +63,55 @@
     w.document.close();
   }
 
-  // Use jsPDF.html() to convert single HTML element to PDF. We render to off-DOM and return blob.
-  async function htmlToPdfBlob(htmlBody, filename) {
+  // Use html2canvas directly — no print preview, direct blob download
+  async function htmlToPdfBlob(htmlBody) {
     if (window.Tier && Tier.blockExportIfTrial && Tier.blockExportIfTrial('Download PDF')) return null;
     const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+
+    // Grab app.css content for accurate rendering
+    let appCss = '';
+    const cssLink = document.querySelector('link[href*="app.css"]');
+    if (cssLink) {
+      try {
+        const resp = await fetch(cssLink.href);
+        appCss = await resp.text();
+      } catch (e) { appCss = ''; }
+    }
+
     const tmp = document.createElement('div');
-    tmp.innerHTML = htmlBody;
     tmp.style.position = 'fixed';
     tmp.style.left = '-10000px';
     tmp.style.top = '0';
-    tmp.style.width = '210mm';
+    tmp.style.width = '794px';
     tmp.style.background = '#fff';
+    tmp.style.zIndex = '-9999';
+    tmp.innerHTML = `<style>${appCss}</style>${htmlBody}`;
     document.body.appendChild(tmp);
 
     const pages = tmp.querySelectorAll('.doc-page');
+    const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+    const pageW = 210, pageH = 297;
     let first = true;
+
     for (const p of pages) {
-      // each .doc-page renders as its own page
       if (!first) pdf.addPage();
       first = false;
-      await pdf.html(p, {
-        callback: () => {},
-        x: 0, y: 0,
-        width: 210, windowWidth: p.offsetWidth || 800,
-        autoPaging: 'text',
-        margin: 0,
-      });
+      try {
+        const canvas = await html2canvas(p, {
+          scale: 3,
+          useCORS: true,
+          logging: false,
+          backgroundColor: '#ffffff',
+          width: p.offsetWidth || 794,
+          windowWidth: p.offsetWidth || 794,
+        });
+        const imgData = canvas.toDataURL('image/jpeg', 0.95);
+        const imgW = pageW;
+        const imgH = (canvas.height * imgW) / canvas.width;
+        pdf.addImage(imgData, 'JPEG', 0, 0, imgW, imgH);
+      } catch (e) {
+        console.error('html2canvas page error:', e);
+      }
     }
     document.body.removeChild(tmp);
 

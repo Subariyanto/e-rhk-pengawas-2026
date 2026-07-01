@@ -1,5 +1,7 @@
-﻿// HTML Generators for Eviden documents (Cover, Pengesahan, BAB I-IV, Lampiran, Surat Tugas, dll)
+// HTML Generators for Eviden documents (Cover, Pengesahan, BAB I-IV, Lampiran, Surat Tugas, dll)
 (function () {
+  // Force non-breaking: html2canvas doesn't reliably honor white-space:nowrap
+  function nbsp(s) { return U.escapeHtml(s).replace(/ /g, '&nbsp;'); }
   function header(idn) {
     const i = idn || Page.Identitas.get();
     return `<div class="kop">
@@ -29,7 +31,7 @@
   }
 
   // ===== Helper: Pengawas TTD block based on mode =====
-  // When inside a .ttd-block (inside .ttd flex row), render plain â€” no extra flex wrapper.
+  // When inside a .ttd-block (inside .ttd flex row), render plain — no extra flex wrapper.
   function pengawasTTDHtml(i, mode, rhkId) {
     const kota = i.pegawai.kabupaten || 'Jember';
     const tanggal = U.fmtTanggal(new Date());
@@ -68,19 +70,19 @@
           <div>${U.escapeHtml(kota)}, ${tanggal}</div>
           <div>Pengawas Madrasah,</div>
           <div style="height:90px;"></div>
-          <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
+          <div style="text-decoration:underline;font-weight:700">${nbsp(i.pegawai.nama)}</div>
           <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
         </div>
       `;
     }
-    // Default: scan_signature â€” clean centered layout, no nested flex wrappers
+    // Default: scan_signature — clean centered layout, no nested flex wrappers
     const sigImg = i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : '<div style="height:70px;"></div>';
     return `
       <div style="text-align:center;margin-top:10px;">
         <div>${U.escapeHtml(kota)}, ${tanggal}</div>
         <div>Pengawas Madrasah,</div>
         <div style="min-height:70px;display:flex;align-items:center;justify-content:center;">${sigImg}</div>
-        <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
+        <div style="text-decoration:underline;font-weight:700">${nbsp(i.pegawai.nama)}</div>
         <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
       </div>
     `;
@@ -99,7 +101,7 @@
           <div>&nbsp;</div>
           <div>Ketua Pokjawas Madrasah,</div>
           <div style="height:80px;"></div>
-          <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(ketuaPokjawasNama)}</div>
+          <div style="text-decoration:underline;font-weight:700;white-space:nowrap">${nbsp(ketuaPokjawasNama)}</div>
           <div>NIP. ${U.escapeHtml(ketuaPokjawasNIP)}</div>
         </div>
         <div class="ttd-block">
@@ -110,7 +112,7 @@
         <div>Mengetahui,</div>
         <div>${U.escapeHtml(i.pejabat_penilai.jabatan || 'Kepala Kantor Kementerian Agama Kabupaten Jember')},</div>
         <div style="height:80px;"></div>
-        <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pejabat_penilai.nama)}</div>
+        <div style="text-decoration:underline;font-weight:700;white-space:nowrap">${nbsp(i.pejabat_penilai.nama)}</div>
         <div>NIP. ${U.escapeHtml(i.pejabat_penilai.nip)}</div>
       </div>
     `;
@@ -124,14 +126,14 @@
     const ketuaPokjawasNIP  = (i.ketua_pokjawas && i.ketua_pokjawas.nip) || '197002122005011004';
     return `
       <div style="margin-top:24px;text-align:center;">
-        <div style="display:inline-block;vertical-align:top;text-align:center;width:40%;margin-right:20px;">
+        <div style="display:inline-block;vertical-align:top;text-align:center;width:45%;margin-right:10px;white-space:nowrap;">
           <div>&nbsp;</div>
           <div>Ketua Pokjawas Madrasah,</div>
           <div style="height:80px;"></div>
-          <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(ketuaPokjawasNama)}</div>
+          <div style="text-decoration:underline;font-weight:700;white-space:nowrap">${nbsp(ketuaPokjawasNama)}</div>
           <div>NIP. ${U.escapeHtml(ketuaPokjawasNIP)}</div>
         </div>
-        <div style="display:inline-block;vertical-align:top;text-align:center;width:40%;">
+        <div style="display:inline-block;vertical-align:top;text-align:center;width:45%;white-space:nowrap;">
           ${pengawasTTDHtml(i, mode, rhkId).replace(/margin-top:10px;/g, 'margin-top:0;').replace(/<div[^>]*>\s*Pengawas Madrasah,\s*<\/div>/gi, '')}
         </div>
       </div>
@@ -201,7 +203,7 @@
         <div class="cover-sub" style="font-style:italic;">${rhk.triwulan === 'TAMBAHAN' ? 'Kinerja Tambahan' : 'Triwulan ' + rhk.triwulan + ' Tahun 2026'}${keg && keg.nama_kegiatan ? '<br />Kegiatan: ' + U.escapeHtml(keg.nama_kegiatan) : ''}</div>
 
         <div style="text-align:center;margin:60px auto;">
-          ${i.logo ? `<img src="${i.logo}" style="width:160px" />` : '<div style="height:160px;display:grid;place-items:center;color:#888">â€” LOGO KEMENAG â€”</div>'}
+          ${i.logo ? `<img src="${i.logo}" style="width:160px" />` : '<div style="height:160px;display:grid;place-items:center;color:#888">— LOGO KEMENAG —</div>'}
         </div>
 
         <div class="cover-id">
@@ -366,7 +368,7 @@
     `;
   }
 
-  // Laporan Singkat per RHK â€” ringkas, berbasis hasil pendampingan/pengawasan
+  // Laporan Singkat per RHK — ringkas, berbasis hasil pendampingan/pengawasan
   function genLaporanSingkat(rhk, keg, idn) {
     const i = idn || Page.Identitas.get();
     const N = getNarasi(rhk.id);
@@ -395,7 +397,7 @@
       <div class="doc-page">
         ${header(i)}
         <h3 style="text-align:center;text-decoration:underline;margin:8px 0 4px;">LAPORAN SINGKAT HASIL PENGAWASAN / PENDAMPINGAN</h3>
-        <p style="text-align:center;margin:0 0 16px;"><strong>${U.escapeHtml(rhk.nama_eviden)}</strong><br/><em>${U.escapeHtml(rhk.id)} Â· ${U.escapeHtml(periode)} Â· ${U.escapeHtml(rhk.jenis_kinerja || '')}</em></p>
+        <p style="text-align:center;margin:0 0 16px;"><strong>${U.escapeHtml(rhk.nama_eviden)}</strong><br/><em>${U.escapeHtml(rhk.id)} · ${U.escapeHtml(periode)} · ${U.escapeHtml(rhk.jenis_kinerja || '')}</em></p>
 
         <table class="fmt" style="width:100%;margin-bottom:10px;">
           <tr><td style="width:30%">Pengawas Madrasah</td><td>${U.escapeHtml(i.pegawai.nama)} (NIP. ${U.escapeHtml(i.pegawai.nip)})</td></tr>
@@ -448,7 +450,7 @@
             <div>${keg && keg.tanggal ? U.escapeHtml((i.pegawai.kabupaten || 'Jember') + ', ' + U.fmtTanggal(keg.tanggal)) : tanggalKota(i)}</div>
             <div>Pengawas Madrasah,</div>
             <div style="height:auto;min-height:70px;display:flex;align-items:center;justify-content:center;">${i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : ''}</div>
-            <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
+            <div style="text-decoration:underline;font-weight:700;white-space:nowrap">${U.escapeHtml(i.pegawai.nama)}</div>
             <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
           </div>
         </div>
@@ -485,7 +487,7 @@
             <div>${tanggalKota(i)}</div>
             <div>${U.escapeHtml(i.pejabat_penilai.jabatan)},</div>
             <div style="height:80px"></div>
-            <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pejabat_penilai.nama)}</div>
+            <div style="text-decoration:underline;font-weight:700;white-space:nowrap">${nbsp(i.pejabat_penilai.nama)}</div>
             <div>NIP. ${U.escapeHtml(i.pejabat_penilai.nip)}</div>
           </div>
         </div>
@@ -517,7 +519,7 @@
           <div style="width:50%;text-align:center;">
             <div>Pengawas Madrasah,</div>
             <div style="height:auto;min-height:70px;display:flex;align-items:center;justify-content:center;">${i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : ''}</div>
-            <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
+            <div style="text-decoration:underline;font-weight:700;white-space:nowrap">${U.escapeHtml(i.pegawai.nama)}</div>
             <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
           </div>
         </div>
@@ -531,14 +533,14 @@
     let gtkRows = [];
     const allMadrasah = Store.get('madrasah', []) || [];
     if (keg && keg.madrasah_id === 'semua') {
-      // Semua Madrasah â€” isi dengan Kepala Madrasah
+      // Semua Madrasah — isi dengan Kepala Madrasah
       allMadrasah.forEach(mad => {
         if (mad.kepala_madrasah) {
           gtkRows.push({ nama: mad.kepala_madrasah, nip_nuptk: mad.nip_kepala || '', asal: mad.nama_madrasah, jabatan: 'Kepala Madrasah' });
         }
       });
     } else if (keg && keg.madrasah_id) {
-      // Specific madrasah â€” isi dengan GTK
+      // Specific madrasah — isi dengan GTK
       const mad = allMadrasah.find(x => x.id === keg.madrasah_id);
       if (mad && mad.gtk && mad.gtk.length) {
         gtkRows = mad.gtk.map(g => ({ nama: g.nama, nip_nuptk: g.nip_nuptk || '', asal: mad.nama_madrasah, jabatan: g.jabatan || '' }));
@@ -574,7 +576,7 @@
             <div>Mengetahui,</div>
             <div>Pengawas Madrasah,</div>
             <div style="height:auto;min-height:70px;display:flex;align-items:center;justify-content:center;">${i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : ''}</div>
-            <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
+            <div style="text-decoration:underline;font-weight:700;white-space:nowrap">${U.escapeHtml(i.pegawai.nama)}</div>
             <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
           </div>
         </div>
@@ -605,12 +607,12 @@
           <div class="ttd-block">
             <div>Notulis,</div>
             <div style="height:80px"></div>
-            <div style="text-decoration:underline;font-weight:700">________________</div>
+            <div style="text-decoration:underline;font-weight:700;white-space:nowrap">________________</div>
           </div>
           <div class="ttd-block">
             <div>Pemimpin Rapat,</div>
             <div style="height:auto;min-height:70px;display:flex;align-items:center;justify-content:center;">${i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : ''}</div>
-            <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
+            <div style="text-decoration:underline;font-weight:700;white-space:nowrap">${U.escapeHtml(i.pegawai.nama)}</div>
             <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
           </div>
         </div>
@@ -632,12 +634,12 @@
           <div class="ttd-block">
             <div>Saksi,</div>
             <div style="height:80px"></div>
-            <div style="text-decoration:underline;font-weight:700">________________</div>
+            <div style="text-decoration:underline;font-weight:700;white-space:nowrap">________________</div>
           </div>
           <div class="ttd-block">
             <div>Pengawas Madrasah,</div>
             <div style="height:auto;min-height:70px;display:flex;align-items:center;justify-content:center;">${i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : ''}</div>
-            <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
+            <div style="text-decoration:underline;font-weight:700;white-space:nowrap">${U.escapeHtml(i.pegawai.nama)}</div>
             <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
           </div>
         </div>
@@ -651,7 +653,7 @@
       <div class="doc-page">
         ${header(i)}
         <h3 style="text-align:center;text-decoration:underline;">INSTRUMEN ${U.escapeHtml((rhk.nama_eviden || '').toUpperCase())}</h3>
-        <p>Petunjuk: Berikan tanda centang (âœ“) pada kolom yang sesuai dengan kondisi di lapangan.</p>
+        <p>Petunjuk: Berikan tanda centang (✓) pada kolom yang sesuai dengan kondisi di lapangan.</p>
         <table class="fmt" style="width:100%">
           <thead><tr><th style="width:30px">No</th><th>Aspek/Komponen</th><th style="width:60px">Ya</th><th style="width:60px">Tidak</th><th>Catatan</th></tr></thead>
           <tbody>
@@ -665,7 +667,7 @@
           <div style="width:50%;text-align:center;">
             <div>Pengawas Madrasah,</div>
             <div style="height:auto;min-height:70px;display:flex;align-items:center;justify-content:center;">${i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : ''}</div>
-            <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
+            <div style="text-decoration:underline;font-weight:700;white-space:nowrap">${U.escapeHtml(i.pegawai.nama)}</div>
             <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
           </div>
         </div>
@@ -714,7 +716,7 @@
           <div style="width:50%;text-align:center;">
             <div>Pengawas Madrasah,</div>
             <div style="height:auto;min-height:70px;display:flex;align-items:center;justify-content:center;">${i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : ''}</div>
-            <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
+            <div style="text-decoration:underline;font-weight:700;white-space:nowrap">${U.escapeHtml(i.pegawai.nama)}</div>
             <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
           </div>
         </div>
@@ -769,7 +771,7 @@
             <div>${keg && keg.tanggal ? U.escapeHtml((i.pegawai.kabupaten || 'Jember') + ', ' + U.fmtTanggal(keg.tanggal)) : tanggalKota(i)}</div>
             <div>Pengawas Madrasah,</div>
             <div style="height:auto;min-height:70px;display:flex;align-items:center;justify-content:center;">${i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : ''}</div>
-            <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
+            <div style="text-decoration:underline;font-weight:700;white-space:nowrap">${U.escapeHtml(i.pegawai.nama)}</div>
             <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
           </div>
         </div>
@@ -792,7 +794,7 @@
             <div>${keg && keg.tanggal ? U.escapeHtml((i.pegawai.kabupaten || 'Jember') + ', ' + U.fmtTanggal(keg.tanggal)) : tanggalKota(i)}</div>
             <div>Pengawas Madrasah,</div>
             <div style="height:auto;min-height:70px;display:flex;align-items:center;justify-content:center;">${i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : ''}</div>
-            <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(i.pegawai.nama)}</div>
+            <div style="text-decoration:underline;font-weight:700;white-space:nowrap">${U.escapeHtml(i.pegawai.nama)}</div>
             <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
           </div>
         </div>
@@ -834,7 +836,7 @@
         <h3 style="text-align:center;text-decoration:underline;">LINK BUKTI DUKUNG GOOGLE DRIVE</h3>
         <p>Bukti dukung lengkap untuk <strong>${U.escapeHtml(rhk.nama_eviden)}</strong> tersedia pada tautan berikut:</p>
         <p style="text-align:center;font-size:14pt;">${link ? `<a href="${U.escapeHtml(link)}">${U.escapeHtml(link)}</a>` : '<em>(Belum diisi pada Master RHK)</em>'}</p>
-        <p class="text-muted small">Anda dapat mengubah link ini melalui menu <strong>Master RHK â†’ Edit RHK ${U.escapeHtml(rhk.id)}</strong>.</p>
+        <p class="text-muted small">Anda dapat mengubah link ini melalui menu <strong>Master RHK → Edit RHK ${U.escapeHtml(rhk.id)}</strong>.</p>
       </div>
     `;
   }
@@ -875,7 +877,7 @@
     const tanggalSurat = (keg && keg.tanggal) ? U.fmtTanggal(keg.tanggal) : U.fmtTanggal(new Date());
     const kodeMad = npsnMad || (mad ? (String(mad.nama_madrasah || '').replace(/\s+/g, '').slice(0, 5).toUpperCase() || 'MAD') : 'MAD');
     const nomorSurat = (keg && keg.no_surat_keterangan) ? keg.no_surat_keterangan : `....../SK/${kodeMad}/${new Date().getFullYear()}`;
-    const kontakLine = [npsnMad ? 'NPSN: ' + npsnMad : '', nsmMad ? 'NSM: ' + nsmMad : '', teleponMad ? 'Telp/HP: ' + teleponMad : ''].filter(Boolean).join(' â€” ');
+    const kontakLine = [npsnMad ? 'NPSN: ' + npsnMad : '', nsmMad ? 'NSM: ' + nsmMad : '', teleponMad ? 'Telp/HP: ' + teleponMad : ''].filter(Boolean).join(' — ');
 
     return `
       <div class="doc-page">
@@ -909,7 +911,7 @@
           <tr><td style="padding:2pt 8pt;border:none;">Tempat</td><td style="padding:2pt 8pt;border:none;">:</td><td style="padding:2pt 8pt;border:none;">${U.escapeHtml(keg ? (keg.tempat || namaMad) : namaMad)}</td></tr>
           <tr><td style="padding:2pt 8pt;border:none;">Sasaran/Peserta</td><td style="padding:2pt 8pt;border:none;">:</td><td style="padding:2pt 8pt;border:none;">${U.escapeHtml(sasaran)}</td></tr>
           <tr><td style="padding:2pt 8pt;border:none;">Periode</td><td style="padding:2pt 8pt;border:none;">:</td><td style="padding:2pt 8pt;border:none;">${U.escapeHtml(periode)}</td></tr>
-          <tr><td style="padding:2pt 8pt;border:none;vertical-align:top;">RHK Terkait</td><td style="padding:2pt 8pt;border:none;vertical-align:top;">:</td><td style="padding:2pt 8pt;border:none;">${U.escapeHtml(rhk.id)} â€” ${U.escapeHtml(rhk.nama_eviden)}</td></tr>
+          <tr><td style="padding:2pt 8pt;border:none;vertical-align:top;">RHK Terkait</td><td style="padding:2pt 8pt;border:none;vertical-align:top;">:</td><td style="padding:2pt 8pt;border:none;">${U.escapeHtml(rhk.id)} — ${U.escapeHtml(rhk.nama_eviden)}</td></tr>
         </table>
 
         <p style="text-align:justify;">Kegiatan tersebut dilaksanakan dalam rangka pendampingan/pengawasan akademik dan manajerial sebagai bagian dari pelaksanaan tugas pokok Pengawas Madrasah pada satuan pendidikan binaan kami. Pengawas yang bersangkutan telah melaksanakan tugasnya dengan baik, profesional, dan bertanggung jawab.</p>
@@ -932,7 +934,7 @@
     `;
   }
 
-  // ===== Program Pendampingan Tahunan (Program Kerja Pengawas) â€” khusus RHK-1 =====
+  // ===== Program Pendampingan Tahunan (Program Kerja Pengawas) — khusus RHK-1 =====
   function genProgramPendampingan(rhk, keg, idn) {
     const i = idn || Page.Identitas.get();
     const tahun = new Date().getFullYear();
@@ -946,7 +948,7 @@
         <div class="cover-title">PROGRAM PENDAMPINGAN TAHUNAN</div>
         <div class="cover-sub">PENGAWAS MADRASAH<br/>TAHUN ${tahun}</div>
         <div style="text-align:center;margin:60px auto;">
-          ${i.logo ? `<img src="${i.logo}" style="width:160px" />` : '<div style="height:160px;display:grid;place-items:center;color:#888">â€” LOGO KEMENAG â€”</div>'}
+          ${i.logo ? `<img src="${i.logo}" style="width:160px" />` : '<div style="height:160px;display:grid;place-items:center;color:#888">— LOGO KEMENAG —</div>'}
         </div>
         <div class="cover-id">
           <div>Disusun oleh:</div>
@@ -1137,11 +1139,11 @@
 
         <h3>B. Strategi Pendampingan</h3>
         <ol style="text-align:justify;">
-          <li><strong>Pendekatan kolaboratif</strong> â€” melibatkan Kepala Madrasah, guru, dan komite madrasah;</li>
-          <li><strong>Pendekatan klinis</strong> â€” supervisi yang berfokus pada perbaikan praktik pembelajaran melalui observasi & feedback;</li>
-          <li><strong>Pendekatan reflektif</strong> â€” mendorong guru dan kepala madrasah melakukan refleksi diri atas praktik kerja;</li>
-          <li><strong>Pendekatan terbuka</strong> â€” berbasis dialog dan saling belajar (peer-coaching);</li>
-          <li><strong>Pemanfaatan teknologi</strong> â€” supervisi blended (luring + daring) dengan dokumentasi digital.</li>
+          <li><strong>Pendekatan kolaboratif</strong> — melibatkan Kepala Madrasah, guru, dan komite madrasah;</li>
+          <li><strong>Pendekatan klinis</strong> — supervisi yang berfokus pada perbaikan praktik pembelajaran melalui observasi & feedback;</li>
+          <li><strong>Pendekatan reflektif</strong> — mendorong guru dan kepala madrasah melakukan refleksi diri atas praktik kerja;</li>
+          <li><strong>Pendekatan terbuka</strong> — berbasis dialog dan saling belajar (peer-coaching);</li>
+          <li><strong>Pemanfaatan teknologi</strong> — supervisi blended (luring + daring) dengan dokumentasi digital.</li>
         </ol>
 
         <h3>C. Matriks Program per Triwulan</h3>
@@ -1270,7 +1272,7 @@
     return ['laporan_singkat','surat_tugas','undangan','daftar_hadir','notulen','berita_acara','instrumen','rekap','analisis','rekomendasi','surat_keterangan_madrasah','foto','link'];
   }
 
-  // Plain text version (for DOCX & PDF fallback) â€” strip HTML
+  // Plain text version (for DOCX & PDF fallback) — strip HTML
   function htmlToPlain(html) {
     return html.replace(/<style[\s\S]*?<\/style>/gi, '')
                .replace(/<script[\s\S]*?<\/script>/gi, '')

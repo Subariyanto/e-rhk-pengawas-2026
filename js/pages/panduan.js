@@ -236,7 +236,7 @@
 
               <section id="sec-admin" class="panduan-section mt-4">
                 <h3>🛡️ Menu Admin</h3>
-                <p>Khusus user dengan role <code>admin</code>. Default admin: <code>admin@local</code> / <code>@riyant1970</code> (segera ganti password!).</p>
+                <p>Khusus user dengan role <code>admin</code>.</p>
                 <h4>Kelola User</h4>
                 <ul>
                   <li>Lihat semua user terdaftar</li>

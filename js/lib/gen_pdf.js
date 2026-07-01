@@ -97,6 +97,12 @@
       if (!first) pdf.addPage();
       first = false;
       try {
+        // Force natural height — remove min-height constraint
+        p.style.minHeight = 'auto';
+        p.style.height = 'auto';
+        p.style.overflow = 'visible';
+        p.style.pageBreakAfter = 'auto';
+        
         const canvas = await html2canvas(p, {
           scale: 3,
           useCORS: true,
@@ -109,14 +115,40 @@
           scrollY: 0,
         });
         const imgData = canvas.toDataURL('image/jpeg', 0.95);
-        let imgW = pageW;
+        const imgW = pageW;
         let imgH = (canvas.height * imgW) / canvas.width;
-        // Cap to A4 height — scale down proportionally if exceeds
-        if (imgH > pageH) {
-          imgW = (pageH * imgW) / imgH;
-          imgH = pageH;
+
+        if (imgH <= pageH) {
+          // Fits in one page — pad to full A4 height
+          const fullPxH = Math.round((pageH / imgH) * canvas.height);
+          const padCanvas = document.createElement('canvas');
+          padCanvas.width = canvas.width;
+          padCanvas.height = fullPxH;
+          const pctx = padCanvas.getContext('2d');
+          pctx.fillStyle = '#ffffff';
+          pctx.fillRect(0, 0, padCanvas.width, padCanvas.height);
+          pctx.drawImage(canvas, 0, 0);
+          pdf.addImage(padCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, imgW, pageH);
+        } else {
+          // Content exceeds A4 — split across multiple pages
+          const totalPages = Math.ceil(imgH / pageH);
+          const fullSlicePx = Math.round((pageH / imgH) * canvas.height);
+          for (let pg = 0; pg < totalPages; pg++) {
+            if (pg > 0) pdf.addPage();
+            const sliceY = Math.round(pg * (pageH / imgH) * canvas.height);
+            const sliceH = Math.min(fullSlicePx, canvas.height - sliceY);
+            if (sliceH <= 0) continue;
+            // Always render at full page size — pad short slices with white
+            const sliceCanvas = document.createElement('canvas');
+            sliceCanvas.width = canvas.width;
+            sliceCanvas.height = fullSlicePx;
+            const ctx = sliceCanvas.getContext('2d');
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
+            ctx.drawImage(canvas, 0, sliceY, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
+            pdf.addImage(sliceCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, imgW, pageH);
+          }
         }
-        pdf.addImage(imgData, 'JPEG', 0, 0, imgW, imgH);
       } catch (e) {
         console.error('html2canvas page error:', e);
       }

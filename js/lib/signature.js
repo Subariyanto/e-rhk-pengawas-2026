@@ -6,7 +6,7 @@
 
   // ===== DEFAULT SETTINGS =====
   const DEFAULT_SETTINGS = {
-    default_mode: 'qrcode_tte',
+    default_mode: 'scan_signature',
     enable_qrcode_tte: true,
     enable_scan_signature: true,
     enable_blank_manual: true,

@@ -130,6 +130,56 @@
     });
   };
 
+  // ==================== HELPERS ====================
+  function cleanupUI() {
+    // Tutup semua dropdown (class-based, reliable)
+    document.querySelectorAll('.dropdown-menu.show').forEach(m => m.classList.remove('show'));
+    document.querySelectorAll('[data-bs-toggle="dropdown"].show').forEach(b => b.classList.remove('show'));
+    // Hapus semua modal backdrop
+    document.querySelectorAll('.modal-backdrop').forEach(mb => mb.remove());
+    // Reset body state
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
+  }
+
+  function downloadDocxFromHtml(htmlArray, title, filename, openDriveCb) {
+    UI.toast('Membuat Word… mohon tunggu.');
+    const blob = GenDOCX.htmlToWordDocBlob(htmlArray, title);
+    U.downloadBlob(blob, U.sanitizeFilename(filename) + '.doc');
+    cleanupUI();
+    if (openDriveCb) openDriveCb();
+  }
+
+  async function downloadPdfFromHtml(htmlStr, filename, openDriveCb) {
+    UI.toast('Membuat PDF… mohon tunggu.');
+    try {
+      const blob = await GenPDF.htmlToPdfBlob(htmlStr);
+      U.downloadBlob(blob, U.sanitizeFilename(filename) + '.pdf');
+    } catch (err) {
+      UI.toast('PDF gagal, fallback ke print: ' + err.message, 'warning');
+      GenPDF.printHTML(htmlStr);
+    }
+    cleanupUI();
+    if (openDriveCb) openDriveCb();
+  }
+
+  function downloadHtmlPrintable(htmlStr, filename, openDriveCb) {
+    GenPDF.htmlAsPrintable(htmlStr, filename);
+    cleanupUI();
+    if (openDriveCb) openDriveCb();
+  }
+
+  async function downloadZipForEviden(ev, openDriveCb) {
+    UI.toast('Membuat paket ZIP…');
+    const { blob, filename } = await GenZIP.zipForEviden(ev);
+    U.downloadBlob(blob, filename);
+    cleanupUI();
+    if (openDriveCb) openDriveCb();
+  }
+
+  // ==================== PREVIEW PAGE ====================
+
   Page.EvidenPreview = function (id) {
     const list = Store.get('eviden', []) || [];
     const ev = list.find(x => x.id === id);
@@ -141,6 +191,11 @@
     const types = (ev.tipe_dokumen || GenHTML.defaultTypesFor(rhk)).filter(t => GenHTML.TYPES[t]);
     const idn = Page.Identitas.get();
     const parts = types.map(t => ({ id: t, label: GenHTML.TYPES[t].label, html: GenHTML.TYPES[t].gen(rhk, keg, idn) }));
+    const hasDrive = !!rhk.link_bukti_dukung;
+
+    const openDriveLink = hasDrive ? function() {
+      setTimeout(() => window.open(rhk.link_bukti_dukung, '_blank', 'noopener'), 300);
+    } : null;
 
     UI.shell('Preview Eviden ' + rhk.id, `
       <div class="d-flex flex-wrap gap-2 mb-3 no-print">
@@ -157,11 +212,10 @@
             <li><a class="dropdown-item" href="#" id="btnZipOne"><i class="bi bi-file-zip"></i> ZIP (paket lengkap)</a></li>
           </ul>
         </div>
-        ${rhk.link_bukti_dukung ? `<a class="btn btn-outline-primary" href="${U.escapeHtml(rhk.link_bukti_dukung)}" target="_blank" rel="noopener" title="Buka folder Google Drive untuk upload eviden"><i class="bi bi-folder2-open"></i> Buka Drive</a>` : ''}
+        ${hasDrive ? `<a class="btn btn-outline-primary" href="${U.escapeHtml(rhk.link_bukti_dukung)}" target="_blank" rel="noopener" title="Buka folder Google Drive untuk upload eviden"><i class="bi bi-folder2-open"></i> Buka Drive</a>` : ''}
         <button class="btn btn-outline-success" id="btnFinal" ${ev.status === 'final' ? 'disabled' : ''}><i class="bi bi-check2-circle"></i> Tandai Final</button>
         <button class="btn btn-outline-danger ms-auto" id="btnDel"><i class="bi bi-trash"></i> Hapus Eviden</button>
       </div>
-      ${rhk.link_bukti_dukung ? `<div class="alert alert-info py-2 small no-print mb-3"><i class="bi bi-cloud-upload"></i> Setelah download, file otomatis siap diupload ke folder: <a href="${U.escapeHtml(rhk.link_bukti_dukung)}" target="_blank" rel="noopener">${U.escapeHtml(rhk.link_bukti_dukung)}</a></div>` : ''}
 
       <div class="alert alert-light border no-print">
         <strong>${U.escapeHtml(rhk.nama_eviden)}</strong> · ${ev.status} · ${parts.length} dokumen ·
@@ -175,12 +229,12 @@
       <div id="docContainer">
         ${parts.map((p, i) => `<div data-doc="${i}" class="doc-pane ${i === 0 ? '' : 'd-none'}">
           <div class="d-flex gap-2 mb-3 no-print doc-actions">
-            <button class="btn btn-sm btn-success doc-print" data-idx="${i}"><i class="bi bi-printer"></i> Cetak</button>
+            <button class="btn btn-sm btn-success doc-print-btn" data-idx="${i}"><i class="bi bi-printer"></i> Cetak</button>
             <div class="dropdown">
               <button class="btn btn-sm btn-success dropdown-toggle" data-bs-toggle="dropdown"><i class="bi bi-download"></i> Download</button>
               <ul class="dropdown-menu">
-                <li><a class="dropdown-item doc-docx" data-idx="${i}" href="#"><i class="bi bi-file-earmark-word"></i> Word</a></li>
-                <li><a class="dropdown-item doc-pdf" data-idx="${i}" href="#"><i class="bi bi-file-earmark-pdf"></i> PDF</a></li>
+                <li><a class="dropdown-item doc-docx-btn" data-idx="${i}" href="#"><i class="bi bi-file-earmark-word"></i> Word</a></li>
+                <li><a class="dropdown-item doc-pdf-btn" data-idx="${i}" href="#"><i class="bi bi-file-earmark-pdf"></i> PDF</a></li>
               </ul>
             </div>
           </div>
@@ -189,6 +243,7 @@
       </div>
     `);
 
+    // Tab switching
     document.querySelectorAll('#navDoc button').forEach(btn => btn.addEventListener('click', () => {
       document.querySelectorAll('#navDoc button').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
@@ -196,23 +251,16 @@
       document.querySelector(`#docContainer > .doc-pane[data-doc="${btn.dataset.tab}"]`).classList.remove('d-none');
     }));
 
-    // Per-document print
-    const showPrintDialog = (() => { /* defined inline below */ })();
-    (function setupPrintDialog() { window._showPrintDialog = function() {
-      window.print();
-      document.body.classList.remove('print-landscape');
-      document.documentElement.style.removeProperty('--print-scale');
+    // Per-document print button
+    document.querySelectorAll('.doc-print-btn').forEach(btn => btn.addEventListener('click', () => {
+      const idx = parseInt(btn.dataset.idx);
+      cleanupUI();
+      // Show only this doc
       document.querySelectorAll('#docContainer > .doc-pane').forEach(d => {
-        if (!d.dataset.wasVisible) d.classList.add('d-none');
-        delete d.dataset.wasVisible;
-      });
-    }; })();
-    document.querySelectorAll('.doc-print').forEach(btn => btn.addEventListener('click', () => {
-      const idx = btn.dataset.idx;
-      // Show only this doc, hide others, remember which were visible
-      document.querySelectorAll('#docContainer > .doc-pane').forEach(d => {
-        if (d.dataset.doc === idx) { d.dataset.wasVisible = 'true'; d.classList.remove('d-none'); }
-        else { d.dataset.wasVisible = d.classList.contains('d-none') ? '' : 'true'; d.classList.add('d-none'); }
+        const didx = parseInt(d.dataset.doc);
+        d.dataset.__wasVisible = !d.classList.contains('d-none') ? '1' : '';
+        if (didx === idx) d.classList.remove('d-none');
+        else d.classList.add('d-none');
       });
       // Modal orientasi
       const modal = document.createElement('div');
@@ -235,7 +283,10 @@
       document.body.appendChild(modal);
       const bsModal = new bootstrap.Modal(modal);
       bsModal.show();
-      modal.addEventListener('hidden.bs.modal', () => modal.remove());
+      modal.addEventListener('hidden.bs.modal', () => {
+        modal.remove();
+        restoreDocVisibility();
+      });
       modal.querySelector('#btnDoPrintSingle').addEventListener('click', () => {
         const orientasi = modal.querySelector('input[name="orientasi"]:checked').value;
         const scale = modal.querySelector('#selScaleSingle').value;
@@ -246,40 +297,39 @@
           window.print();
           document.body.classList.remove('print-landscape');
           document.documentElement.style.removeProperty('--print-scale');
-          document.querySelectorAll('#docContainer > .doc-pane').forEach(d => {
-            if (!d.dataset.wasVisible) d.classList.add('d-none');
-            delete d.dataset.wasVisible;
-          });
-        }, 300);
+          restoreDocVisibility();
+        }, 350);
       });
     }));
-    // Per-document download handlers
-    document.querySelectorAll('.doc-docx').forEach(btn => btn.addEventListener('click', async (e) => {
+
+    function restoreDocVisibility() {
+      document.querySelectorAll('#docContainer > .doc-pane').forEach(d => {
+        if (!d.dataset.__wasVisible) d.classList.add('d-none');
+        else d.classList.remove('d-none');
+        delete d.dataset.__wasVisible;
+      });
+    }
+
+    // Per-document download: Word
+    document.querySelectorAll('.doc-docx-btn').forEach(btn => btn.addEventListener('click', (e) => {
       e.preventDefault();
-      const idx = btn.dataset.idx;
+      cleanupUI();
+      const idx = parseInt(btn.dataset.idx);
       const p = parts[idx];
-      UI.toast('Membuat Word… mohon tunggu.');
-      const blob = GenDOCX.htmlToWordDocBlob([p.html], rhk.id + ' ' + p.label);
-      U.downloadBlob(blob, U.sanitizeFilename(rhk.id + '_' + p.label) + '.doc');
-      openDriveLink();
+      downloadDocxFromHtml([p.html], rhk.id + ' ' + p.label, rhk.id + '_' + p.label, openDriveLink);
     }));
-    document.querySelectorAll('.doc-pdf').forEach(btn => btn.addEventListener('click', async (e) => {
+    // Per-document download: PDF
+    document.querySelectorAll('.doc-pdf-btn').forEach(btn => btn.addEventListener('click', (e) => {
       e.preventDefault();
-      const idx = btn.dataset.idx;
+      cleanupUI();
+      const idx = parseInt(btn.dataset.idx);
       const p = parts[idx];
-      UI.toast('Membuat PDF… mohon tunggu.');
-      try {
-        const blob = await GenPDF.htmlToPdfBlob(p.html);
-        U.downloadBlob(blob, U.sanitizeFilename(rhk.id + '_' + p.label) + '.pdf');
-      } catch (err) {
-        UI.toast('PDF gagal, fallback ke print: ' + err.message, 'warning');
-        GenPDF.printHTML(p.html);
-      }
-      openDriveLink();
+      downloadPdfFromHtml(p.html, rhk.id + '_' + p.label, openDriveLink);
     }));
 
+    // Global print button
     document.getElementById('btnPrint').addEventListener('click', () => {
-      // Modal pilih orientasi
+      cleanupUI();
       const modal = document.createElement('div');
       modal.className = 'modal fade';
       modal.id = 'modalOrientasi';
@@ -306,51 +356,40 @@
         const scale = modal.querySelector('#selScale').value;
         document.body.classList.toggle('print-landscape', orientasi === 'landscape');
         document.documentElement.style.setProperty('--print-scale', scale);
-        document.querySelectorAll('#docContainer > div').forEach(d => d.classList.remove('d-none'));
+        document.querySelectorAll('#docContainer > .doc-pane').forEach(d => d.classList.remove('d-none'));
         bsModal.hide();
-        setTimeout(() => showPrintDialog(), 300);
+        setTimeout(() => {
+          window.print();
+          document.body.classList.remove('print-landscape');
+          document.documentElement.style.removeProperty('--print-scale');
+        }, 350);
       });
     });
-    const openDriveLink = () => {
-      if (rhk.link_bukti_dukung) {
-        setTimeout(() => window.open(rhk.link_bukti_dukung, '_blank', 'noopener'), 800);
-      }
-    };
-    document.getElementById('btnDocxAll').addEventListener('click', async (e) => {
+
+    // Global download buttons
+    document.getElementById('btnDocxAll').addEventListener('click', (e) => {
       e.preventDefault();
-      UI.toast('Membuat Word… mohon tunggu.');
-      // Pakai Word-HTML wrapper supaya layout match dengan tampilan cetak.
-      const blob = GenDOCX.htmlToWordDocBlob(parts.map(p => p.html), rhk.id + ' ' + rhk.nama_eviden);
-      U.downloadBlob(blob, U.sanitizeFilename(rhk.id + '_' + rhk.nama_eviden) + '.doc');
-      openDriveLink();
+      cleanupUI();
+      downloadDocxFromHtml(parts.map(p => p.html), rhk.id + ' ' + rhk.nama_eviden, rhk.id + '_' + rhk.nama_eviden, openDriveLink);
     });
-    document.getElementById('btnPdfAll').addEventListener('click', async (e) => {
+    document.getElementById('btnPdfAll').addEventListener('click', (e) => {
       e.preventDefault();
-      UI.toast('Membuat PDF… mohon tunggu.');
-      try {
-        const combined = parts.map(p => p.html).join('\n');
-        const blob = await GenPDF.htmlToPdfBlob(combined);
-        U.downloadBlob(blob, U.sanitizeFilename(rhk.id + '_' + rhk.nama_eviden) + '.pdf');
-      } catch (err) {
-        UI.toast('PDF gagal, fallback ke print dialog: ' + err.message, 'warning');
-        const combined = parts.map(p => p.html).join('\n');
-        GenPDF.printHTML(combined);
-      }
-      openDriveLink();
+      cleanupUI();
+      const combined = parts.map(p => p.html).join('\n');
+      downloadPdfFromHtml(combined, rhk.id + '_' + rhk.nama_eviden, openDriveLink);
     });
     document.getElementById('btnHtmlAll').addEventListener('click', (e) => {
       e.preventDefault();
+      cleanupUI();
       const combined = parts.map(p => p.html).join('\n');
-      GenPDF.htmlAsPrintable(combined, rhk.id + '_' + rhk.nama_eviden);
-      openDriveLink();
+      downloadHtmlPrintable(combined, rhk.id + '_' + rhk.nama_eviden, openDriveLink);
     });
-    document.getElementById('btnZipOne').addEventListener('click', async (e) => {
+    document.getElementById('btnZipOne').addEventListener('click', (e) => {
       e.preventDefault();
-      UI.toast('Membuat paket ZIP…');
-      const { blob, filename } = await GenZIP.zipForEviden(ev);
-      U.downloadBlob(blob, filename);
-      openDriveLink();
+      cleanupUI();
+      downloadZipForEviden(ev, openDriveLink);
     });
+
     document.getElementById('btnFinal').addEventListener('click', () => {
       const list2 = Store.get('eviden', []) || [];
       const idx = list2.findIndex(x => x.id === ev.id);

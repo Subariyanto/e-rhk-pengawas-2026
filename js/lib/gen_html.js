@@ -158,19 +158,21 @@
   // TTD untuk halaman Penutup / Kata Pengantar: hanya Pengawas, geser ke kanan
   function ttdBlokPenutup(idn, rhkId) {
     const i = idn || Page.Identitas.get();
-    const mode = getSigMode();
     const kota = i.pegawai.kabupaten || 'Jember';
     const tanggal = U.fmtTanggal(new Date());
     const sigImg = i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : '';
+    const nbspAll = s => U.escapeHtml(s).replace(/ /g, '\u00A0');
     return `
-      <div style="margin-top:24px;overflow:hidden;">
-        <div style="float:right;text-align:center;min-width:260px;">
-          <div>${nbsp(kota + ', ' + tanggal)}</div>
+      <style>.ttd-penutup, .ttd-penutup * { word-break:keep-all !important; overflow-wrap:normal !important; white-space:nowrap !important; }</style>
+      <div class="ttd-penutup" style="margin-top:24px;">
+        <div style="float:right;text-align:center;min-width:300px;max-width:400px;">
+          <div>${nbspAll(kota + ', ' + tanggal)}</div>
           <div>Pengawas Madrasah,</div>
-          <div style="min-height:70px;display:flex;align-items:center;justify-content:center;">${sigImg}</div>
-          <div style="text-decoration:underline;font-weight:700">${nbsp(i.pegawai.nama)}</div>
-          <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
+          <div style="min-height:70px;white-space:normal !important;">${sigImg}</div>
+          <div style="text-decoration:underline;font-weight:700;">${nbspAll(i.pegawai.nama)}</div>
+          <div>NIP.\u00A0${U.escapeHtml(i.pegawai.nip)}</div>
         </div>
+        <div style="clear:both"></div>
       </div>
     `;
   }

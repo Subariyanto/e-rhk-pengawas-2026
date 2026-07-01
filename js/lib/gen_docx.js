@@ -160,8 +160,22 @@
       kop.parentNode.replaceChild(tbl, kop);
     });
 
-    // 2. Transform TTD blok (div berisi anak div text-align:center dengan signature-img)
-    //    biasanya: <div style="display:flex;justify-content:flex-end"><div style="width:50%;text-align:center;...">...</div></div>
+    // 2a. Transform .ttd class blocks (CSS-based flex) → Word-compatible table
+    tmp.querySelectorAll('.ttd').forEach(ttd => {
+      const blocks = ttd.querySelectorAll('.ttd-block');
+      if (blocks.length < 2) return;
+      const tbl = document.createElement('table');
+      tbl.setAttribute('style', 'width:100%;border-collapse:collapse;margin-top:18pt;');
+      let row = '<tr>';
+      blocks.forEach(b => {
+        row += `<td style="width:50%;border:none;text-align:center;vertical-align:top;padding:0 20pt;">${b.innerHTML}</td>`;
+      });
+      row += '</tr>';
+      tbl.innerHTML = row;
+      ttd.parentNode.replaceChild(tbl, ttd);
+    });
+
+    // 2b. Transform inline-flex TTD blok (div berisi anak div text-align:center dengan signature)
     //    → jadi table 2-col, kolom kiri kosong, kolom kanan center.
     tmp.querySelectorAll('div').forEach(d => {
       const style = d.getAttribute('style') || '';

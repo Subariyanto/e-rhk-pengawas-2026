@@ -95,7 +95,7 @@
     const mode = getSigMode();
     const ketuaPokjawasNama = (i.ketua_pokjawas && i.ketua_pokjawas.nama) || 'SUBARIYANTO, S.Pd, M.Pd.I';
     const ketuaPokjawasNIP  = (i.ketua_pokjawas && i.ketua_pokjawas.nip) || '197002122005011004';
-    const ketuaTTDImg = (i.ttd_ketua_pokjawas) ? `<img class="signature-img" src="${i.ttd_ketua_pokjawas}" style="max-height:160px;position:absolute;top:-40px;left:50%;transform:translateX(-50%);z-index:1;mix-blend-mode:multiply;background:transparent;" />` : '<div style="height:80px;"></div>';
+    const ketuaTTDImg = (i.ttd_ketua_pokjawas) ? `<img class="signature-img" src="${i.ttd_ketua_pokjawas}" style="max-height:100px;position:absolute;top:-10px;left:50%;transform:translateX(-50%);z-index:1;mix-blend-mode:multiply;background:transparent;" />` : '<div style="height:80px;"></div>';
     return `
       <div class="ttd" style="margin-top:24px;">
         <div class="ttd-block">
@@ -128,7 +128,7 @@
     const ketuaPokjawasNama = (i.ketua_pokjawas && i.ketua_pokjawas.nama) || 'SUBARIYANTO, S.Pd, M.Pd.I';
     const ketuaPokjawasNIP  = (i.ketua_pokjawas && i.ketua_pokjawas.nip) || '197002122005011004';
     const sigImg = i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : '';
-    const ketuaTTDImg = (i.ttd_ketua_pokjawas) ? `<img class="signature-img" src="${i.ttd_ketua_pokjawas}" style="max-height:160px;position:absolute;top:-40px;left:50%;transform:translateX(-50%);z-index:1;mix-blend-mode:multiply;background:transparent;" />` : '';
+    const ketuaTTDImg = (i.ttd_ketua_pokjawas) ? `<img class="signature-img" src="${i.ttd_ketua_pokjawas}" style="max-height:100px;position:absolute;top:-10px;left:50%;transform:translateX(-50%);z-index:1;mix-blend-mode:multiply;background:transparent;" />` : '';
     // Both columns share identical line structure → nama always sejajar
     return `
       <div style="margin-top:24px;text-align:center;">

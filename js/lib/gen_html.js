@@ -138,20 +138,18 @@
     `;
   }
 
-  // TTD versi sederhana (cuma pengawas, posisi center agak ke kanan)
+  // TTD versi sederhana (cuma pengawas, center)
   function ttdPengawas(idn, rhkId) {
     const i = idn || Page.Identitas.get();
     const mode = getSigMode();
-    return pengawasTTDHtml(i, mode, rhkId);
+    return `<div style="text-align:center;margin-top:24px;">${pengawasTTDHtml(i, mode, rhkId)}</div>`;
   }
 
-  // TTD untuk halaman Penutup / Kata Pengantar: hanya Pengawas, center-right
+  // TTD untuk halaman Penutup / Kata Pengantar: hanya Pengawas, center
   function ttdBlokPenutup(idn, rhkId) {
     const i = idn || Page.Identitas.get();
     const mode = getSigMode();
-    return `<div style="display:flex;justify-content:center;">
-      <div style="width:50%;min-width:240px;text-align:center;">${pengawasTTDHtml(i, mode, rhkId)}</div>
-    </div>`;
+    return `<div style="text-align:center;margin-top:24px;">${pengawasTTDHtml(i, mode, rhkId)}</div>`;
   }
 
   // Variables for narasi templates

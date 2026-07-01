@@ -72,6 +72,32 @@
     });
   }
 
+  // Remove white/near-white background from image → return transparent PNG dataURL
+  function removeWhiteBg(dataUrl, threshold = 240) {
+    return new Promise((res) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const d = imgData.data;
+        for (let i = 0; i < d.length; i += 4) {
+          // If pixel is white/near-white → make transparent
+          if (d[i] > threshold && d[i+1] > threshold && d[i+2] > threshold) {
+            d[i+3] = 0; // alpha = 0
+          }
+        }
+        ctx.putImageData(imgData, 0, 0);
+        res(canvas.toDataURL('image/png'));
+      };
+      img.onerror = () => res(dataUrl);
+      img.src = dataUrl;
+    });
+  }
+
   function debounce(fn, wait) {
     let t; return function (...a) { clearTimeout(t); t = setTimeout(() => fn.apply(this, a), wait); };
   }
@@ -97,7 +123,7 @@
     return String(s || 'file').replace(/[\\/:*?"<>|]+/g, '_').slice(0, 120);
   }
 
-  window.U = { $, $$, el, escapeHtml, nl2br, fmtTanggal, fmtTanggalISO, readFileAsDataURL, readFileAsArrayBuffer, compressImage, debounce, downloadBlob, fillTemplate, sanitizeFilename };
+  window.U = { $, $$, el, escapeHtml, nl2br, fmtTanggal, fmtTanggalISO, readFileAsDataURL, readFileAsArrayBuffer, compressImage, removeWhiteBg, debounce, downloadBlob, fillTemplate, sanitizeFilename };
 })();
 
 // Global Print Dialog (orientasi + skala)

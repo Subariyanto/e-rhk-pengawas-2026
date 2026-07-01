@@ -132,7 +132,7 @@
           <div>NIP. ${U.escapeHtml(ketuaPokjawasNIP)}</div>
         </div>
         <div class="ttd-block">
-          ${pengawasTTDHtml(i, mode, rhkId)}
+          ${pengawasTTDHtml(i, mode, rhkId).replace('margin-top:10px;', 'margin-top:0;').replace('<div>Pengawas Madrasah,</div>', '')}
         </div>
       </div>
     `;

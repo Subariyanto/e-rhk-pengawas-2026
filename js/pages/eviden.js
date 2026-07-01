@@ -161,7 +161,6 @@
         <button class="btn btn-outline-success" id="btnFinal" ${ev.status === 'final' ? 'disabled' : ''}><i class="bi bi-check2-circle"></i> Tandai Final</button>
         <button class="btn btn-outline-danger ms-auto" id="btnDel"><i class="bi bi-trash"></i> Hapus Eviden</button>
       </div>
-      ${rhk.link_bukti_dukung ? `<div class="alert alert-info py-2 small no-print mb-3"><i class="bi bi-cloud-upload"></i> Setelah download, file otomatis siap diupload ke folder: <a href="${U.escapeHtml(rhk.link_bukti_dukung)}" target="_blank" rel="noopener">${U.escapeHtml(rhk.link_bukti_dukung)}</a></div>` : ''}
 
       <div class="alert alert-light border no-print">
         <strong>${U.escapeHtml(rhk.nama_eviden)}</strong> · ${ev.status} · ${parts.length} dokumen ·

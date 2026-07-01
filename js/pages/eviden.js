@@ -258,6 +258,9 @@
       e.preventDefault();
       const idx = btn.dataset.idx;
       const p = parts[idx];
+      // Close dropdown first
+      const dd = btn.closest('.dropdown');
+      if (dd) { const inst = bootstrap.Dropdown.getInstance(dd.querySelector('[data-bs-toggle="dropdown"]')); if (inst) inst.hide(); }
       UI.toast('Membuat Word… mohon tunggu.');
       const blob = GenDOCX.htmlToWordDocBlob([p.html], rhk.id + ' ' + p.label);
       U.downloadBlob(blob, U.sanitizeFilename(rhk.id + '_' + p.label) + '.doc');
@@ -267,6 +270,9 @@
       e.preventDefault();
       const idx = btn.dataset.idx;
       const p = parts[idx];
+      // Close dropdown first
+      const dd = btn.closest('.dropdown');
+      if (dd) { const inst = bootstrap.Dropdown.getInstance(dd.querySelector('[data-bs-toggle="dropdown"]')); if (inst) inst.hide(); }
       UI.toast('Membuat PDF… mohon tunggu.');
       try {
         const blob = await GenPDF.htmlToPdfBlob(p.html);
@@ -313,11 +319,21 @@
     });
     const openDriveLink = () => {
       if (rhk.link_bukti_dukung) {
-        setTimeout(() => window.open(rhk.link_bukti_dukung, '_blank', 'noopener'), 800);
+        setTimeout(() => {
+          // Cleanup: tutup semua dropdown & backdrop sebelum buka Drive
+          document.querySelectorAll('.dropdown-menu.show').forEach(m => m.classList.remove('show'));
+          document.querySelectorAll('[data-bs-toggle="dropdown"]').forEach(b => b.classList.remove('show'));
+          document.querySelectorAll('.modal-backdrop').forEach(mb => mb.remove());
+          document.body.classList.remove('modal-open');
+          document.body.style.overflow = '';
+          document.body.style.paddingRight = '';
+          window.open(rhk.link_bukti_dukung, '_blank', 'noopener');
+        }, 1500);
       }
     };
     document.getElementById('btnDocxAll').addEventListener('click', async (e) => {
       e.preventDefault();
+      bootstrap.Dropdown.getInstance(document.querySelector('#btnDocxAll').closest('.dropdown').querySelector('[data-bs-toggle="dropdown"]'))?.hide();
       UI.toast('Membuat Word… mohon tunggu.');
       // Pakai Word-HTML wrapper supaya layout match dengan tampilan cetak.
       const blob = GenDOCX.htmlToWordDocBlob(parts.map(p => p.html), rhk.id + ' ' + rhk.nama_eviden);
@@ -326,6 +342,8 @@
     });
     document.getElementById('btnPdfAll').addEventListener('click', async (e) => {
       e.preventDefault();
+      const ddBtn = document.getElementById('btnPdfAll').closest('.dropdown')?.querySelector('[data-bs-toggle="dropdown"]');
+      if (ddBtn) bootstrap.Dropdown.getInstance(ddBtn)?.hide();
       UI.toast('Membuat PDF… mohon tunggu.');
       try {
         const combined = parts.map(p => p.html).join('\n');
@@ -340,12 +358,16 @@
     });
     document.getElementById('btnHtmlAll').addEventListener('click', (e) => {
       e.preventDefault();
+      const ddBtn = document.getElementById('btnHtmlAll').closest('.dropdown')?.querySelector('[data-bs-toggle="dropdown"]');
+      if (ddBtn) bootstrap.Dropdown.getInstance(ddBtn)?.hide();
       const combined = parts.map(p => p.html).join('\n');
       GenPDF.htmlAsPrintable(combined, rhk.id + '_' + rhk.nama_eviden);
       openDriveLink();
     });
     document.getElementById('btnZipOne').addEventListener('click', async (e) => {
       e.preventDefault();
+      const ddBtn = document.getElementById('btnZipOne').closest('.dropdown')?.querySelector('[data-bs-toggle="dropdown"]');
+      if (ddBtn) bootstrap.Dropdown.getInstance(ddBtn)?.hide();
       UI.toast('Membuat paket ZIP…');
       const { blob, filename } = await GenZIP.zipForEviden(ev);
       U.downloadBlob(blob, filename);

@@ -123,15 +123,15 @@
     const ketuaPokjawasNama = (i.ketua_pokjawas && i.ketua_pokjawas.nama) || 'SUBARIYANTO, S.Pd, M.Pd.I';
     const ketuaPokjawasNIP  = (i.ketua_pokjawas && i.ketua_pokjawas.nip) || '197002122005011004';
     return `
-      <div class="ttd" style="margin-top:24px;">
-        <div class="ttd-block">
+      <div style="margin-top:24px;text-align:center;">
+        <div style="display:inline-block;vertical-align:top;text-align:center;width:40%;margin-right:20px;">
           <div>&nbsp;</div>
           <div>Ketua Pokjawas Madrasah,</div>
           <div style="height:80px;"></div>
           <div style="text-decoration:underline;font-weight:700">${U.escapeHtml(ketuaPokjawasNama)}</div>
           <div>NIP. ${U.escapeHtml(ketuaPokjawasNIP)}</div>
         </div>
-        <div class="ttd-block">
+        <div style="display:inline-block;vertical-align:top;text-align:center;width:40%;">
           ${pengawasTTDHtml(i, mode, rhkId).replace('margin-top:10px;', 'margin-top:0;').replace('<div>Pengawas Madrasah,</div>', '')}
         </div>
       </div>

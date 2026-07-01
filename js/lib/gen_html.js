@@ -163,12 +163,12 @@
     const tanggal = U.fmtTanggal(new Date());
     const sigImg = i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : '';
     return `
-      <div style="margin-top:24px;text-align:right;padding-right:8%;">
-        <div style="text-align:center;display:inline-block;">
+      <div style="margin-top:24px;">
+        <div style="text-align:center;margin-left:auto;margin-right:8%;width:280px;white-space:nowrap;">
           <div>${nbsp(kota + ', ' + tanggal)}</div>
           <div>Pengawas Madrasah,</div>
           <div style="min-height:70px;display:flex;align-items:center;justify-content:center;">${sigImg}</div>
-          <div style="text-decoration:underline;font-weight:700">${nbsp(i.pegawai.nama)}</div>
+          <div style="text-decoration:underline;font-weight:700;white-space:nowrap">${nbsp(i.pegawai.nama)}</div>
           <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
         </div>
       </div>

@@ -63,49 +63,54 @@
     w.document.close();
   }
 
-  // Use html2canvas directly to avoid jsPDF.html() triggering print preview
-  async function htmlToPdfBlob(htmlBody, filename) {
+  // Use html2canvas directly — no print preview, direct blob download
+  async function htmlToPdfBlob(htmlBody) {
     if (window.Tier && Tier.blockExportIfTrial && Tier.blockExportIfTrial('Download PDF')) return null;
     const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+
+    // Grab app.css content for accurate rendering
+    let appCss = '';
+    const cssLink = document.querySelector('link[href*="app.css"]');
+    if (cssLink) {
+      try {
+        const resp = await fetch(cssLink.href);
+        appCss = await resp.text();
+      } catch (e) { appCss = ''; }
+    }
+
     const tmp = document.createElement('div');
-    tmp.innerHTML = htmlBody;
     tmp.style.position = 'fixed';
     tmp.style.left = '-10000px';
     tmp.style.top = '0';
-    tmp.style.width = '794px'; // ~210mm at 96dpi
+    tmp.style.width = '794px';
     tmp.style.background = '#fff';
-    tmp.style.fontFamily = '"Times New Roman", serif';
-    tmp.style.fontSize = '12pt';
-    tmp.style.lineHeight = '1.5';
+    tmp.style.zIndex = '-9999';
+    tmp.innerHTML = `<style>${appCss}</style>${htmlBody}`;
     document.body.appendChild(tmp);
 
     const pages = tmp.querySelectorAll('.doc-page');
+    const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
     const pageW = 210, pageH = 297;
     let first = true;
+
     for (const p of pages) {
       if (!first) pdf.addPage();
       first = false;
       try {
         const canvas = await html2canvas(p, {
-          scale: 2,
+          scale: 3,
           useCORS: true,
           logging: false,
+          backgroundColor: '#ffffff',
           width: p.offsetWidth || 794,
           windowWidth: p.offsetWidth || 794,
         });
         const imgData = canvas.toDataURL('image/jpeg', 0.95);
         const imgW = pageW;
         const imgH = (canvas.height * imgW) / canvas.width;
-        // Fit to page, add page if content overflows
-        if (imgH > pageH) {
-          const ratio = pageH / imgH;
-          pdf.addImage(imgData, 'JPEG', 0, 0, imgW * ratio, pageH);
-        } else {
-          pdf.addImage(imgData, 'JPEG', 0, 0, imgW, imgH);
-        }
+        pdf.addImage(imgData, 'JPEG', 0, 0, imgW, imgH);
       } catch (e) {
-        console.error('html2canvas error:', e);
+        console.error('html2canvas page error:', e);
       }
     }
     document.body.removeChild(tmp);

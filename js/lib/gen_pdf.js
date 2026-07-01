@@ -103,11 +103,19 @@
           logging: false,
           backgroundColor: '#ffffff',
           width: p.offsetWidth || 794,
+          height: p.scrollHeight || p.offsetHeight,
           windowWidth: p.offsetWidth || 794,
+          scrollX: 0,
+          scrollY: 0,
         });
         const imgData = canvas.toDataURL('image/jpeg', 0.95);
-        const imgW = pageW;
-        const imgH = (canvas.height * imgW) / canvas.width;
+        let imgW = pageW;
+        let imgH = (canvas.height * imgW) / canvas.width;
+        // Cap to A4 height — scale down proportionally if exceeds
+        if (imgH > pageH) {
+          imgW = (pageH * imgW) / imgH;
+          imgH = pageH;
+        }
         pdf.addImage(imgData, 'JPEG', 0, 0, imgW, imgH);
       } catch (e) {
         console.error('html2canvas page error:', e);

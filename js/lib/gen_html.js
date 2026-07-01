@@ -118,23 +118,31 @@
     `;
   }
 
-  // TTD untuk Laporan Triwulan: Kiri Ketua Pokjawas, Kanan Pengawas + Kota & Tanggal (sejajar, tanpa Mengetahui)
+  // TTD untuk Laporan Triwulan: Kiri Ketua Pokjawas, Kanan Pengawas — nama sejajar
   function ttdTriwulan(idn, rhkId) {
     const i = idn || Page.Identitas.get();
     const mode = getSigMode();
+    const kota = i.pegawai.kabupaten || 'Jember';
+    const tanggal = U.fmtTanggal(new Date());
     const ketuaPokjawasNama = (i.ketua_pokjawas && i.ketua_pokjawas.nama) || 'SUBARIYANTO, S.Pd, M.Pd.I';
     const ketuaPokjawasNIP  = (i.ketua_pokjawas && i.ketua_pokjawas.nip) || '197002122005011004';
+    const sigImg = i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : '';
+    // Both columns share identical line structure → nama always sejajar
     return `
       <div style="margin-top:24px;text-align:center;">
-        <div style="display:inline-block;vertical-align:top;text-align:center;width:45%;margin-right:10px;white-space:nowrap;">
-          <div>&nbsp;</div>
+        <div style="display:inline-block;vertical-align:top;text-align:center;width:45%;margin-right:10px;">
+          <div>${nbsp(kota + ', ' + tanggal)}</div>
           <div>Ketua Pokjawas Madrasah,</div>
-          <div style="height:80px;"></div>
-          <div style="text-decoration:underline;font-weight:700;white-space:nowrap">${nbsp(ketuaPokjawasNama)}</div>
+          <div style="height:80px;display:flex;align-items:center;justify-content:center;"></div>
+          <div style="text-decoration:underline;font-weight:700">${nbsp(ketuaPokjawasNama)}</div>
           <div>NIP. ${U.escapeHtml(ketuaPokjawasNIP)}</div>
         </div>
-        <div style="display:inline-block;vertical-align:top;text-align:center;width:45%;white-space:nowrap;">
-          ${pengawasTTDHtml(i, mode, rhkId).replace(/margin-top:10px;/g, 'margin-top:0;').replace(/<div[^>]*>\s*Pengawas Madrasah,\s*<\/div>/gi, '')}
+        <div style="display:inline-block;vertical-align:top;text-align:center;width:45%;">
+          <div>${nbsp(kota + ', ' + tanggal)}</div>
+          <div>Pengawas Madrasah,</div>
+          <div style="height:80px;display:flex;align-items:center;justify-content:center;">${sigImg}</div>
+          <div style="text-decoration:underline;font-weight:700">${nbsp(i.pegawai.nama)}</div>
+          <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
         </div>
       </div>
     `;

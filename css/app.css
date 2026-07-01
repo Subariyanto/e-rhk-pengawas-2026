@@ -509,6 +509,10 @@ body.trial-mode .trial-watermark::before{content:"TRIAL \2022  e-RHK Pengawas 20
 .doc-page table.fmt { width: 100%; border-collapse: collapse; }
 .doc-page table.fmt th, .doc-page table.fmt td { border: 1px solid #000; padding: 4px 6px; }
 
+/* TTD blocks: never wrap names */
+.doc-page .ttd, .doc-page .ttd-penutup, .doc-page table { word-break: normal; overflow-wrap: normal; }
+.doc-page .ttd-penutup div { word-break: keep-all; overflow-wrap: normal; }
+
 /* Cover khusus: tanpa kop, padding sama */
 .doc-cover { padding: 0.8in; }
 

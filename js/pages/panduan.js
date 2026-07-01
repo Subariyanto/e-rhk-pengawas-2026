@@ -60,7 +60,7 @@
                   <li>Generator Eviden otomatis (13 jenis dokumen) — surat tugas, undangan, daftar hadir, notulen, dll.</li>
                   <li>Rekapitulasi & Laporan Triwulan dengan TTD digital</li>
                   <li>Backup & Restore data lokal (JSON)</li>
-                  <li>Multi-user (admin + pengawas) dengan tier TRIAL/FULL</li>
+                  <li>Multi-user dengan tier TRIAL/FULL</li>
                 </ul>
                 <p><strong>Catatan penting:</strong> Semua data tersimpan di browser (localStorage). Pindah perangkat = data hilang. Wajib backup berkala via menu <em>Backup &amp; Restore</em>.</p>
               </section>
@@ -72,9 +72,9 @@
                   <strong>Cara 1 — Pengawas dengan NIP:</strong>
                   <ol class="mb-0">
                     <li>Buka halaman <a href="#/register">Daftar</a></li>
-                    <li>Isi NIP 18 digit. Sistem auto-lookup nama kalau NIP terdaftar di registry admin.</li>
+                    <li>Isi NIP 18 digit. Sistem auto-lookup nama kalau NIP terdaftar.</li>
                     <li>Isi password minimal 6 karakter (& konfirmasi).</li>
-                    <li>(Opsional) Isi <strong>Kode Aktivasi FULL</strong> dari admin agar langsung aktif penuh.</li>
+                    <li>(Opsional) Isi <strong>Kode Aktivasi FULL</strong> agar langsung aktif penuh.</li>
                     <li>Klik <strong>Daftar</strong>. Login pakai NIP + password.</li>
                   </ol>
                 </div>
@@ -91,7 +91,7 @@
                 <p>Buka halaman <a href="#/login">Login</a>, masukkan NIP atau Email + password.</p>
                 <div class="panduan-tip"><strong>💡 Tips:</strong> Setelah daftar, halaman login akan auto pre-fill identitas Bapak/Ibu (sesi terakhir). Tinggal ketik password.</div>
                 <h4>Lupa Password</h4>
-                <p>Hubungi admin untuk reset via menu <em>Admin → Kelola User</em>.</p>
+                <p>Hubungi pengelola aplikasi untuk reset password.</p>
               </section>
 
               <section id="sec-tier" class="panduan-section mt-4">
@@ -105,7 +105,7 @@
                           <li>Gratis</li>
                           <li>Berlaku 5 hari</li>
                           <li>Maks 10 kegiatan</li>
-                          <li>Akses penuh semua menu (kecuali admin)</li>
+                          <li>Akses penuh semua menu</li>
                           <li>Cocok untuk eksplorasi fitur</li>
                         </ul>
                       </div>
@@ -119,14 +119,14 @@
                           <li>Aktif permanen</li>
                           <li>Tidak ada batas kegiatan</li>
                           <li>Semua fitur unlimited</li>
-                          <li>Aktivasi pakai <strong>Kode Aktivasi</strong> dari admin</li>
+                          <li>Aktivasi pakai <strong>Kode Aktivasi</strong></li>
                           <li>Beli via <a href="#/beli-lisensi">halaman Beli Lisensi</a></li>
                         </ul>
                       </div>
                     </div>
                   </div>
                 </div>
-                <div class="panduan-tip mt-2"><strong>💡 Upgrade dari TRIAL ke FULL:</strong> Login admin (atau hubungi admin) → menu <em>Kelola User</em> → klik <em>Upgrade ke FULL</em> pada baris user.</div>
+                <div class="panduan-tip mt-2"><strong>💡 Upgrade dari TRIAL ke FULL:</strong> Masukkan kode aktivasi pada menu <em>Pembelian → Aktivasi</em>.</div>
               </section>
 
               <section id="sec-setup" class="panduan-section mt-4">

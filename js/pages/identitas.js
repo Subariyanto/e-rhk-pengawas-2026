@@ -77,6 +77,14 @@
         </div>
 
         <div class="card mb-3">
+          <div class="card-header"><i class="bi bi-person-gear"></i> Ketua Pokjawas Madrasah</div>
+          <div class="card-body row g-3">
+            ${pegInput('ketua_pokjawas', idn.ketua_pokjawas || { nama: 'SUBARIYANTO, S.Pd, M.Pd.I', nip: '197002122005011004', jabatan: 'Ketua Pokjawas Madrasah Kab. Jember', unit_kerja: 'Kantor Kementerian Agama Kab. Jember' }, false)}
+            ${imgUpload('ttd_ketua_pokjawas', 'Tanda Tangan Ketua Pokjawas', idn.ttd_ketua_pokjawas || '')}
+          </div>
+        </div>
+
+        <div class="card mb-3">
           <div class="card-header"><i class="bi bi-image"></i> Logo, Tanda Tangan, dan Stempel</div>
           <div class="card-body row g-3">
             ${imgUpload('logo', 'Logo Kemenag', idn.logo)}
@@ -149,7 +157,7 @@
     document.getElementById('frmIdn').addEventListener('submit', (e) => {
       e.preventDefault();
       const fd = new FormData(e.target);
-      const out = { pegawai: {}, pejabat_penilai: {}, atasan_pejabat_penilai: {} };
+      const out = { pegawai: {}, pejabat_penilai: {}, atasan_pejabat_penilai: {}, ketua_pokjawas: {} };
       for (const [k, v] of fd.entries()) {
         if (k.includes('.')) {
           const [a, b] = k.split('.');

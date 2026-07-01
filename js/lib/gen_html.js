@@ -95,12 +95,13 @@
     const mode = getSigMode();
     const ketuaPokjawasNama = (i.ketua_pokjawas && i.ketua_pokjawas.nama) || 'SUBARIYANTO, S.Pd, M.Pd.I';
     const ketuaPokjawasNIP  = (i.ketua_pokjawas && i.ketua_pokjawas.nip) || '197002122005011004';
+    const ketuaTTDImg = (i.ttd_ketua_pokjawas) ? `<img class="signature-img" src="${i.ttd_ketua_pokjawas}" style="max-height:80px;" />` : '<div style="height:80px;"></div>';
     return `
       <div class="ttd" style="margin-top:24px;">
         <div class="ttd-block">
           <div>&nbsp;</div>
           <div>Ketua Pokjawas Madrasah,</div>
-          <div style="height:80px;"></div>
+          <div style="height:80px;display:flex;align-items:center;justify-content:center;">${ketuaTTDImg}</div>
           <div style="text-decoration:underline;font-weight:700;white-space:nowrap">${nbsp(ketuaPokjawasNama)}</div>
           <div>NIP. ${U.escapeHtml(ketuaPokjawasNIP)}</div>
         </div>
@@ -127,13 +128,14 @@
     const ketuaPokjawasNama = (i.ketua_pokjawas && i.ketua_pokjawas.nama) || 'SUBARIYANTO, S.Pd, M.Pd.I';
     const ketuaPokjawasNIP  = (i.ketua_pokjawas && i.ketua_pokjawas.nip) || '197002122005011004';
     const sigImg = i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : '';
+    const ketuaTTDImg = (i.ttd_ketua_pokjawas) ? `<img class="signature-img" src="${i.ttd_ketua_pokjawas}" style="max-height:80px;" />` : '';
     // Both columns share identical line structure → nama always sejajar
     return `
       <div style="margin-top:24px;text-align:center;">
         <div style="display:inline-block;vertical-align:top;text-align:center;width:45%;margin-right:10px;">
           <div>&nbsp;</div>
           <div>Ketua Pokjawas Madrasah,</div>
-          <div style="height:80px;display:flex;align-items:center;justify-content:center;"></div>
+          <div style="height:80px;display:flex;align-items:center;justify-content:center;">${ketuaTTDImg}</div>
           <div style="text-decoration:underline;font-weight:700">${nbsp(ketuaPokjawasNama)}</div>
           <div>NIP. ${U.escapeHtml(ketuaPokjawasNIP)}</div>
         </div>

@@ -38,7 +38,6 @@
                 <a href="#sec-rekap">📊 Rekap & Laporan</a>
                 <a href="#sec-periode">📅 Periode SKP</a>
                 <a href="#sec-backup">💾 Backup & Restore</a>
-                <a href="#sec-admin">🛡️ Menu Admin</a>
                 <a href="#sec-faq">❓ FAQ</a>
                 <a href="#sec-kontak">📞 Kontak & Lisensi</a>
               </nav>
@@ -232,31 +231,6 @@
                   <li>Untuk restore: klik <strong>Pilih File</strong> → upload JSON → klik Restore</li>
                 </ol>
                 <div class="panduan-tip"><strong>💡 Saran:</strong> Backup tiap minggu, simpan di Google Drive / OneDrive.</div>
-              </section>
-
-              <section id="sec-admin" class="panduan-section mt-4">
-                <h3>🛡️ Menu Admin</h3>
-                <p>Khusus user dengan role <code>admin</code>.</p>
-                <h4>Kelola User</h4>
-                <ul>
-                  <li>Lihat semua user terdaftar</li>
-                  <li>Upgrade TRIAL → FULL atau sebaliknya</li>
-                  <li>Reset password user</li>
-                  <li>Hapus user</li>
-                </ul>
-                <h4>Kode Aktivasi</h4>
-                <ul>
-                  <li><strong>Generate Kode FULL</strong> — bulk atau per-NIP</li>
-                  <li><strong>Import Excel Pengawas</strong> — upload daftar NIP+Nama, auto-generate kode per baris</li>
-                  <li>Export hasil ke CSV/Excel/Cetak</li>
-                  <li>Tombol WhatsApp per baris untuk kirim kode ke pengawas</li>
-                  <li>Edit/Hapus per row, atau Hapus Semua registry</li>
-                </ul>
-                <h4>Pengaturan Pembelian</h4>
-                <ul>
-                  <li>Atur nomor WhatsApp admin, harga lisensi, info bank</li>
-                  <li>Customize template pesan WA</li>
-                </ul>
               </section>
 
               <section id="sec-faq" class="panduan-section mt-4">

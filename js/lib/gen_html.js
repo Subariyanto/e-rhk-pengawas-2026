@@ -155,11 +155,24 @@
     return `<div style="text-align:center;margin-top:24px;">${pengawasTTDHtml(i, mode, rhkId)}</div>`;
   }
 
-  // TTD untuk halaman Penutup / Kata Pengantar: hanya Pengawas, center
+  // TTD untuk halaman Penutup / Kata Pengantar: hanya Pengawas, geser ke kanan
   function ttdBlokPenutup(idn, rhkId) {
     const i = idn || Page.Identitas.get();
     const mode = getSigMode();
-    return `<div style="text-align:center;margin-top:24px;">${pengawasTTDHtml(i, mode, rhkId)}</div>`;
+    const kota = i.pegawai.kabupaten || 'Jember';
+    const tanggal = U.fmtTanggal(new Date());
+    const sigImg = i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : '';
+    return `
+      <div style="margin-top:24px;text-align:right;padding-right:8%;">
+        <div style="text-align:center;display:inline-block;">
+          <div>${nbsp(kota + ', ' + tanggal)}</div>
+          <div>Pengawas Madrasah,</div>
+          <div style="min-height:70px;display:flex;align-items:center;justify-content:center;">${sigImg}</div>
+          <div style="text-decoration:underline;font-weight:700">${nbsp(i.pegawai.nama)}</div>
+          <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
+        </div>
+      </div>
+    `;
   }
 
   // Variables for narasi templates

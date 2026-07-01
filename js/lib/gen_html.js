@@ -131,7 +131,7 @@
     return `
       <div style="margin-top:24px;text-align:center;">
         <div style="display:inline-block;vertical-align:top;text-align:center;width:45%;margin-right:10px;">
-          <div>${nbsp(kota + ', ' + tanggal)}</div>
+          <div>&nbsp;</div>
           <div>Ketua Pokjawas Madrasah,</div>
           <div style="height:80px;display:flex;align-items:center;justify-content:center;"></div>
           <div style="text-decoration:underline;font-weight:700">${nbsp(ketuaPokjawasNama)}</div>

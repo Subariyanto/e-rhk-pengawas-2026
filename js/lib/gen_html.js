@@ -1,5 +1,7 @@
 // HTML Generators for Eviden documents (Cover, Pengesahan, BAB I-IV, Lampiran, Surat Tugas, dll)
 (function () {
+  // Force non-breaking: html2canvas doesn't reliably honor white-space:nowrap
+  function nbsp(s) { return U.escapeHtml(s).replace(/ /g, '&nbsp;'); }
   function header(idn) {
     const i = idn || Page.Identitas.get();
     return `<div class="kop">
@@ -68,7 +70,7 @@
           <div>${U.escapeHtml(kota)}, ${tanggal}</div>
           <div>Pengawas Madrasah,</div>
           <div style="height:90px;"></div>
-          <div style="text-decoration:underline;font-weight:700;white-space:nowrap">${U.escapeHtml(i.pegawai.nama)}</div>
+          <div style="text-decoration:underline;font-weight:700">${nbsp(i.pegawai.nama)}</div>
           <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
         </div>
       `;
@@ -80,7 +82,7 @@
         <div>${U.escapeHtml(kota)}, ${tanggal}</div>
         <div>Pengawas Madrasah,</div>
         <div style="min-height:70px;display:flex;align-items:center;justify-content:center;">${sigImg}</div>
-        <div style="text-decoration:underline;font-weight:700;white-space:nowrap">${U.escapeHtml(i.pegawai.nama)}</div>
+        <div style="text-decoration:underline;font-weight:700">${nbsp(i.pegawai.nama)}</div>
         <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
       </div>
     `;
@@ -99,7 +101,7 @@
           <div>&nbsp;</div>
           <div>Ketua Pokjawas Madrasah,</div>
           <div style="height:80px;"></div>
-          <div style="text-decoration:underline;font-weight:700;white-space:nowrap">${U.escapeHtml(ketuaPokjawasNama)}</div>
+          <div style="text-decoration:underline;font-weight:700;white-space:nowrap">${nbsp(ketuaPokjawasNama)}</div>
           <div>NIP. ${U.escapeHtml(ketuaPokjawasNIP)}</div>
         </div>
         <div class="ttd-block">
@@ -110,7 +112,7 @@
         <div>Mengetahui,</div>
         <div>${U.escapeHtml(i.pejabat_penilai.jabatan || 'Kepala Kantor Kementerian Agama Kabupaten Jember')},</div>
         <div style="height:80px;"></div>
-        <div style="text-decoration:underline;font-weight:700;white-space:nowrap">${U.escapeHtml(i.pejabat_penilai.nama)}</div>
+        <div style="text-decoration:underline;font-weight:700;white-space:nowrap">${nbsp(i.pejabat_penilai.nama)}</div>
         <div>NIP. ${U.escapeHtml(i.pejabat_penilai.nip)}</div>
       </div>
     `;
@@ -128,7 +130,7 @@
           <div>&nbsp;</div>
           <div>Ketua Pokjawas Madrasah,</div>
           <div style="height:80px;"></div>
-          <div style="text-decoration:underline;font-weight:700;white-space:nowrap">${U.escapeHtml(ketuaPokjawasNama)}</div>
+          <div style="text-decoration:underline;font-weight:700;white-space:nowrap">${nbsp(ketuaPokjawasNama)}</div>
           <div>NIP. ${U.escapeHtml(ketuaPokjawasNIP)}</div>
         </div>
         <div style="display:inline-block;vertical-align:top;text-align:center;width:45%;white-space:nowrap;">
@@ -485,7 +487,7 @@
             <div>${tanggalKota(i)}</div>
             <div>${U.escapeHtml(i.pejabat_penilai.jabatan)},</div>
             <div style="height:80px"></div>
-            <div style="text-decoration:underline;font-weight:700;white-space:nowrap">${U.escapeHtml(i.pejabat_penilai.nama)}</div>
+            <div style="text-decoration:underline;font-weight:700;white-space:nowrap">${nbsp(i.pejabat_penilai.nama)}</div>
             <div>NIP. ${U.escapeHtml(i.pejabat_penilai.nip)}</div>
           </div>
         </div>

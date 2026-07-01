@@ -133,11 +133,19 @@
       inp.addEventListener('change', async () => {
         if (!inp.files || !inp.files[0]) return;
         const dataUrl = await U.readFileAsDataURL(inp.files[0]);
-        const compressed = await U.compressImage(dataUrl, 600, 0.85);
         const name = inp.dataset.imgfor;
-        document.getElementById('prev_' + name).src = compressed;
+        // For signature images: compress then remove white background
+        const isSignature = (name === 'tanda_tangan' || name === 'ttd_ketua_pokjawas');
+        let processed;
+        if (isSignature) {
+          const compressed = await U.compressImage(dataUrl, 600, 0.95);
+          processed = await U.removeWhiteBg(compressed, 230);
+        } else {
+          processed = await U.compressImage(dataUrl, 600, 0.85);
+        }
+        document.getElementById('prev_' + name).src = processed;
         document.getElementById('prev_' + name).style.display = '';
-        document.querySelector(`input[name="${name}"]`).value = compressed;
+        document.querySelector(`input[name="${name}"]`).value = processed;
         document.querySelector(`button[data-clearimg="${name}"]`).classList.remove('d-none');
       });
     });

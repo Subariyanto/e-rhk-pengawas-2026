@@ -106,7 +106,7 @@
           ${pengawasTTDHtml(i, mode, rhkId)}
         </div>
       </div>
-      <div style="text-align:center;margin-top:30px;">
+      <div style="text-align:center;margin-top:36px;clear:both;">
         <div>Mengetahui,</div>
         <div>${U.escapeHtml(i.pejabat_penilai.jabatan || 'Kepala Kantor Kementerian Agama Kabupaten Jember')},</div>
         <div style="height:80px;"></div>
@@ -145,12 +145,12 @@
     return pengawasTTDHtml(i, mode, rhkId);
   }
 
-  // TTD untuk halaman Penutup / Kata Pengantar: hanya Pengawas, posisi di kanan
+  // TTD untuk halaman Penutup / Kata Pengantar: hanya Pengawas, center-right
   function ttdBlokPenutup(idn, rhkId) {
     const i = idn || Page.Identitas.get();
     const mode = getSigMode();
-    return `<div style="display:flex;justify-content:flex-end;">
-      <div style="width:45%;min-width:220px;">${pengawasTTDHtml(i, mode, rhkId)}</div>
+    return `<div style="display:flex;justify-content:center;">
+      <div style="width:50%;min-width:240px;text-align:center;">${pengawasTTDHtml(i, mode, rhkId)}</div>
     </div>`;
   }
 

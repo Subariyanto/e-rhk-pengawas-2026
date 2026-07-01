@@ -155,10 +155,11 @@
     UI.toast('Membuat PDF… mohon tunggu.');
     try {
       const blob = await GenPDF.htmlToPdfBlob(htmlStr);
-      U.downloadBlob(blob, U.sanitizeFilename(filename) + '.pdf');
+      if (blob) {
+        U.downloadBlob(blob, U.sanitizeFilename(filename) + '.pdf');
+      }
     } catch (err) {
-      UI.toast('PDF gagal, fallback ke print: ' + err.message, 'warning');
-      GenPDF.printHTML(htmlStr);
+      UI.toast('PDF gagal dibuat: ' + err.message, 'danger');
     }
     cleanupUI();
     if (openDriveCb) openDriveCb();

@@ -107,7 +107,7 @@
           <div style="text-decoration:underline;font-weight:700;white-space:nowrap">${nbsp(ketuaPokjawasNama)}</div>
           <div>NIP. ${U.escapeHtml(ketuaPokjawasNIP)}</div>
         </div>
-        <div class="ttd-block">
+        <div class="ttd-block" style="padding-right:40px;">
           ${pengawasTTDHtml(i, mode, rhkId)}
         </div>
       </div>

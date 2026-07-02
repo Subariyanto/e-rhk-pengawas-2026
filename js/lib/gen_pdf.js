@@ -118,6 +118,28 @@
         const imgW = pageW;
         let imgH = (canvas.height * imgW) / canvas.width;
 
+        // Smart page-break: find nearest white row near ideal split point
+        function findBreakY(ctx, idealY, canvasH, canvasW, margin) {
+          // Search ±margin pixels around idealY for a full white row
+          const threshold = 245; // near-white pixel
+          for (let offset = 0; offset <= margin; offset++) {
+            // Try above first, then below
+            for (const sign of [-1, 1]) {
+              const y = idealY + (sign * offset);
+              if (y < 10 || y >= canvasH) continue;
+              const row = ctx.getImageData(0, y, canvasW, 1).data;
+              let isWhite = true;
+              for (let x = 0; x < row.length; x += 4) {
+                if (row[x] < threshold || row[x+1] < threshold || row[x+2] < threshold) {
+                  isWhite = false; break;
+                }
+              }
+              if (isWhite) return y;
+            }
+          }
+          return idealY; // fallback: no white row found, use ideal
+        }
+
         if (imgH <= pageH) {
           // Fits in one page — pad to full A4 height
           const fullPxH = Math.round((pageH / imgH) * canvas.height);
@@ -130,23 +152,37 @@
           pctx.drawImage(canvas, 0, 0);
           pdf.addImage(padCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, imgW, pageH);
         } else {
-          // Content exceeds A4 — split across multiple pages
-          const totalPages = Math.ceil(imgH / pageH);
+          // Content exceeds A4 — smart split across pages at white rows
           const fullSlicePx = Math.round((pageH / imgH) * canvas.height);
-          for (let pg = 0; pg < totalPages; pg++) {
-            if (pg > 0) pdf.addPage();
-            const sliceY = Math.round(pg * (pageH / imgH) * canvas.height);
-            const sliceH = Math.min(fullSlicePx, canvas.height - sliceY);
-            if (sliceH <= 0) continue;
-            // Always render at full page size — pad short slices with white
+          const searchMargin = Math.round(fullSlicePx * 0.08); // ~8% search range
+          const cctx = canvas.getContext('2d');
+          let curY = 0;
+          let pageNum = 0;
+          while (curY < canvas.height) {
+            if (pageNum > 0) pdf.addPage();
+            const idealEnd = curY + fullSlicePx;
+            const actualEnd = Math.min(idealEnd, canvas.height);
+            // Find break point: if not last chunk, search for white row near ideal
+            let breakY = actualEnd;
+            if (idealEnd < canvas.height - 20) {
+              breakY = findBreakY(cctx, idealEnd, canvas.height, canvas.width, searchMargin);
+            }
+            const sliceH = breakY - curY;
+            if (sliceH <= 0) break;
+            // Calculate proportional PDF height for this slice
+            const sliceMmH = (sliceH / canvas.height) * (imgH);
             const sliceCanvas = document.createElement('canvas');
             sliceCanvas.width = canvas.width;
-            sliceCanvas.height = fullSlicePx;
-            const ctx = sliceCanvas.getContext('2d');
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
-            ctx.drawImage(canvas, 0, sliceY, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
-            pdf.addImage(sliceCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, imgW, pageH);
+            sliceCanvas.height = sliceH;
+            const ctx2 = sliceCanvas.getContext('2d');
+            ctx2.fillStyle = '#ffffff';
+            ctx2.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
+            ctx2.drawImage(canvas, 0, curY, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
+            // Place image proportionally — no stretching, natural height capped at pageH
+            const placedH = Math.min(sliceMmH, pageH);
+            pdf.addImage(sliceCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, imgW, placedH);
+            curY = breakY;
+            pageNum++;
           }
         }
       } catch (e) {

@@ -194,6 +194,14 @@
     const parts = types.map(t => ({ id: t, label: GenHTML.TYPES[t].label, html: GenHTML.TYPES[t].gen(rhk, keg, idn) }));
     const hasDrive = !!rhk.link_bukti_dukung;
 
+    // Resolve madrasah name for filename prefix
+    const madrasahList = Store.get('madrasah', []) || [];
+    let madrasahPrefix = '';
+    if (keg && keg.madrasah_id && keg.madrasah_id !== 'semua') {
+      const m = madrasahList.find(x => x.id === keg.madrasah_id);
+      if (m) madrasahPrefix = U.sanitizeFilename(m.nama_madrasah) + '_';
+    }
+
     const openDriveLink = hasDrive ? function() {
       setTimeout(() => window.open(rhk.link_bukti_dukung, '_blank', 'noopener'), 300);
     } : null;
@@ -317,7 +325,7 @@
       cleanupUI();
       const idx = parseInt(btn.dataset.idx);
       const p = parts[idx];
-      downloadDocxFromHtml([p.html], rhk.id + ' ' + p.label, rhk.id + '_' + p.label, openDriveLink);
+      downloadDocxFromHtml([p.html], rhk.id + ' ' + p.label, madrasahPrefix + rhk.id + '_' + p.label, openDriveLink);
     }));
     // Per-document download: PDF
     document.querySelectorAll('.doc-pdf-btn').forEach(btn => btn.addEventListener('click', (e) => {
@@ -325,7 +333,7 @@
       cleanupUI();
       const idx = parseInt(btn.dataset.idx);
       const p = parts[idx];
-      downloadPdfFromHtml(p.html, rhk.id + '_' + p.label, openDriveLink);
+      downloadPdfFromHtml(p.html, madrasahPrefix + rhk.id + '_' + p.label, openDriveLink);
     }));
 
     // Global print button
@@ -371,19 +379,19 @@
     document.getElementById('btnDocxAll').addEventListener('click', (e) => {
       e.preventDefault();
       cleanupUI();
-      downloadDocxFromHtml(parts.map(p => p.html), rhk.id + ' ' + rhk.nama_eviden, rhk.id + '_' + rhk.nama_eviden, openDriveLink);
+      downloadDocxFromHtml(parts.map(p => p.html), rhk.id + ' ' + rhk.nama_eviden, madrasahPrefix + rhk.id + '_' + rhk.nama_eviden, openDriveLink);
     });
     document.getElementById('btnPdfAll').addEventListener('click', (e) => {
       e.preventDefault();
       cleanupUI();
       const combined = parts.map(p => p.html).join('\n');
-      downloadPdfFromHtml(combined, rhk.id + '_' + rhk.nama_eviden, openDriveLink);
+      downloadPdfFromHtml(combined, madrasahPrefix + rhk.id + '_' + rhk.nama_eviden, openDriveLink);
     });
     document.getElementById('btnHtmlAll').addEventListener('click', (e) => {
       e.preventDefault();
       cleanupUI();
       const combined = parts.map(p => p.html).join('\n');
-      downloadHtmlPrintable(combined, rhk.id + '_' + rhk.nama_eviden, openDriveLink);
+      downloadHtmlPrintable(combined, madrasahPrefix + rhk.id + '_' + rhk.nama_eviden, openDriveLink);
     });
     document.getElementById('btnZipOne').addEventListener('click', (e) => {
       e.preventDefault();

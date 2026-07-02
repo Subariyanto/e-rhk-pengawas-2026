@@ -93,96 +93,78 @@
     const pageW = 210, pageH = 297;
     let first = true;
 
+    // Helper: render a single DOM element to canvas
+    const renderEl = async (el) => {
+      return html2canvas(el, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+        width: el.offsetWidth,
+        height: el.scrollHeight,
+        windowWidth: el.offsetWidth,
+        scrollX: 0,
+        scrollY: 0,
+      });
+    };
+
     for (const p of pages) {
       if (!first) pdf.addPage();
       first = false;
       try {
-        // Force natural height — remove min-height constraint
         p.style.minHeight = 'auto';
         p.style.height = 'auto';
         p.style.overflow = 'visible';
         p.style.pageBreakAfter = 'auto';
-        
-        const canvas = await html2canvas(p, {
-          scale: 3,
-          useCORS: true,
-          logging: false,
-          backgroundColor: '#ffffff',
-          width: p.offsetWidth || 794,
-          height: p.scrollHeight || p.offsetHeight,
-          windowWidth: p.offsetWidth || 794,
-          scrollX: 0,
-          scrollY: 0,
-        });
-        const imgData = canvas.toDataURL('image/jpeg', 0.95);
+
+        const pw = p.offsetWidth || 794;
         const imgW = pageW;
-        let imgH = (canvas.height * imgW) / canvas.width;
+        // px per mm ratio: canvas px → mm on page
+        const pxToMm = (px) => (px / pw) * imgW;
+        const maxPageMmH = pageH;
 
-        // Smart page-break: find nearest white row near ideal split point
-        function findBreakY(ctx, idealY, canvasH, canvasW, margin) {
-          // Search ±margin pixels around idealY for a full white row
-          const threshold = 245; // near-white pixel
-          for (let offset = 0; offset <= margin; offset++) {
-            // Try above first, then below
-            for (const sign of [-1, 1]) {
-              const y = idealY + (sign * offset);
-              if (y < 10 || y >= canvasH) continue;
-              const row = ctx.getImageData(0, y, canvasW, 1).data;
-              let isWhite = true;
-              for (let x = 0; x < row.length; x += 4) {
-                if (row[x] < threshold || row[x+1] < threshold || row[x+2] < threshold) {
-                  isWhite = false; break;
-                }
-              }
-              if (isWhite) return y;
-            }
+        // Collect direct children with their rendered heights
+        const children = Array.from(p.children);
+        let curPageMmH = 0; // mm used on current PDF page
+
+        for (let ci = 0; ci < children.length; ci++) {
+          const el = children[ci];
+          // Render element
+          const canvas = await renderEl(el);
+          const elMmH = pxToMm(canvas.height);
+          const elImgData = canvas.toDataURL('image/jpeg', 0.95);
+
+          // Check if this element fits on current page
+          if (curPageMmH + elMmH > maxPageMmH && curPageMmH > 0) {
+            // Doesn't fit — add new page
+            pdf.addPage();
+            curPageMmH = 0;
           }
-          return idealY; // fallback: no white row found, use ideal
-        }
 
-        if (imgH <= pageH) {
-          // Fits in one page — pad to full A4 height
-          const fullPxH = Math.round((pageH / imgH) * canvas.height);
-          const padCanvas = document.createElement('canvas');
-          padCanvas.width = canvas.width;
-          padCanvas.height = fullPxH;
-          const pctx = padCanvas.getContext('2d');
-          pctx.fillStyle = '#ffffff';
-          pctx.fillRect(0, 0, padCanvas.width, padCanvas.height);
-          pctx.drawImage(canvas, 0, 0);
-          pdf.addImage(padCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, imgW, pageH);
-        } else {
-          // Content exceeds A4 — smart split across pages at white rows
-          const fullSlicePx = Math.round((pageH / imgH) * canvas.height);
-          const searchMargin = Math.round(fullSlicePx * 0.08); // ~8% search range
-          const cctx = canvas.getContext('2d');
-          let curY = 0;
-          let pageNum = 0;
-          while (curY < canvas.height) {
-            if (pageNum > 0) pdf.addPage();
-            const idealEnd = curY + fullSlicePx;
-            const actualEnd = Math.min(idealEnd, canvas.height);
-            // Find break point: if not last chunk, search for white row near ideal
-            let breakY = actualEnd;
-            if (idealEnd < canvas.height - 20) {
-              breakY = findBreakY(cctx, idealEnd, canvas.height, canvas.width, searchMargin);
+          // If single element is bigger than a page, it gets its own page
+          if (elMmH > maxPageMmH) {
+            // Split this large element (fallback: slice canvas)
+            const slicePxH = Math.round((maxPageMmH / elMmH) * canvas.height);
+            let y = 0;
+            while (y < canvas.height) {
+              const sh = Math.min(slicePxH, canvas.height - y);
+              const sliceC = document.createElement('canvas');
+              sliceC.width = canvas.width;
+              sliceC.height = sh;
+              const sctx = sliceC.getContext('2d');
+              sctx.fillStyle = '#ffffff';
+              sctx.fillRect(0, 0, sliceC.width, sliceC.height);
+              sctx.drawImage(canvas, 0, y, canvas.width, sh, 0, 0, canvas.width, sh);
+              const shMm = pxToMm(sh);
+              pdf.addImage(sliceC.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, imgW, shMm);
+              y += sh;
+              if (y < canvas.height) pdf.addPage();
             }
-            const sliceH = breakY - curY;
-            if (sliceH <= 0) break;
-            // Calculate proportional PDF height for this slice
-            const sliceMmH = (sliceH / canvas.height) * (imgH);
-            const sliceCanvas = document.createElement('canvas');
-            sliceCanvas.width = canvas.width;
-            sliceCanvas.height = sliceH;
-            const ctx2 = sliceCanvas.getContext('2d');
-            ctx2.fillStyle = '#ffffff';
-            ctx2.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
-            ctx2.drawImage(canvas, 0, curY, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
-            // Place image proportionally — no stretching, natural height capped at pageH
-            const placedH = Math.min(sliceMmH, pageH);
-            pdf.addImage(sliceCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, imgW, placedH);
-            curY = breakY;
-            pageNum++;
+            pdf.addPage(); // next content on fresh page
+            curPageMmH = 0;
+          } else {
+            pdf.addImage(elImgData, 'JPEG', 0, curPageMmH, imgW, elMmH);
+            curPageMmH += elMmH;
           }
         }
       } catch (e) {

@@ -20,7 +20,15 @@
     const types = evidenItem.tipe_dokumen || GenHTML.defaultTypesFor(rhk);
     const parts = buildAllHTML(rhk, keg, types);
     const zip = new JSZip();
-    const dir = U.sanitizeFilename(rhk.id + '_' + rhk.nama_eviden);
+    const kegList2 = Store.get('kegiatan', []) || [];
+    const keg2 = evidenItem.kegiatan_id ? kegList2.find(k => k.id === evidenItem.kegiatan_id) : null;
+    const madrasahList = Store.get('madrasah', []) || [];
+    let madrasahPrefix = '';
+    if (keg2 && keg2.madrasah_id && keg2.madrasah_id !== 'semua') {
+      const m = madrasahList.find(x => x.id === keg2.madrasah_id);
+      if (m) madrasahPrefix = U.sanitizeFilename(m.nama_madrasah) + '_';
+    }
+    const dir = U.sanitizeFilename(madrasahPrefix + rhk.id + '_' + rhk.nama_eviden);
     const folder = zip.folder(dir);
     parts.forEach((p, i) => {
       const fname = String(i + 1).padStart(2, '0') + '_' + U.sanitizeFilename(p.label) + '.html';

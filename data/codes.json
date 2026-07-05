@@ -7,7 +7,7 @@
       "usedBy": "196810071998031001@pengawas.local",
       "usedAt": "2026-06-29T13:03:44.709671+00:00",
       "revoked": false,
-      "note": "auto: Pengawas 1001 · NIP 196810071998031001 · 196810071998031001@pengawas.local · auto 29/6/2026"
+      "note": "Nanang"
     },
     {
       "code": "FULL-Q24U-ZKCA-VNCV",
@@ -83,5 +83,5 @@
       "revoked": false
     }
   ],
-  "updatedAt": "2026-07-05T03:33:27.288Z"
+  "updatedAt": "2026-07-05T03:33:52.110Z"
 }

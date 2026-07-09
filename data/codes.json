@@ -22,8 +22,8 @@
       "code": "FULL-F284-M4X2-UU6F",
       "tier": "full",
       "createdAt": "2026-06-27T01:47:25.141Z",
-      "usedBy": "u_mr9uypyc_4x7erg",
-      "usedAt": "2026-07-06T23:35:37.195Z",
+      "usedBy": null,
+      "usedAt": null,
       "revoked": false
     },
     {
@@ -83,5 +83,5 @@
       "revoked": false
     }
   ],
-  "updatedAt": "2026-07-09T04:21:33.146Z"
+  "updatedAt": "2026-07-09T23:25:53.334Z"
 }

@@ -146,6 +146,7 @@
             // Split this large element (fallback: slice canvas)
             const slicePxH = Math.round((maxPageMmH / elMmH) * canvas.height);
             let y = 0;
+            let lastSliceMmH = 0;
             while (y < canvas.height) {
               const sh = Math.min(slicePxH, canvas.height - y);
               const sliceC = document.createElement('canvas');
@@ -158,10 +159,13 @@
               const shMm = pxToMm(sh);
               pdf.addImage(sliceC.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, imgW, shMm);
               y += sh;
+              lastSliceMmH = shMm;
               if (y < canvas.height) pdf.addPage();
             }
-            pdf.addPage(); // next content on fresh page
-            curPageMmH = 0;
+            // Continue subsequent content right below the last slice instead of
+            // forcing an extra blank page. A fresh page will only be added later
+            // if the next element genuinely doesn't fit in the remaining space.
+            curPageMmH = lastSliceMmH;
           } else {
             pdf.addImage(elImgData, 'JPEG', 0, curPageMmH, imgW, elMmH);
             curPageMmH += elMmH;

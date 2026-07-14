@@ -63,6 +63,54 @@
     w.document.close();
   }
 
+  // Break a large container (table/list) into row/item-level units so that
+  // page-break pagination never has to slice through the middle of a table
+  // row or list item. Returns an array of detached clone elements to insert
+  // in place of the original, or null if the element does not need splitting.
+  function expandUnit(el) {
+    const tag = el.tagName;
+    if (tag === 'TABLE') {
+      const rows = Array.from(el.querySelectorAll(':scope > thead > tr, :scope > tbody > tr, :scope > tr'));
+      if (rows.length > 1) {
+        const colgroup = el.querySelector(':scope > colgroup');
+        return rows.map((row) => {
+          const clone = el.cloneNode(false);
+          if (colgroup) clone.appendChild(colgroup.cloneNode(true));
+          const tbody = document.createElement('tbody');
+          tbody.appendChild(row.cloneNode(true));
+          clone.appendChild(tbody);
+          return clone;
+        });
+      }
+    }
+    if (tag === 'OL' || tag === 'UL') {
+      const items = Array.from(el.children).filter((c) => c.tagName === 'LI');
+      if (items.length > 1) {
+        return items.map((li, idx) => {
+          const clone = el.cloneNode(false);
+          if (tag === 'OL') clone.setAttribute('start', String(idx + 1));
+          clone.appendChild(li.cloneNode(true));
+          return clone;
+        });
+      }
+    }
+    return null;
+  }
+
+  // Replace any top-level TABLE/OL/UL child of a .doc-page with its
+  // row/item-level units (in place, same parent) so pagination below
+  // operates at a fine enough granularity to avoid mid-row/mid-line cuts.
+  function preprocessPageForPagination(p) {
+    Array.from(p.children).forEach((child) => {
+      const units = expandUnit(child);
+      if (units && units.length > 1) {
+        const frag = document.createDocumentFragment();
+        units.forEach((u) => frag.appendChild(u));
+        child.replaceWith(frag);
+      }
+    });
+  }
+
   // Use html2canvas directly — no print preview, direct blob download
   async function htmlToPdfBlob(htmlBody) {
     if (window.Tier && Tier.blockExportIfTrial && Tier.blockExportIfTrial('Download PDF')) return null;
@@ -112,6 +160,7 @@
       if (!first) pdf.addPage();
       first = false;
       try {
+        preprocessPageForPagination(p);
         p.style.minHeight = 'auto';
         p.style.height = 'auto';
         p.style.overflow = 'visible';

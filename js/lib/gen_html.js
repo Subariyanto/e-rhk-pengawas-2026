@@ -208,11 +208,13 @@
     `;
   }
 
-  // TTD versi sederhana (cuma pengawas, center)
+  // TTD versi sederhana (cuma pengawas). Posisi center agak ke kanan pada
+  // semua dokumen KECUALI lembar pengesahan (yang memakai pengawasTTDHtml()
+  // langsung dalam ttdBlokStandar dengan posisi center biasa).
   function ttdPengawas(idn, rhkId) {
     const i = idn || Page.Identitas.get();
     const mode = getSigMode();
-    return `<div style="text-align:center;margin-top:24px;">${pengawasTTDHtml(i, mode, rhkId)}</div>`;
+    return `<div style="text-align:center;margin-top:24px;margin-left:35%;">${pengawasTTDHtml(i, mode, rhkId)}</div>`;
   }
 
   // TTD untuk halaman Penutup / Kata Pengantar: hanya Pengawas, geser ke kanan
@@ -528,7 +530,7 @@
         <h4>${(kendala || solusi) ? 'F' : 'E'}. Rekomendasi</h4>
         <p style="text-align:justify;">${U.nl2br(ringkasRekom)}</p>
 
-        <div style="display:flex;justify-content:center;margin-top:24px;">
+        <div style="display:flex;justify-content:center;margin-top:24px;margin-left:12%;">
           <div style="width:50%;text-align:center;">
             <div>${keg && keg.tanggal ? U.escapeHtml((i.pegawai.kabupaten || 'Jember') + ', ' + U.fmtTanggal(keg.tanggal)) : tanggalKota(i)}</div>
             <div>Pengawas Madrasah,</div>
@@ -598,7 +600,7 @@
           <tr><td>Acara</td><td>${U.escapeHtml(keg ? keg.nama_kegiatan : rhk.nama_eviden)}</td></tr>
         </table>
         <p style="text-align:justify;">Mengingat pentingnya acara tersebut, dimohon kehadirannya tepat waktu. Atas perhatian dan kerja sama Bapak/Ibu, kami sampaikan terima kasih.</p>
-        <div style="display:flex;justify-content:center;margin-top:24px;">
+        <div style="display:flex;justify-content:center;margin-top:24px;margin-left:12%;">
           <div style="width:50%;text-align:center;">
             <div>Pengawas Madrasah,</div>
             <div style="height:auto;min-height:70px;display:flex;align-items:center;justify-content:center;">${i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : ''}</div>
@@ -654,7 +656,7 @@
           <thead><tr><th style="width:30px">No</th><th>Nama</th><th>NIP/NUPTK</th><th>Asal Madrasah</th><th>Jabatan</th><th>Tanda Tangan</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
-        <div style="display:flex;justify-content:center;margin-top:24px;">
+        <div style="display:flex;justify-content:center;margin-top:24px;margin-left:12%;">
           <div style="width:50%;text-align:center;">
             <div>Mengetahui,</div>
             <div>Pengawas Madrasah,</div>
@@ -746,7 +748,7 @@
         </table>
         <p class="mt-3">Indikator Kuantitas: ${U.escapeHtml(rhk.indikator_kuantitas || '')} (Target: ${U.escapeHtml(rhk.target_kuantitas || '')})<br />
         Indikator Waktu: ${U.escapeHtml(rhk.indikator_waktu || '')} (Durasi: ${U.escapeHtml(rhk.target_waktu || '')})</p>
-        <div style="display:flex;justify-content:center;margin-top:24px;">
+        <div style="display:flex;justify-content:center;margin-top:24px;margin-left:12%;">
           <div style="width:50%;text-align:center;">
             <div>Pengawas Madrasah,</div>
             <div style="height:auto;min-height:70px;display:flex;align-items:center;justify-content:center;">${i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : ''}</div>
@@ -795,7 +797,7 @@
         </table>
         <h4 class="mt-3">Catatan Hasil</h4>
         <p style="text-align:justify;">${U.nl2br(catatanHasil)}</p>
-        <div style="display:flex;justify-content:center;margin-top:24px;">
+        <div style="display:flex;justify-content:center;margin-top:24px;margin-left:12%;">
           <div style="width:50%;text-align:center;">
             <div>Pengawas Madrasah,</div>
             <div style="height:auto;min-height:70px;display:flex;align-items:center;justify-content:center;">${i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : ''}</div>
@@ -849,7 +851,7 @@
         <p style="text-align:justify;">${penghambatHtml}</p>
         <h4>Strategi Tindak Lanjut</h4>
         <p style="text-align:justify;">${tindakLanjutHtml}</p>
-        <div style="display:flex;justify-content:center;margin-top:24px;">
+        <div style="display:flex;justify-content:center;margin-top:24px;margin-left:12%;">
           <div style="width:50%;text-align:center;">
             <div>${keg && keg.tanggal ? U.escapeHtml((i.pegawai.kabupaten || 'Jember') + ', ' + U.fmtTanggal(keg.tanggal)) : tanggalKota(i)}</div>
             <div>Pengawas Madrasah,</div>
@@ -872,7 +874,7 @@
         <h3 style="text-align:center;text-decoration:underline;margin-top:24px;margin-bottom:24px;">REKOMENDASI TINDAK LANJUT</h3>
         <p style="text-align:justify;margin-top:24px;">Berdasarkan hasil pelaksanaan ${U.escapeHtml(rhk.nama_eviden)}, ${rhk.triwulan === 'TAMBAHAN' ? 'Kinerja Tambahan' : 'Triwulan ' + rhk.triwulan + ' Tahun 2026'}, kami menyampaikan rekomendasi sebagai berikut:</p>
         <p style="text-align:justify;white-space:pre-wrap;">${U.escapeHtml(U.fillTemplate(N.rekomendasi, v))}</p>
-        <div style="display:flex;justify-content:center;margin-top:24px;">
+        <div style="display:flex;justify-content:center;margin-top:24px;margin-left:12%;">
           <div style="width:50%;text-align:center;">
             <div>${keg && keg.tanggal ? U.escapeHtml((i.pegawai.kabupaten || 'Jember') + ', ' + U.fmtTanggal(keg.tanggal)) : tanggalKota(i)}</div>
             <div>Pengawas Madrasah,</div>

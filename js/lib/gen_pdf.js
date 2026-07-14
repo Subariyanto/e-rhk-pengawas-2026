@@ -204,12 +204,19 @@
         const mmPerPx = pageW / pw;
         const pxToMm = (px) => px * mmPerPx;
         const canvasPxToMm = (px) => (px / RENDER_SCALE) * mmPerPx;
-        const maxPageMmH = pageH;
+        // Reserve a top/bottom margin band on every PDF page. This canvas-based
+        // export path lays out content by hand (no CSS @page rule applies to
+        // canvas/jsPDF output), so without this the content used the full
+        // 297mm page height with zero top/bottom margin regardless of the
+        // 0.6in margin configured elsewhere in the app (margin atas/bawah
+        // tidak sesuai).
+        const MARGIN_MM = 0.6 * 25.4; // 0.6in in mm
+        const maxPageMmH = pageH - MARGIN_MM * 2;
         const pageLeft = p.getBoundingClientRect().left;
 
         // Collect direct children with their rendered heights
         const children = Array.from(p.children);
-        let curPageMmH = 0; // mm used on current PDF page
+        let curPageMmH = 0; // mm used within the current page's content band (below top margin)
 
         for (let ci = 0; ci < children.length; ci++) {
           const el = children[ci];
@@ -246,7 +253,7 @@
               sctx.fillRect(0, 0, sliceC.width, sliceC.height);
               sctx.drawImage(canvas, 0, y, canvas.width, sh, 0, 0, canvas.width, sh);
               const shMm = canvasPxToMm(sh);
-              pdf.addImage(sliceC.toDataURL('image/jpeg', 0.95), 'JPEG', offsetXmm, 0, elMmW, shMm);
+              pdf.addImage(sliceC.toDataURL('image/jpeg', 0.95), 'JPEG', offsetXmm, MARGIN_MM, elMmW, shMm);
               y += sh;
               lastSliceMmH = shMm;
               if (y < canvas.height) pdf.addPage();
@@ -256,7 +263,7 @@
             // if the next element genuinely doesn't fit in the remaining space.
             curPageMmH = lastSliceMmH;
           } else {
-            pdf.addImage(elImgData, 'JPEG', offsetXmm, curPageMmH, elMmW, elMmH);
+            pdf.addImage(elImgData, 'JPEG', offsetXmm, MARGIN_MM + curPageMmH, elMmW, elMmH);
             curPageMmH += elMmH;
           }
         }

@@ -1419,6 +1419,6 @@
                .replace(/\n{3,}/g, '\n\n').trim();
   }
 
-  window.GenHTML = { TYPES, defaultTypesFor, htmlToPlain, header, varsFor, getNarasi, tanggalKota, ttdBlokStandar, ttdBlokPenutup, ttdPengawas, ttdTriwulan };
+  window.GenHTML = { TYPES, defaultTypesFor, htmlToPlain, header, varsFor, getNarasi, tanggalKota, ttdBlokStandar, ttdBlokPenutup, ttdPengawas, ttdTriwulan, ttdPengesahanTriwulan };
 })();
 

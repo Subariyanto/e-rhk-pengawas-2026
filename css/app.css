@@ -446,7 +446,7 @@ a:hover { color: var(--primary-dark); }
   body { background: #fff; }
   .doc-page {
     page-break-after: always;
-    padding: 0.8in 0.8in 1.2in 0.8in;
+    padding: 0.6in;
     margin: 0;
     box-shadow: none;
     max-width: none;
@@ -454,8 +454,8 @@ a:hover { color: var(--primary-dark); }
     transform: scale(var(--print-scale, 1));
     transform-origin: top left;
   }
-  .doc-page:last-child { padding-bottom: 0.8in; }
-  .doc-cover { padding: 0.8in 0.8in 1.2in 0.8in; }
+  .doc-page:last-child { padding-bottom: 0.6in; }
+  .doc-cover { padding: 0.6in; }
   /* @page margin set ke 0 supaya padding .doc-page yang kontrol jarak */
   @page { size: A4 portrait; margin: 0; }
   @page :first { margin-top: 0; }
@@ -473,8 +473,8 @@ body.trial-mode .trial-watermark::before{content:"TRIAL \2022  e-RHK Pengawas 20
 /* ===== Document preview ===== */
 .doc-page {
   background: #fff;
-  /* Margin standar: 0.8" semua sisi */
-  padding: 0.8in;
+  /* Margin standar: 0.6" semua sisi */
+  padding: 0.6in;
   max-width: 210mm;
   min-height: 297mm;
   margin: 16px auto;

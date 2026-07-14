@@ -26,12 +26,12 @@
         body{font-family:"Times New Roman",serif;font-size:12pt;line-height:1.5;background:#fff}
         h1,h2,h3{font-family:"Times New Roman",serif;font-size:13pt;font-weight:700}
         h4,h5{font-family:"Times New Roman",serif;font-size:12pt;font-weight:700}
-        .doc-page{padding:1in 1in 1in 1.2in;max-width:210mm;min-height:297mm;page-break-after:always;}
+        .doc-page{padding:0.6in;max-width:210mm;min-height:297mm;page-break-after:always;}
         @media print {
           body{background:#fff}
           .doc-page{padding:0;margin:0;max-width:none;min-height:0;box-shadow:none}
           .doc-cover{padding:0}
-          @page{size:A4;margin:1in 1in 1in 1.2in}
+          @page{size:A4;margin:0.6in}
         }
         .kop{display:flex;align-items:center;gap:12px;border-bottom:3px double #000;padding-bottom:8px;margin-bottom:16px}
         .kop .logo{width:80px;height:80px;flex-shrink:0}
@@ -50,7 +50,7 @@
         .cover-sub{text-align:center;font-size:12pt;margin-bottom:80px}
         .cover-id{text-align:center;line-height:1.8;margin-top:60px;font-size:12pt}
         .cover-foot{text-align:center;margin-top:80px;font-weight:700;font-size:12pt}
-        .doc-cover{padding:1in 1in 1in 1.2in}
+        .doc-cover{padding:0.6in}
         ${watermarkCSS()}
       </style>
       </head><body>${watermarkHTML(trial)}${htmlBody}<script>window.onload=()=>{setTimeout(()=>{window.print();},300)}</` + `script></body></html>`;

@@ -26,7 +26,8 @@
         body{font-family:"Times New Roman",serif;font-size:12pt;line-height:1.5;background:#fff}
         h1,h2,h3{font-family:"Times New Roman",serif;font-size:13pt;font-weight:700}
         h4,h5{font-family:"Times New Roman",serif;font-size:12pt;font-weight:700}
-        .doc-page{padding:0.6in;max-width:210mm;min-height:297mm;page-break-after:always;}
+        .doc-page{padding:0.6in;max-width:210mm;min-height:297mm;page-break-before:always;}
+        .doc-page:first-of-type{page-break-before:avoid;}
         @media print {
           body{background:#fff}
           .doc-page{padding:0;margin:0;max-width:none;min-height:0;box-shadow:none}

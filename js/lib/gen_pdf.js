@@ -167,10 +167,11 @@
         p.style.pageBreakAfter = 'auto';
 
         const pw = p.offsetWidth || 794;
-        const imgW = pageW;
-        // px per mm ratio: canvas px → mm on page
-        const pxToMm = (px) => (px / pw) * imgW;
+        // px per mm ratio: canvas px → mm on page (consistent for width, height, and offset)
+        const mmPerPx = pageW / pw;
+        const pxToMm = (px) => px * mmPerPx;
         const maxPageMmH = pageH;
+        const pageLeft = p.getBoundingClientRect().left;
 
         // Collect direct children with their rendered heights
         const children = Array.from(p.children);
@@ -181,6 +182,11 @@
           // Render element
           const canvas = await renderEl(el);
           const elMmH = pxToMm(canvas.height);
+          const elMmW = pxToMm(canvas.width);
+          // Preserve the element's real left offset (page padding/margin) instead
+          // of stretching content to the full page width at x=0 — that was
+          // collapsing the left/right margins and cutting off content.
+          const offsetXmm = pxToMm(el.getBoundingClientRect().left - pageLeft);
           const elImgData = canvas.toDataURL('image/jpeg', 0.95);
 
           // Check if this element fits on current page
@@ -206,7 +212,7 @@
               sctx.fillRect(0, 0, sliceC.width, sliceC.height);
               sctx.drawImage(canvas, 0, y, canvas.width, sh, 0, 0, canvas.width, sh);
               const shMm = pxToMm(sh);
-              pdf.addImage(sliceC.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, imgW, shMm);
+              pdf.addImage(sliceC.toDataURL('image/jpeg', 0.95), 'JPEG', offsetXmm, 0, elMmW, shMm);
               y += sh;
               lastSliceMmH = shMm;
               if (y < canvas.height) pdf.addPage();
@@ -216,7 +222,7 @@
             // if the next element genuinely doesn't fit in the remaining space.
             curPageMmH = lastSliceMmH;
           } else {
-            pdf.addImage(elImgData, 'JPEG', 0, curPageMmH, imgW, elMmH);
+            pdf.addImage(elImgData, 'JPEG', offsetXmm, curPageMmH, elMmW, elMmH);
             curPageMmH += elMmH;
           }
         }

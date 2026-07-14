@@ -208,6 +208,52 @@
     `;
   }
 
+  // TTD khusus Lembar Pengesahan Laporan Triwulan: Kiri Ketua Pokjawas, Kanan
+  // Pengawas Madrasah (tanggal di atas, TTD di bawah nama), lalu di bawah
+  // kedua kolom itu (center) blok "Mengetahui, Kepala Kemenag" dengan TTD dan
+  // stempel Kemenag yang diambil dari menu Identitas Pengawas.
+  function ttdPengesahanTriwulan(idn) {
+    const i = idn || Page.Identitas.get();
+    const kota = i.pegawai.kabupaten || 'Jember';
+    const tanggal = U.fmtTanggal(new Date());
+    const ketuaPokjawasNama = (i.ketua_pokjawas && i.ketua_pokjawas.nama) || 'SUBARIYANTO, S.Pd, M.Pd.I';
+    const ketuaPokjawasNIP  = (i.ketua_pokjawas && i.ketua_pokjawas.nip) || '197002122005011004';
+    const sigImg = i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : '';
+    const stempelImg = i.stempel ? `<img src="${i.stempel}" style="position:absolute;top:50%;left:25%;transform:translate(-50%,-50%);max-height:110px;opacity:0.85;z-index:2;pointer-events:none;mix-blend-mode:multiply;" />` : '';
+    const ketuaTTDImg = (i.ttd_ketua_pokjawas) ? `<img class="signature-img" src="${i.ttd_ketua_pokjawas}" style="max-height:100px;position:absolute;top:-10px;left:50%;transform:translateX(-50%);z-index:1;mix-blend-mode:multiply;background:transparent;" />` : '';
+    const stempelBlock = stempelImg ? `${ketuaTTDImg}${stempelImg}` : ketuaTTDImg;
+
+    const kepalaTTDImg = (i.ttd_kepala_kemenag) ? `<img class="signature-img" src="${i.ttd_kepala_kemenag}" style="max-height:100px;position:absolute;top:-10px;left:50%;transform:translateX(-50%);z-index:1;mix-blend-mode:multiply;background:transparent;" />` : '';
+    const stempelKemenagImg = i.stempel_kemenag ? `<img src="${i.stempel_kemenag}" style="position:absolute;top:50%;left:25%;transform:translate(-50%,-50%);max-height:110px;opacity:0.85;z-index:2;pointer-events:none;mix-blend-mode:multiply;" />` : '';
+    const kepalaBlock = stempelKemenagImg ? `${kepalaTTDImg}${stempelKemenagImg}` : kepalaTTDImg;
+
+    return `
+      <div style="margin-top:24px;text-align:center;">
+        <div style="display:inline-block;vertical-align:top;text-align:center;width:45%;margin-right:10px;">
+          <div>&nbsp;</div>
+          <div>Ketua Pokjawas Madrasah,</div>
+          <div style="height:80px;display:flex;align-items:center;justify-content:center;position:relative;">${stempelBlock}</div>
+          <div style="text-decoration:underline;font-weight:700">${nbsp(ketuaPokjawasNama)}</div>
+          <div>NIP. ${U.escapeHtml(ketuaPokjawasNIP)}</div>
+        </div>
+        <div style="display:inline-block;vertical-align:top;text-align:center;width:45%;">
+          <div>${nbsp(kota + ', ' + tanggal)}</div>
+          <div>Pengawas Madrasah,</div>
+          <div style="height:80px;display:flex;align-items:center;justify-content:center;">${sigImg}</div>
+          <div style="text-decoration:underline;font-weight:700">${nbsp(i.pegawai.nama)}</div>
+          <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
+        </div>
+      </div>
+      <div style="margin-top:24px;text-align:center;">
+        <div>Mengetahui,</div>
+        <div>${U.escapeHtml(i.pejabat_penilai.jabatan || 'Kepala Kantor Kementerian Agama Kabupaten Jember')},</div>
+        <div style="height:80px;display:flex;align-items:center;justify-content:center;position:relative;">${kepalaBlock}</div>
+        <div style="text-decoration:underline;font-weight:700;white-space:nowrap">${nbsp(i.pejabat_penilai.nama)}</div>
+        <div>NIP. ${U.escapeHtml(i.pejabat_penilai.nip)}</div>
+      </div>
+    `;
+  }
+
   // TTD versi sederhana (cuma pengawas). Posisi center agak ke kanan pada
   // semua dokumen KECUALI lembar pengesahan (yang memakai pengawasTTDHtml()
   // langsung dalam ttdBlokStandar dengan posisi center biasa).

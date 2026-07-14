@@ -67,6 +67,7 @@
           <div class="card-body row g-3">
             ${pegInput('pejabat_penilai', idn.pejabat_penilai, false)}
             ${imgUpload('ttd_kepala_kemenag', 'Tanda Tangan Kepala Kemenag', idn.ttd_kepala_kemenag || '')}
+            ${imgUpload('stempel_kemenag', 'Stempel Kemenag', idn.stempel_kemenag || '')}
           </div>
         </div>
 

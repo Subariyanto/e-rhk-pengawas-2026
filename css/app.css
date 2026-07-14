@@ -452,6 +452,15 @@ a:hover { color: var(--primary-dark); }
     box-shadow: none;
     max-width: none;
     min-height: 0;
+  }
+  /* Skala cetak (--print-scale) diterapkan di container pembungkus
+     (#docContainer / .app-content), BUKAN pada .doc-page itu sendiri. CSS
+     transform pada elemen yang juga menerima page-break-before:always
+     membuat Chromium salah hitung batas halaman saat print-to-PDF,
+     menyisipkan 1 halaman kosong ekstra tiap kali .doc-page berikutnya
+     dimulai. Dengan transform di container luar, setiap .doc-page tetap
+     "flat" untuk keperluan page-break. */
+  #docContainer, .app-content {
     transform: scale(var(--print-scale, 1));
     transform-origin: top left;
   }

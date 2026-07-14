@@ -1,10 +1,12 @@
 // ZIP packaging: bundle eviden output (HTML + DOCX + index.html)
 (function () {
-  // Build all docs HTML for a given evidenItem (rhk, keg, types)
+  // Build all docs HTML for a given evidenItem (rhk, keg, types).
+  // Skips types with no real data yet (foto/link/surat keterangan tanpa data)
+  // via GenHTML.applicableTypes so ZIP output doesn't include near-empty pages.
   function buildAllHTML(rhk, keg, types) {
-    return types
-      .filter(t => GenHTML.TYPES[t] && typeof GenHTML.TYPES[t].gen === 'function')
-      .map(t => ({ id: t, label: GenHTML.TYPES[t].label, html: GenHTML.TYPES[t].gen(rhk, keg) }));
+    const applicable = (GenHTML.applicableTypes ? GenHTML.applicableTypes(types, rhk, keg) : types)
+      .filter(t => GenHTML.TYPES[t] && typeof GenHTML.TYPES[t].gen === 'function');
+    return applicable.map(t => ({ id: t, label: GenHTML.TYPES[t].label, html: GenHTML.TYPES[t].gen(rhk, keg) }));
   }
 
   function combinedHTML(parts) {

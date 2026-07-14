@@ -189,7 +189,10 @@
     const rhk = masterRhk.find(r => r.id === ev.rhk_id);
     const kegList = Store.get('kegiatan', []) || [];
     const keg = ev.kegiatan_id ? kegList.find(k => k.id === ev.kegiatan_id) : null;
-    const types = (ev.tipe_dokumen || GenHTML.defaultTypesFor(rhk)).filter(t => GenHTML.TYPES[t]);
+    // Auto-exclude doc types with no real data yet (Foto tanpa upload, Link
+    // Drive belum diisi, Surat Keterangan tanpa data Madrasah Binaan) supaya
+    // Cetak/Download tidak menghasilkan halaman "kosong" per Yanto 2026-07-15.
+    const types = GenHTML.applicableTypes((ev.tipe_dokumen || GenHTML.defaultTypesFor(rhk)).filter(t => GenHTML.TYPES[t]), rhk, keg);
     const idn = Page.Identitas.get();
     const parts = types.map(t => ({ id: t, label: GenHTML.TYPES[t].label, html: GenHTML.TYPES[t].gen(rhk, keg, idn) }));
     const hasDrive = !!rhk.link_bukti_dukung;

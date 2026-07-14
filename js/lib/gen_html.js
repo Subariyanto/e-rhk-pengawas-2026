@@ -224,7 +224,7 @@
     const stempelBlock = stempelImg ? `${ketuaTTDImg}${stempelImg}` : ketuaTTDImg;
 
     const kepalaTTDImg = (i.ttd_kepala_kemenag) ? `<img class="signature-img" src="${i.ttd_kepala_kemenag}" style="max-height:100px;position:absolute;top:75%;left:50%;transform:translate(-50%,-50%);z-index:1;mix-blend-mode:multiply;background:transparent;" />` : '';
-    const stempelKemenagImg = i.stempel_kemenag ? `<img src="${i.stempel_kemenag}" style="position:absolute;top:75%;left:calc(50% + 70px);transform:translate(-50%,-50%);max-height:110px;opacity:0.85;z-index:2;pointer-events:none;mix-blend-mode:multiply;" />` : '';
+    const stempelKemenagImg = i.stempel_kemenag ? `<img src="${i.stempel_kemenag}" style="position:absolute;top:75%;left:calc(50% - 60px);transform:translate(-50%,-50%);max-height:110px;opacity:0.85;z-index:2;pointer-events:none;mix-blend-mode:multiply;" />` : '';
     const kepalaBlock = stempelKemenagImg ? `${kepalaTTDImg}${stempelKemenagImg}` : kepalaTTDImg;
 
     return `

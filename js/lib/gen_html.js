@@ -88,16 +88,76 @@
     `;
   }
 
+  // ===== Helper: apakah pembuat laporan (pegawai) adalah Ketua Pokjawas sendiri? =====
+  // Dipakai untuk menentukan isi blok "Mengetahui" pada lembar pengesahan:
+  // - Kalau pembuat laporan = Ketua Pokjawas -> Mengetahui hanya Kepala Kemenag.
+  // - Kalau pembuat laporan = Pengawas biasa -> Mengetahui Ketua Pokjawas + Kepala Kemenag.
+  function isPembuatKetuaPokjawas(i) {
+    const ketuaNama = ((i.ketua_pokjawas && i.ketua_pokjawas.nama) || '').trim().toUpperCase();
+    const pengawasNama = ((i.pegawai && i.pegawai.nama) || '').trim().toUpperCase();
+    return !!ketuaNama && ketuaNama === pengawasNama;
+  }
+
+  // Blok "Mengetahui" untuk lembar pengesahan: satu kolom (Kepala Kemenag) jika
+  // pembuat laporan adalah Ketua Pokjawas sendiri, atau dua kolom berdampingan
+  // (Ketua Pokjawas + Kepala Kemenag) jika pembuat laporan adalah Pengawas biasa.
+  function mengetahuiBlok(i) {
+    const kepalaTTDImg = i.ttd_kepala_kemenag ? `<img class="signature-img" src="${i.ttd_kepala_kemenag}" style="max-height:80px;" />` : '<div style="height:80px;"></div>';
+    const kepalaBlock = `
+        <div>Mengetahui,</div>
+        <div>${U.escapeHtml(i.pejabat_penilai.jabatan || 'Kepala Kantor Kementerian Agama Kabupaten Jember')},</div>
+        <div style="height:80px;display:flex;align-items:center;justify-content:center;">${kepalaTTDImg}</div>
+        <div style="text-decoration:underline;font-weight:700;white-space:nowrap">${nbsp(i.pejabat_penilai.nama)}</div>
+        <div>NIP. ${U.escapeHtml(i.pejabat_penilai.nip)}</div>`;
+
+    if (isPembuatKetuaPokjawas(i)) {
+      return `<div style="text-align:center;margin-top:36px;clear:both;">${kepalaBlock}</div>`;
+    }
+
+    const ketuaPokjawasNama = (i.ketua_pokjawas && i.ketua_pokjawas.nama) || 'SUBARIYANTO, S.Pd, M.Pd.I';
+    const ketuaPokjawasNIP  = (i.ketua_pokjawas && i.ketua_pokjawas.nip) || '197002122005011004';
+    const ketuaTTDImg = i.ttd_ketua_pokjawas ? `<img class="signature-img" src="${i.ttd_ketua_pokjawas}" style="max-height:80px;" />` : '<div style="height:80px;"></div>';
+    return `
+      <div style="margin-top:36px;clear:both;text-align:center;">
+        <div style="display:inline-block;vertical-align:top;text-align:center;width:45%;margin-right:10px;">
+          <div>Mengetahui,</div>
+          <div>Ketua Pokjawas Madrasah,</div>
+          <div style="height:80px;display:flex;align-items:center;justify-content:center;">${ketuaTTDImg}</div>
+          <div style="text-decoration:underline;font-weight:700;white-space:nowrap">${nbsp(ketuaPokjawasNama)}</div>
+          <div>NIP. ${U.escapeHtml(ketuaPokjawasNIP)}</div>
+        </div>
+        <div style="display:inline-block;vertical-align:top;text-align:center;width:45%;">
+          ${kepalaBlock}
+        </div>
+      </div>
+    `;
+  }
+
   // ===== TTD Layout standar (Kanan: Pengawas, Kiri: Ketua Pokjawas, Bawah: Kepala Kankemenag) =====
   // Default Ketua Pokjawas Kab Jember (sesuai MEMORY): SUBARIYANTO, S.Pd, M.Pd.I (NIP 197002122005011004)
+  // Blok atas (Ketua Pokjawas vs Pengawas) hanya relevan kalau pembuat laporan
+  // BUKAN Ketua Pokjawas sendiri — kalau Ketua Pokjawas yang membuat laporan,
+  // dia sudah muncul sebagai "Pengawas" pembuat laporan, jadi blok atas tidak
+  // perlu menampilkan namanya dua kali sebagai "Ketua Pokjawas" juga.
   function ttdBlokStandar(idn, rhkId) {
     const i = idn || Page.Identitas.get();
     const mode = getSigMode();
+    const ketuaJugaPembuat = isPembuatKetuaPokjawas(i);
     const ketuaPokjawasNama = (i.ketua_pokjawas && i.ketua_pokjawas.nama) || 'SUBARIYANTO, S.Pd, M.Pd.I';
     const ketuaPokjawasNIP  = (i.ketua_pokjawas && i.ketua_pokjawas.nip) || '197002122005011004';
     const stempelImg = i.stempel ? `<img src="${i.stempel}" style="position:absolute;top:50%;left:25%;transform:translate(-50%,-50%);max-height:110px;opacity:0.85;z-index:2;pointer-events:none;mix-blend-mode:multiply;" />` : '';
     const ketuaTTDImg = (i.ttd_ketua_pokjawas) ? `<img class="signature-img" src="${i.ttd_ketua_pokjawas}" style="max-height:100px;position:absolute;top:-10px;left:50%;transform:translateX(-50%);z-index:1;mix-blend-mode:multiply;background:transparent;" />` : '<div style="height:80px;"></div>';
     const stempelBlock = stempelImg ? `<div style="height:80px;display:flex;align-items:center;justify-content:center;position:relative;overflow:visible;">${ketuaTTDImg}${stempelImg}</div>` : `<div style="height:80px;display:flex;align-items:center;justify-content:center;position:relative;overflow:visible;">${ketuaTTDImg}</div>`;
+    if (ketuaJugaPembuat) {
+      return `
+        <div class="ttd" style="margin-top:24px;justify-content:center;">
+          <div class="ttd-block" style="padding-right:40px;">
+            ${pengawasTTDHtml(i, mode, rhkId)}
+          </div>
+        </div>
+        ${mengetahuiBlok(i)}
+      `;
+    }
     return `
       <div class="ttd" style="margin-top:24px;">
         <div class="ttd-block">
@@ -111,13 +171,7 @@
           ${pengawasTTDHtml(i, mode, rhkId)}
         </div>
       </div>
-      <div style="text-align:center;margin-top:36px;clear:both;">
-        <div>Mengetahui,</div>
-        <div>${U.escapeHtml(i.pejabat_penilai.jabatan || 'Kepala Kantor Kementerian Agama Kabupaten Jember')},</div>
-        <div style="height:80px;"></div>
-        <div style="text-decoration:underline;font-weight:700;white-space:nowrap">${nbsp(i.pejabat_penilai.nama)}</div>
-        <div>NIP. ${U.escapeHtml(i.pejabat_penilai.nip)}</div>
-      </div>
+      ${mengetahuiBlok(i)}
     `;
   }
 

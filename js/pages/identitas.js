@@ -63,9 +63,10 @@
         </div>
 
         <div class="card mb-3">
-          <div class="card-header"><i class="bi bi-person-check"></i> Pejabat Penilai</div>
+          <div class="card-header"><i class="bi bi-person-check"></i> Pejabat Penilai (Kepala Kantor Kemenag)</div>
           <div class="card-body row g-3">
             ${pegInput('pejabat_penilai', idn.pejabat_penilai, false)}
+            ${imgUpload('ttd_kepala_kemenag', 'Tanda Tangan Kepala Kemenag', idn.ttd_kepala_kemenag || '')}
           </div>
         </div>
 
@@ -135,7 +136,7 @@
         const dataUrl = await U.readFileAsDataURL(inp.files[0]);
         const name = inp.dataset.imgfor;
         // For signature images: compress then remove white background
-        const isSignature = (name === 'tanda_tangan' || name === 'ttd_ketua_pokjawas');
+        const isSignature = (name === 'tanda_tangan' || name === 'ttd_ketua_pokjawas' || name === 'ttd_kepala_kemenag');
         let processed;
         if (isSignature) {
           const compressed = await U.compressImage(dataUrl, 600, 0.95);

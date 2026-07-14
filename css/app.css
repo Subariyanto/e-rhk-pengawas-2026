@@ -446,7 +446,7 @@ a:hover { color: var(--primary-dark); }
   body { background: #fff; }
   .doc-page {
     page-break-after: always;
-    padding: 0.6in;
+    padding: 0;
     margin: 0;
     box-shadow: none;
     max-width: none;
@@ -454,10 +454,13 @@ a:hover { color: var(--primary-dark); }
     transform: scale(var(--print-scale, 1));
     transform-origin: top left;
   }
-  .doc-page:last-child { padding-bottom: 0.6in; }
-  .doc-cover { padding: 0.6in; }
-  /* @page margin set ke 0 supaya padding .doc-page yang kontrol jarak */
-  @page { size: A4 portrait; margin: 0; }
+  .doc-page:last-child { padding-bottom: 0; }
+  .doc-cover { padding: 0; }
+  /* Margin fisik per halaman diatur di @page supaya berulang otomatis di
+     setiap halaman fisik (termasuk halaman sambungan saat 1 dokumen meluber
+     ke >1 halaman) — padding di .doc-page tidak berulang di tiap page-break
+     fisik, jadi harus dipindah ke sini. */
+  @page { size: A4 portrait; margin: 0.6in; }
   @page :first { margin-top: 0; }
 }
 

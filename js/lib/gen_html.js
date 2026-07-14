@@ -1382,6 +1382,11 @@
   }
 
   // Document type catalog: id -> { label, gen }
+  // isApplicable(rhk, keg): returns false when a doc type has no real data to
+  // show yet, so it can be auto-excluded from cetak/preview/download instead
+  // of printing a near-empty page (halaman "kosong" — hanya header + placeholder
+  // singkat seperti "Belum ada foto diunggah" / "Link belum diisi"). Types
+  // without an isApplicable entry are always considered applicable.
   const TYPES = {
     laporan_singkat: { label: 'Laporan Singkat Hasil Pendampingan', gen: genLaporanSingkat },
     program_pendampingan: { label: 'Program Pendampingan Tahunan (Program Kerja Pengawas)', gen: genProgramPendampingan },
@@ -1394,10 +1399,30 @@
     rekap: { label: 'Rekap Hasil', gen: genRekap },
     analisis: { label: 'Analisis Hasil', gen: genAnalisis },
     rekomendasi: { label: 'Rekomendasi Tindak Lanjut', gen: genRekomendasi },
-    foto: { label: 'Dokumentasi Foto Kegiatan', gen: genFotoDok },
-    link: { label: 'Link Bukti Dukung Google Drive', gen: genLinkBukti },
-    surat_keterangan_madrasah: { label: 'Surat Keterangan dari Madrasah Binaan', gen: genSuratKeteranganMadrasah },
+    foto: {
+      label: 'Dokumentasi Foto Kegiatan', gen: genFotoDok,
+      isApplicable: (rhk, keg) => !!(keg && keg.foto && keg.foto.length),
+    },
+    link: {
+      label: 'Link Bukti Dukung Google Drive', gen: genLinkBukti,
+      isApplicable: (rhk) => !!(rhk && rhk.link_bukti_dukung),
+    },
+    surat_keterangan_madrasah: {
+      label: 'Surat Keterangan dari Madrasah Binaan', gen: genSuratKeteranganMadrasah,
+      isApplicable: () => !!((Store && typeof Store.get === 'function') && (Store.get('madrasah', []) || []).length),
+    },
   };
+
+  // Filter a list of selected type ids down to the ones that actually have
+  // data to render, given the current rhk/kegiatan context.
+  function applicableTypes(types, rhk, keg) {
+    return (types || []).filter((t) => {
+      const def = TYPES[t];
+      if (!def) return false;
+      if (typeof def.isApplicable !== 'function') return true;
+      return def.isApplicable(rhk, keg);
+    });
+  }
 
   function defaultTypesFor(rhk) {
     if (rhk && rhk.id === 'RHK-1') {

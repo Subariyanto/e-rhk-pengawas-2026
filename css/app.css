@@ -468,8 +468,21 @@ a:hover { color: var(--primary-dark); }
      Using page-break-BEFORE on every .doc-page (instead of page-break-AFTER)
      avoids the classic Chromium bug where a forced break placed right at the
      end of naturally-reflowed multi-page content produces an extra blank
-     page. Each .doc-page starts a new page except the very first one. */
-  .doc-page:first-of-type { page-break-before: avoid; }
+     page. Each .doc-page starts a new page except the very first one.
+     NOTE: this must NOT be `.doc-page:first-of-type`. In the Eviden preview
+     each document (Laporan Singkat / Surat Tugas / Undangan) is wrapped in
+     its own `.doc-pane > .doc-body` container, so every `.doc-page` is the
+     ONLY .doc-page inside its own parent — each one independently matches
+     `:first-of-type`, which cancels page-break-before on every document and
+     causes the next document to start on the same physical page as the
+     previous one instead of a fresh page. Scope the "avoid" rule to only the
+     page inside the very first .doc-pane/document (works for both the
+     multi-.doc-pane Eviden layout and the flat Laporan Triwulan layout,
+     where #docContainer's first child IS the first .doc-page). */
+  #docContainer > .doc-page:first-child,
+  #docContainer > .doc-pane:first-child .doc-page:first-child {
+    page-break-before: avoid;
+  }
   .doc-cover { padding: 0; }
   /* Margin fisik per halaman diatur di @page supaya berulang otomatis di
      setiap halaman fisik (termasuk halaman sambungan saat 1 dokumen meluber

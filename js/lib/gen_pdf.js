@@ -73,11 +73,40 @@
       const rows = Array.from(el.querySelectorAll(':scope > thead > tr, :scope > tbody > tr, :scope > tr'));
       if (rows.length > 1) {
         const colgroup = el.querySelector(':scope > colgroup');
+        // Measure each column's real rendered width from the ORIGINAL (still
+        // attached, still fully laid out) table before splitting it into
+        // one-row-per-table units below. Without this, each split-off table
+        // uses the browser's default table-layout:auto and recomputes column
+        // widths independently based only on that row's own content, so a
+        // short header row and a long content row end up with different
+        // column widths, and columns visually misalign between rows once
+        // stacked as separate images in the PDF (tabel tidak rapi).
+        const refRow = rows.find((r) => r.children.length > 0) || rows[0];
+        const colWidths = Array.from(refRow.children).map((cell) => cell.getBoundingClientRect().width);
         return rows.map((row) => {
           const clone = el.cloneNode(false);
-          if (colgroup) clone.appendChild(colgroup.cloneNode(true));
+          clone.style.tableLayout = 'fixed';
+          if (colgroup) {
+            clone.appendChild(colgroup.cloneNode(true));
+          } else if (colWidths.length) {
+            const cg = document.createElement('colgroup');
+            colWidths.forEach((w) => {
+              const col = document.createElement('col');
+              col.style.width = w + 'px';
+              cg.appendChild(col);
+            });
+            clone.appendChild(cg);
+          }
           const tbody = document.createElement('tbody');
-          tbody.appendChild(row.cloneNode(true));
+          const rowClone = row.cloneNode(true);
+          // Pin each cell's width directly too, in case of colspan/rowspan
+          // mismatches between the reference row and this row.
+          Array.from(rowClone.children).forEach((cell, ci) => {
+            if (colWidths[ci] != null) {
+              cell.style.width = colWidths[ci] + 'px';
+            }
+          });
+          tbody.appendChild(rowClone);
           clone.appendChild(tbody);
           return clone;
         });

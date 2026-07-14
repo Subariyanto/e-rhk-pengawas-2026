@@ -220,7 +220,7 @@
           <tr><td>Periode</td><td>${labelTW(tw)} Tahun ${tahun}</td></tr>
         </table>
         <p style="text-align:justify;">Laporan ini menjadi bukti pelaksanaan Sasaran Kinerja Pegawai (SKP) Pengawas Madrasah pada ${U.escapeHtml(i.pegawai.unit_kerja)} sesuai dengan Perdirjen GTK Nomor 7328 Tahun 2023 tentang Petunjuk Teknis Pengelolaan Kinerja Pengawas Madrasah.</p>
-        ${GenHTML.ttdTriwulan(i)}
+        ${GenHTML.ttdPengesahanTriwulan(i)}
       </div>
     `;
 

@@ -88,16 +88,76 @@
     `;
   }
 
+  // ===== Helper: apakah pembuat laporan (pegawai) adalah Ketua Pokjawas sendiri? =====
+  // Dipakai untuk menentukan isi blok "Mengetahui" pada lembar pengesahan:
+  // - Kalau pembuat laporan = Ketua Pokjawas -> Mengetahui hanya Kepala Kemenag.
+  // - Kalau pembuat laporan = Pengawas biasa -> Mengetahui Ketua Pokjawas + Kepala Kemenag.
+  function isPembuatKetuaPokjawas(i) {
+    const ketuaNama = ((i.ketua_pokjawas && i.ketua_pokjawas.nama) || '').trim().toUpperCase();
+    const pengawasNama = ((i.pegawai && i.pegawai.nama) || '').trim().toUpperCase();
+    return !!ketuaNama && ketuaNama === pengawasNama;
+  }
+
+  // Blok "Mengetahui" untuk lembar pengesahan: satu kolom (Kepala Kemenag) jika
+  // pembuat laporan adalah Ketua Pokjawas sendiri, atau dua kolom berdampingan
+  // (Ketua Pokjawas + Kepala Kemenag) jika pembuat laporan adalah Pengawas biasa.
+  function mengetahuiBlok(i) {
+    const kepalaTTDImg = i.ttd_kepala_kemenag ? `<img class="signature-img" src="${i.ttd_kepala_kemenag}" style="max-height:80px;" />` : '<div style="height:80px;"></div>';
+    const kepalaBlock = `
+        <div>Mengetahui,</div>
+        <div>${U.escapeHtml(i.pejabat_penilai.jabatan || 'Kepala Kantor Kementerian Agama Kabupaten Jember')},</div>
+        <div style="height:80px;display:flex;align-items:center;justify-content:center;">${kepalaTTDImg}</div>
+        <div style="text-decoration:underline;font-weight:700;white-space:nowrap">${nbsp(i.pejabat_penilai.nama)}</div>
+        <div>NIP. ${U.escapeHtml(i.pejabat_penilai.nip)}</div>`;
+
+    if (isPembuatKetuaPokjawas(i)) {
+      return `<div style="text-align:center;margin-top:36px;clear:both;">${kepalaBlock}</div>`;
+    }
+
+    const ketuaPokjawasNama = (i.ketua_pokjawas && i.ketua_pokjawas.nama) || 'SUBARIYANTO, S.Pd, M.Pd.I';
+    const ketuaPokjawasNIP  = (i.ketua_pokjawas && i.ketua_pokjawas.nip) || '197002122005011004';
+    const ketuaTTDImg = i.ttd_ketua_pokjawas ? `<img class="signature-img" src="${i.ttd_ketua_pokjawas}" style="max-height:80px;" />` : '<div style="height:80px;"></div>';
+    return `
+      <div style="margin-top:36px;clear:both;text-align:center;">
+        <div style="display:inline-block;vertical-align:top;text-align:center;width:45%;margin-right:10px;">
+          <div>Mengetahui,</div>
+          <div>Ketua Pokjawas Madrasah,</div>
+          <div style="height:80px;display:flex;align-items:center;justify-content:center;">${ketuaTTDImg}</div>
+          <div style="text-decoration:underline;font-weight:700;white-space:nowrap">${nbsp(ketuaPokjawasNama)}</div>
+          <div>NIP. ${U.escapeHtml(ketuaPokjawasNIP)}</div>
+        </div>
+        <div style="display:inline-block;vertical-align:top;text-align:center;width:45%;">
+          ${kepalaBlock}
+        </div>
+      </div>
+    `;
+  }
+
   // ===== TTD Layout standar (Kanan: Pengawas, Kiri: Ketua Pokjawas, Bawah: Kepala Kankemenag) =====
   // Default Ketua Pokjawas Kab Jember (sesuai MEMORY): SUBARIYANTO, S.Pd, M.Pd.I (NIP 197002122005011004)
+  // Blok atas (Ketua Pokjawas vs Pengawas) hanya relevan kalau pembuat laporan
+  // BUKAN Ketua Pokjawas sendiri — kalau Ketua Pokjawas yang membuat laporan,
+  // dia sudah muncul sebagai "Pengawas" pembuat laporan, jadi blok atas tidak
+  // perlu menampilkan namanya dua kali sebagai "Ketua Pokjawas" juga.
   function ttdBlokStandar(idn, rhkId) {
     const i = idn || Page.Identitas.get();
     const mode = getSigMode();
+    const ketuaJugaPembuat = isPembuatKetuaPokjawas(i);
     const ketuaPokjawasNama = (i.ketua_pokjawas && i.ketua_pokjawas.nama) || 'SUBARIYANTO, S.Pd, M.Pd.I';
     const ketuaPokjawasNIP  = (i.ketua_pokjawas && i.ketua_pokjawas.nip) || '197002122005011004';
     const stempelImg = i.stempel ? `<img src="${i.stempel}" style="position:absolute;top:50%;left:25%;transform:translate(-50%,-50%);max-height:110px;opacity:0.85;z-index:2;pointer-events:none;mix-blend-mode:multiply;" />` : '';
     const ketuaTTDImg = (i.ttd_ketua_pokjawas) ? `<img class="signature-img" src="${i.ttd_ketua_pokjawas}" style="max-height:100px;position:absolute;top:-10px;left:50%;transform:translateX(-50%);z-index:1;mix-blend-mode:multiply;background:transparent;" />` : '<div style="height:80px;"></div>';
     const stempelBlock = stempelImg ? `<div style="height:80px;display:flex;align-items:center;justify-content:center;position:relative;overflow:visible;">${ketuaTTDImg}${stempelImg}</div>` : `<div style="height:80px;display:flex;align-items:center;justify-content:center;position:relative;overflow:visible;">${ketuaTTDImg}</div>`;
+    if (ketuaJugaPembuat) {
+      return `
+        <div class="ttd" style="margin-top:24px;justify-content:center;">
+          <div class="ttd-block" style="padding-right:40px;">
+            ${pengawasTTDHtml(i, mode, rhkId)}
+          </div>
+        </div>
+        ${mengetahuiBlok(i)}
+      `;
+    }
     return `
       <div class="ttd" style="margin-top:24px;">
         <div class="ttd-block">
@@ -107,17 +167,11 @@
           <div style="text-decoration:underline;font-weight:700;white-space:nowrap">${nbsp(ketuaPokjawasNama)}</div>
           <div>NIP. ${U.escapeHtml(ketuaPokjawasNIP)}</div>
         </div>
-        <div class="ttd-block">
+        <div class="ttd-block" style="padding-right:40px;">
           ${pengawasTTDHtml(i, mode, rhkId)}
         </div>
       </div>
-      <div style="text-align:center;margin-top:36px;clear:both;">
-        <div>Mengetahui,</div>
-        <div>${U.escapeHtml(i.pejabat_penilai.jabatan || 'Kepala Kantor Kementerian Agama Kabupaten Jember')},</div>
-        <div style="height:80px;"></div>
-        <div style="text-decoration:underline;font-weight:700;white-space:nowrap">${nbsp(i.pejabat_penilai.nama)}</div>
-        <div>NIP. ${U.escapeHtml(i.pejabat_penilai.nip)}</div>
-      </div>
+      ${mengetahuiBlok(i)}
     `;
   }
 
@@ -154,11 +208,59 @@
     `;
   }
 
-  // TTD versi sederhana (cuma pengawas, center)
+  // TTD khusus Lembar Pengesahan Laporan Triwulan: Kiri Ketua Pokjawas, Kanan
+  // Pengawas Madrasah (tanggal di atas, TTD di bawah nama), lalu di bawah
+  // kedua kolom itu (center) blok "Mengetahui, Kepala Kemenag" dengan TTD dan
+  // stempel Kemenag yang diambil dari menu Identitas Pengawas.
+  function ttdPengesahanTriwulan(idn) {
+    const i = idn || Page.Identitas.get();
+    const kota = i.pegawai.kabupaten || 'Jember';
+    const tanggal = U.fmtTanggal(new Date());
+    const ketuaPokjawasNama = (i.ketua_pokjawas && i.ketua_pokjawas.nama) || 'SUBARIYANTO, S.Pd, M.Pd.I';
+    const ketuaPokjawasNIP  = (i.ketua_pokjawas && i.ketua_pokjawas.nip) || '197002122005011004';
+    const sigImg = i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : '';
+    const stempelImg = i.stempel ? `<img src="${i.stempel}" style="position:absolute;top:50%;left:calc(50% - 60px);transform:translate(-50%,-50%);max-height:110px;opacity:0.85;z-index:2;pointer-events:none;mix-blend-mode:multiply;" />` : '';
+    const ketuaTTDImg = (i.ttd_ketua_pokjawas) ? `<img class="signature-img" src="${i.ttd_ketua_pokjawas}" style="max-height:100px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1;mix-blend-mode:multiply;background:transparent;" />` : '';
+    const stempelBlock = stempelImg ? `${ketuaTTDImg}${stempelImg}` : ketuaTTDImg;
+
+    const kepalaTTDImg = (i.ttd_kepala_kemenag) ? `<img class="signature-img" src="${i.ttd_kepala_kemenag}" style="max-height:100px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1;mix-blend-mode:multiply;background:transparent;" />` : '';
+    const stempelKemenagImg = i.stempel_kemenag ? `<img src="${i.stempel_kemenag}" style="position:absolute;top:50%;left:calc(50% - 60px);transform:translate(-50%,-50%);max-height:110px;opacity:0.85;z-index:2;pointer-events:none;mix-blend-mode:multiply;" />` : '';
+    const kepalaBlock = stempelKemenagImg ? `${kepalaTTDImg}${stempelKemenagImg}` : kepalaTTDImg;
+
+    return `
+      <div style="margin-top:24px;text-align:center;">
+        <div style="display:inline-block;vertical-align:top;text-align:center;width:45%;margin-right:10px;">
+          <div>&nbsp;</div>
+          <div>Ketua Pokjawas Madrasah,</div>
+          <div style="height:80px;display:flex;align-items:center;justify-content:center;position:relative;">${stempelBlock}</div>
+          <div style="text-decoration:underline;font-weight:700">${nbsp(ketuaPokjawasNama)}</div>
+          <div>NIP. ${U.escapeHtml(ketuaPokjawasNIP)}</div>
+        </div>
+        <div style="display:inline-block;vertical-align:top;text-align:center;width:45%;">
+          <div>${nbsp(kota + ', ' + tanggal)}</div>
+          <div>Pengawas Madrasah,</div>
+          <div style="height:80px;display:flex;align-items:center;justify-content:center;">${sigImg}</div>
+          <div style="text-decoration:underline;font-weight:700">${nbsp(i.pegawai.nama)}</div>
+          <div>NIP. ${U.escapeHtml(i.pegawai.nip)}</div>
+        </div>
+      </div>
+      <div style="margin-top:24px;text-align:center;">
+        <div>Mengetahui,</div>
+        <div>${U.escapeHtml(i.pejabat_penilai.jabatan || 'Kepala Kantor Kementerian Agama Kabupaten Jember')},</div>
+        <div style="height:100px;display:flex;align-items:center;justify-content:center;position:relative;">${kepalaBlock}</div>
+        <div style="text-decoration:underline;font-weight:700;white-space:nowrap">${nbsp(i.pejabat_penilai.nama)}</div>
+        <div>NIP. ${U.escapeHtml(i.pejabat_penilai.nip)}</div>
+      </div>
+    `;
+  }
+
+  // TTD versi sederhana (cuma pengawas). Posisi center agak ke kanan pada
+  // semua dokumen KECUALI lembar pengesahan (yang memakai pengawasTTDHtml()
+  // langsung dalam ttdBlokStandar dengan posisi center biasa).
   function ttdPengawas(idn, rhkId) {
     const i = idn || Page.Identitas.get();
     const mode = getSigMode();
-    return `<div style="text-align:center;margin-top:24px;">${pengawasTTDHtml(i, mode, rhkId)}</div>`;
+    return `<div style="text-align:center;margin-top:24px;margin-left:35%;">${pengawasTTDHtml(i, mode, rhkId)}</div>`;
   }
 
   // TTD untuk halaman Penutup / Kata Pengantar: hanya Pengawas, geser ke kanan
@@ -474,7 +576,7 @@
         <h4>${(kendala || solusi) ? 'F' : 'E'}. Rekomendasi</h4>
         <p style="text-align:justify;">${U.nl2br(ringkasRekom)}</p>
 
-        <div style="display:flex;justify-content:center;margin-top:24px;">
+        <div style="display:flex;justify-content:center;margin-top:24px;margin-left:12%;">
           <div style="width:50%;text-align:center;">
             <div>${keg && keg.tanggal ? U.escapeHtml((i.pegawai.kabupaten || 'Jember') + ', ' + U.fmtTanggal(keg.tanggal)) : tanggalKota(i)}</div>
             <div>Pengawas Madrasah,</div>
@@ -490,6 +592,9 @@
   function genSuratTugas(rhk, keg, idn) {
     const i = idn || Page.Identitas.get();
     const noSurat = `B-${(rhk.nomor_rhk || '00')}/${(i.pegawai.kabupaten || 'JBR').toString().slice(0,3).toUpperCase()}/${new Date().getFullYear()}`;
+    const kepalaTTDImg = i.ttd_kepala_kemenag ? `<img class="signature-img" src="${i.ttd_kepala_kemenag}" style="max-height:100px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1;mix-blend-mode:multiply;background:transparent;" />` : '';
+    const stempelKemenagImg = i.stempel_kemenag ? `<img src="${i.stempel_kemenag}" style="position:absolute;top:50%;left:calc(50% - 60px);transform:translate(-50%,-50%);max-height:110px;opacity:0.85;z-index:2;pointer-events:none;mix-blend-mode:multiply;" />` : '';
+    const kepalaBlock = stempelKemenagImg ? `${kepalaTTDImg}${stempelKemenagImg}` : kepalaTTDImg;
     return `
       <div class="doc-page">
         ${header(i)}
@@ -512,10 +617,10 @@
         <p>Demikian surat tugas ini diberikan untuk dilaksanakan sebagaimana mestinya.</p>
 
         <div style="display:flex;justify-content:center;margin-top:30px;">
-          <div style="width:50%;text-align:center;">
+          <div style="width:50%;text-align:center;position:relative;">
             <div>${tanggalKota(i)}</div>
             <div>${U.escapeHtml(i.pejabat_penilai.jabatan)},</div>
-            <div style="height:80px"></div>
+            <div style="height:80px;display:flex;align-items:center;justify-content:center;position:relative;">${kepalaBlock}</div>
             <div style="text-decoration:underline;font-weight:700;white-space:nowrap">${nbsp(i.pejabat_penilai.nama)}</div>
             <div>NIP. ${U.escapeHtml(i.pejabat_penilai.nip)}</div>
           </div>
@@ -544,7 +649,7 @@
           <tr><td>Acara</td><td>${U.escapeHtml(keg ? keg.nama_kegiatan : rhk.nama_eviden)}</td></tr>
         </table>
         <p style="text-align:justify;">Mengingat pentingnya acara tersebut, dimohon kehadirannya tepat waktu. Atas perhatian dan kerja sama Bapak/Ibu, kami sampaikan terima kasih.</p>
-        <div style="display:flex;justify-content:center;margin-top:24px;">
+        <div style="display:flex;justify-content:center;margin-top:24px;margin-left:12%;">
           <div style="width:50%;text-align:center;">
             <div>Pengawas Madrasah,</div>
             <div style="height:auto;min-height:70px;display:flex;align-items:center;justify-content:center;">${i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : ''}</div>
@@ -600,7 +705,7 @@
           <thead><tr><th style="width:30px">No</th><th>Nama</th><th>NIP/NUPTK</th><th>Asal Madrasah</th><th>Jabatan</th><th>Tanda Tangan</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
-        <div style="display:flex;justify-content:center;margin-top:24px;">
+        <div style="display:flex;justify-content:center;margin-top:24px;margin-left:12%;">
           <div style="width:50%;text-align:center;">
             <div>Mengetahui,</div>
             <div>Pengawas Madrasah,</div>
@@ -692,7 +797,7 @@
         </table>
         <p class="mt-3">Indikator Kuantitas: ${U.escapeHtml(rhk.indikator_kuantitas || '')} (Target: ${U.escapeHtml(rhk.target_kuantitas || '')})<br />
         Indikator Waktu: ${U.escapeHtml(rhk.indikator_waktu || '')} (Durasi: ${U.escapeHtml(rhk.target_waktu || '')})</p>
-        <div style="display:flex;justify-content:center;margin-top:24px;">
+        <div style="display:flex;justify-content:center;margin-top:24px;margin-left:12%;">
           <div style="width:50%;text-align:center;">
             <div>Pengawas Madrasah,</div>
             <div style="height:auto;min-height:70px;display:flex;align-items:center;justify-content:center;">${i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : ''}</div>
@@ -741,7 +846,7 @@
         </table>
         <h4 class="mt-3">Catatan Hasil</h4>
         <p style="text-align:justify;">${U.nl2br(catatanHasil)}</p>
-        <div style="display:flex;justify-content:center;margin-top:24px;">
+        <div style="display:flex;justify-content:center;margin-top:24px;margin-left:12%;">
           <div style="width:50%;text-align:center;">
             <div>Pengawas Madrasah,</div>
             <div style="height:auto;min-height:70px;display:flex;align-items:center;justify-content:center;">${i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : ''}</div>
@@ -795,7 +900,7 @@
         <p style="text-align:justify;">${penghambatHtml}</p>
         <h4>Strategi Tindak Lanjut</h4>
         <p style="text-align:justify;">${tindakLanjutHtml}</p>
-        <div style="display:flex;justify-content:center;margin-top:24px;">
+        <div style="display:flex;justify-content:center;margin-top:24px;margin-left:12%;">
           <div style="width:50%;text-align:center;">
             <div>${keg && keg.tanggal ? U.escapeHtml((i.pegawai.kabupaten || 'Jember') + ', ' + U.fmtTanggal(keg.tanggal)) : tanggalKota(i)}</div>
             <div>Pengawas Madrasah,</div>
@@ -818,7 +923,7 @@
         <h3 style="text-align:center;text-decoration:underline;margin-top:24px;margin-bottom:24px;">REKOMENDASI TINDAK LANJUT</h3>
         <p style="text-align:justify;margin-top:24px;">Berdasarkan hasil pelaksanaan ${U.escapeHtml(rhk.nama_eviden)}, ${rhk.triwulan === 'TAMBAHAN' ? 'Kinerja Tambahan' : 'Triwulan ' + rhk.triwulan + ' Tahun 2026'}, kami menyampaikan rekomendasi sebagai berikut:</p>
         <p style="text-align:justify;white-space:pre-wrap;">${U.escapeHtml(U.fillTemplate(N.rekomendasi, v))}</p>
-        <div style="display:flex;justify-content:center;margin-top:24px;">
+        <div style="display:flex;justify-content:center;margin-top:24px;margin-left:12%;">
           <div style="width:50%;text-align:center;">
             <div>${keg && keg.tanggal ? U.escapeHtml((i.pegawai.kabupaten || 'Jember') + ', ' + U.fmtTanggal(keg.tanggal)) : tanggalKota(i)}</div>
             <div>Pengawas Madrasah,</div>
@@ -1317,6 +1422,6 @@
                .replace(/\n{3,}/g, '\n\n').trim();
   }
 
-  window.GenHTML = { TYPES, defaultTypesFor, htmlToPlain, header, varsFor, getNarasi, tanggalKota, ttdBlokStandar, ttdBlokPenutup, ttdPengawas, ttdTriwulan };
+  window.GenHTML = { TYPES, defaultTypesFor, htmlToPlain, header, varsFor, getNarasi, tanggalKota, ttdBlokStandar, ttdBlokPenutup, ttdPengawas, ttdTriwulan, ttdPengesahanTriwulan };
 })();
 

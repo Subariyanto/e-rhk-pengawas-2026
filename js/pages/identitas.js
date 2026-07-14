@@ -63,9 +63,11 @@
         </div>
 
         <div class="card mb-3">
-          <div class="card-header"><i class="bi bi-person-check"></i> Pejabat Penilai</div>
+          <div class="card-header"><i class="bi bi-person-check"></i> Pejabat Penilai (Kepala Kantor Kemenag)</div>
           <div class="card-body row g-3">
             ${pegInput('pejabat_penilai', idn.pejabat_penilai, false)}
+            ${imgUpload('ttd_kepala_kemenag', 'Tanda Tangan Kepala Kemenag', idn.ttd_kepala_kemenag || '')}
+            ${imgUpload('stempel_kemenag', 'Stempel Kemenag', idn.stempel_kemenag || '')}
           </div>
         </div>
 
@@ -134,12 +136,22 @@
         if (!inp.files || !inp.files[0]) return;
         const dataUrl = await U.readFileAsDataURL(inp.files[0]);
         const name = inp.dataset.imgfor;
-        // For signature images: compress then remove white background
-        const isSignature = (name === 'tanda_tangan' || name === 'ttd_ketua_pokjawas');
+        // For signature/stamp images: compress then remove white background so
+        // transparency is baked into the pixels (alpha channel). CSS
+        // mix-blend-mode:multiply only fakes transparency in the live HTML
+        // preview — it is NOT honored by html2canvas, which the Download PDF
+        // path uses. Without real alpha transparency here, the stamp/signature
+        // renders as an opaque white square in the exported PDF and covers the
+        // text/signature underneath.
+        const isSignature = (name === 'tanda_tangan' || name === 'ttd_ketua_pokjawas' || name === 'ttd_kepala_kemenag');
+        const isStempel = (name === 'stempel' || name === 'stempel_kemenag');
         let processed;
         if (isSignature) {
           const compressed = await U.compressImage(dataUrl, 600, 0.95);
           processed = await U.removeWhiteBg(compressed, 230);
+        } else if (isStempel) {
+          const compressed = await U.compressImage(dataUrl, 600, 0.95);
+          processed = await U.removeWhiteBg(compressed, 235);
         } else {
           processed = await U.compressImage(dataUrl, 600, 0.85);
         }

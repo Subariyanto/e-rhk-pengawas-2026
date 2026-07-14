@@ -26,12 +26,13 @@
         body{font-family:"Times New Roman",serif;font-size:12pt;line-height:1.5;background:#fff}
         h1,h2,h3{font-family:"Times New Roman",serif;font-size:13pt;font-weight:700}
         h4,h5{font-family:"Times New Roman",serif;font-size:12pt;font-weight:700}
-        .doc-page{padding:1in 1in 1in 1.2in;max-width:210mm;min-height:297mm;page-break-after:always;}
+        .doc-page{padding:0.6in;max-width:210mm;min-height:297mm;page-break-before:always;}
+        .doc-page:first-of-type{page-break-before:avoid;}
         @media print {
           body{background:#fff}
           .doc-page{padding:0;margin:0;max-width:none;min-height:0;box-shadow:none}
           .doc-cover{padding:0}
-          @page{size:A4;margin:1in 1in 1in 1.2in}
+          @page{size:A4;margin:0.6in}
         }
         .kop{display:flex;align-items:center;gap:12px;border-bottom:3px double #000;padding-bottom:8px;margin-bottom:16px}
         .kop .logo{width:80px;height:80px;flex-shrink:0}
@@ -50,7 +51,7 @@
         .cover-sub{text-align:center;font-size:12pt;margin-bottom:80px}
         .cover-id{text-align:center;line-height:1.8;margin-top:60px;font-size:12pt}
         .cover-foot{text-align:center;margin-top:80px;font-weight:700;font-size:12pt}
-        .doc-cover{padding:1in 1in 1in 1.2in}
+        .doc-cover{padding:0.6in}
         ${watermarkCSS()}
       </style>
       </head><body>${watermarkHTML(trial)}${htmlBody}<script>window.onload=()=>{setTimeout(()=>{window.print();},300)}</` + `script></body></html>`;
@@ -61,6 +62,83 @@
     w.document.open();
     w.document.write(buildFullHTML(htmlBody));
     w.document.close();
+  }
+
+  // Break a large container (table/list) into row/item-level units so that
+  // page-break pagination never has to slice through the middle of a table
+  // row or list item. Returns an array of detached clone elements to insert
+  // in place of the original, or null if the element does not need splitting.
+  function expandUnit(el) {
+    const tag = el.tagName;
+    if (tag === 'TABLE') {
+      const rows = Array.from(el.querySelectorAll(':scope > thead > tr, :scope > tbody > tr, :scope > tr'));
+      if (rows.length > 1) {
+        const colgroup = el.querySelector(':scope > colgroup');
+        // Measure each column's real rendered width from the ORIGINAL (still
+        // attached, still fully laid out) table before splitting it into
+        // one-row-per-table units below. Without this, each split-off table
+        // uses the browser's default table-layout:auto and recomputes column
+        // widths independently based only on that row's own content, so a
+        // short header row and a long content row end up with different
+        // column widths, and columns visually misalign between rows once
+        // stacked as separate images in the PDF (tabel tidak rapi).
+        const refRow = rows.find((r) => r.children.length > 0) || rows[0];
+        const colWidths = Array.from(refRow.children).map((cell) => cell.getBoundingClientRect().width);
+        return rows.map((row) => {
+          const clone = el.cloneNode(false);
+          clone.style.tableLayout = 'fixed';
+          if (colgroup) {
+            clone.appendChild(colgroup.cloneNode(true));
+          } else if (colWidths.length) {
+            const cg = document.createElement('colgroup');
+            colWidths.forEach((w) => {
+              const col = document.createElement('col');
+              col.style.width = w + 'px';
+              cg.appendChild(col);
+            });
+            clone.appendChild(cg);
+          }
+          const tbody = document.createElement('tbody');
+          const rowClone = row.cloneNode(true);
+          // Pin each cell's width directly too, in case of colspan/rowspan
+          // mismatches between the reference row and this row.
+          Array.from(rowClone.children).forEach((cell, ci) => {
+            if (colWidths[ci] != null) {
+              cell.style.width = colWidths[ci] + 'px';
+            }
+          });
+          tbody.appendChild(rowClone);
+          clone.appendChild(tbody);
+          return clone;
+        });
+      }
+    }
+    if (tag === 'OL' || tag === 'UL') {
+      const items = Array.from(el.children).filter((c) => c.tagName === 'LI');
+      if (items.length > 1) {
+        return items.map((li, idx) => {
+          const clone = el.cloneNode(false);
+          if (tag === 'OL') clone.setAttribute('start', String(idx + 1));
+          clone.appendChild(li.cloneNode(true));
+          return clone;
+        });
+      }
+    }
+    return null;
+  }
+
+  // Replace any top-level TABLE/OL/UL child of a .doc-page with its
+  // row/item-level units (in place, same parent) so pagination below
+  // operates at a fine enough granularity to avoid mid-row/mid-line cuts.
+  function preprocessPageForPagination(p) {
+    Array.from(p.children).forEach((child) => {
+      const units = expandUnit(child);
+      if (units && units.length > 1) {
+        const frag = document.createDocumentFragment();
+        units.forEach((u) => frag.appendChild(u));
+        child.replaceWith(frag);
+      }
+    });
   }
 
   // Use html2canvas directly — no print preview, direct blob download
@@ -93,60 +171,101 @@
     const pageW = 210, pageH = 297;
     let first = true;
 
+    // Helper: render a single DOM element to canvas
+    const RENDER_SCALE = 2;
+    const renderEl = async (el) => {
+      return html2canvas(el, {
+        scale: RENDER_SCALE,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+        width: el.offsetWidth,
+        height: el.scrollHeight,
+        windowWidth: el.offsetWidth,
+        scrollX: 0,
+        scrollY: 0,
+      });
+    };
+
     for (const p of pages) {
       if (!first) pdf.addPage();
       first = false;
       try {
-        // Force natural height — remove min-height constraint
+        preprocessPageForPagination(p);
         p.style.minHeight = 'auto';
         p.style.height = 'auto';
         p.style.overflow = 'visible';
         p.style.pageBreakAfter = 'auto';
-        
-        const canvas = await html2canvas(p, {
-          scale: 3,
-          useCORS: true,
-          logging: false,
-          backgroundColor: '#ffffff',
-          width: p.offsetWidth || 794,
-          height: p.scrollHeight || p.offsetHeight,
-          windowWidth: p.offsetWidth || 794,
-          scrollX: 0,
-          scrollY: 0,
-        });
-        const imgData = canvas.toDataURL('image/jpeg', 0.95);
-        const imgW = pageW;
-        let imgH = (canvas.height * imgW) / canvas.width;
 
-        if (imgH <= pageH) {
-          // Fits in one page — pad to full A4 height
-          const fullPxH = Math.round((pageH / imgH) * canvas.height);
-          const padCanvas = document.createElement('canvas');
-          padCanvas.width = canvas.width;
-          padCanvas.height = fullPxH;
-          const pctx = padCanvas.getContext('2d');
-          pctx.fillStyle = '#ffffff';
-          pctx.fillRect(0, 0, padCanvas.width, padCanvas.height);
-          pctx.drawImage(canvas, 0, 0);
-          pdf.addImage(padCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, imgW, pageH);
-        } else {
-          // Content exceeds A4 — split across multiple pages
-          const totalPages = Math.ceil(imgH / pageH);
-          const fullSlicePx = Math.round((pageH / imgH) * canvas.height);
-          for (let pg = 0; pg < totalPages; pg++) {
-            if (pg > 0) pdf.addPage();
-            const sliceY = Math.round(pg * (pageH / imgH) * canvas.height);
-            const sliceH = Math.min(fullSlicePx, canvas.height - sliceY);
-            if (sliceH <= 0) continue;
-            // Always render at full page size — pad short slices with white
-            const sliceCanvas = document.createElement('canvas');
-            sliceCanvas.width = canvas.width;
-            sliceCanvas.height = fullSlicePx;
-            const ctx = sliceCanvas.getContext('2d');
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
-            ctx.drawImage(canvas, 0, sliceY, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
-            pdf.addImage(sliceCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, imgW, pageH);
+        const pw = p.offsetWidth || 794;
+        // px per mm ratio: CSS px (unscaled) → mm on page. html2canvas renders at
+        // RENDER_SCALE× resolution, so canvas pixel dimensions must be divided by
+        // RENDER_SCALE before converting, otherwise width/height end up inflated
+        // and overflow past the page's right edge (looks like content is cut off).
+        const mmPerPx = pageW / pw;
+        const pxToMm = (px) => px * mmPerPx;
+        const canvasPxToMm = (px) => (px / RENDER_SCALE) * mmPerPx;
+        // Reserve a top/bottom margin band on every PDF page. This canvas-based
+        // export path lays out content by hand (no CSS @page rule applies to
+        // canvas/jsPDF output), so without this the content used the full
+        // 297mm page height with zero top/bottom margin regardless of the
+        // 0.6in margin configured elsewhere in the app (margin atas/bawah
+        // tidak sesuai).
+        const MARGIN_MM = 0.6 * 25.4; // 0.6in in mm
+        const maxPageMmH = pageH - MARGIN_MM * 2;
+        const pageLeft = p.getBoundingClientRect().left;
+
+        // Collect direct children with their rendered heights
+        const children = Array.from(p.children);
+        let curPageMmH = 0; // mm used within the current page's content band (below top margin)
+
+        for (let ci = 0; ci < children.length; ci++) {
+          const el = children[ci];
+          // Render element
+          const canvas = await renderEl(el);
+          const elMmH = canvasPxToMm(canvas.height);
+          const elMmW = canvasPxToMm(canvas.width);
+          // Preserve the element's real left offset (page padding/margin) instead
+          // of stretching content to the full page width at x=0 — that was
+          // collapsing the left/right margins and cutting off content.
+          const offsetXmm = pxToMm(el.getBoundingClientRect().left - pageLeft);
+          const elImgData = canvas.toDataURL('image/jpeg', 0.95);
+
+          // Check if this element fits on current page
+          if (curPageMmH + elMmH > maxPageMmH && curPageMmH > 0) {
+            // Doesn't fit — add new page
+            pdf.addPage();
+            curPageMmH = 0;
+          }
+
+          // If single element is bigger than a page, it gets its own page
+          if (elMmH > maxPageMmH) {
+            // Split this large element (fallback: slice canvas)
+            const slicePxH = Math.round((maxPageMmH / elMmH) * canvas.height);
+            let y = 0;
+            let lastSliceMmH = 0;
+            while (y < canvas.height) {
+              const sh = Math.min(slicePxH, canvas.height - y);
+              const sliceC = document.createElement('canvas');
+              sliceC.width = canvas.width;
+              sliceC.height = sh;
+              const sctx = sliceC.getContext('2d');
+              sctx.fillStyle = '#ffffff';
+              sctx.fillRect(0, 0, sliceC.width, sliceC.height);
+              sctx.drawImage(canvas, 0, y, canvas.width, sh, 0, 0, canvas.width, sh);
+              const shMm = canvasPxToMm(sh);
+              pdf.addImage(sliceC.toDataURL('image/jpeg', 0.95), 'JPEG', offsetXmm, MARGIN_MM, elMmW, shMm);
+              y += sh;
+              lastSliceMmH = shMm;
+              if (y < canvas.height) pdf.addPage();
+            }
+            // Continue subsequent content right below the last slice instead of
+            // forcing an extra blank page. A fresh page will only be added later
+            // if the next element genuinely doesn't fit in the remaining space.
+            curPageMmH = lastSliceMmH;
+          } else {
+            pdf.addImage(elImgData, 'JPEG', offsetXmm, MARGIN_MM + curPageMmH, elMmW, elMmH);
+            curPageMmH += elMmH;
           }
         }
       } catch (e) {

@@ -453,16 +453,17 @@ a:hover { color: var(--primary-dark); }
     max-width: none;
     min-height: 0;
   }
-  /* Skala cetak (--print-scale) diterapkan di container pembungkus
-     (#docContainer / .app-content), BUKAN pada .doc-page itu sendiri. CSS
-     transform pada elemen yang juga menerima page-break-before:always
-     membuat Chromium salah hitung batas halaman saat print-to-PDF,
-     menyisipkan 1 halaman kosong ekstra tiap kali .doc-page berikutnya
-     dimulai. Dengan transform di container luar, setiap .doc-page tetap
-     "flat" untuk keperluan page-break. */
+  /* Skala cetak (--print-scale) HARUS pakai `zoom`, bukan `transform: scale()`.
+     `transform` hanya mengubah tampilan visual SETELAH layout dihitung —
+     ukuran kotak halaman yang dipakai Chromium untuk menghitung page-break
+     tetap memakai ukuran ASLI (sebelum discale). Akibatnya saat skala <100%
+     kontennya mengecil secara visual, tapi jumlah halaman fisik yang
+     dialokasikan tetap dihitung seolah-olah kontennya masih berukuran penuh
+     — menghasilkan banyak halaman kosong/setengah-kosong. `zoom` mengubah
+     ukuran layout SEBELUM page-break dihitung, jadi jumlah halaman fisik
+     ikut menyusut sesuai skala yang sebenarnya dipakai. */
   #docContainer, .app-content {
-    transform: scale(var(--print-scale, 1));
-    transform-origin: top left;
+    zoom: var(--print-scale, 1);
   }
   /* First page in the printed flow should not force a leading blank page.
      Using page-break-BEFORE on every .doc-page (instead of page-break-AFTER)

@@ -219,12 +219,12 @@
     const ketuaPokjawasNama = (i.ketua_pokjawas && i.ketua_pokjawas.nama) || 'SUBARIYANTO, S.Pd, M.Pd.I';
     const ketuaPokjawasNIP  = (i.ketua_pokjawas && i.ketua_pokjawas.nip) || '197002122005011004';
     const sigImg = i.tanda_tangan ? `<img class="signature-img" src="${i.tanda_tangan}" />` : '';
-    const stempelImg = i.stempel ? `<img src="${i.stempel}" style="position:absolute;top:50%;left:25%;transform:translate(-50%,-50%);max-height:110px;opacity:0.85;z-index:2;pointer-events:none;mix-blend-mode:multiply;" />` : '';
-    const ketuaTTDImg = (i.ttd_ketua_pokjawas) ? `<img class="signature-img" src="${i.ttd_ketua_pokjawas}" style="max-height:100px;position:absolute;top:-10px;left:50%;transform:translateX(-50%);z-index:1;mix-blend-mode:multiply;background:transparent;" />` : '';
+    const stempelImg = i.stempel ? `<img src="${i.stempel}" style="position:absolute;top:50%;left:calc(50% + 35px);transform:translate(-50%,-50%);max-height:110px;opacity:0.85;z-index:2;pointer-events:none;mix-blend-mode:multiply;" />` : '';
+    const ketuaTTDImg = (i.ttd_ketua_pokjawas) ? `<img class="signature-img" src="${i.ttd_ketua_pokjawas}" style="max-height:100px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1;mix-blend-mode:multiply;background:transparent;" />` : '';
     const stempelBlock = stempelImg ? `${ketuaTTDImg}${stempelImg}` : ketuaTTDImg;
 
-    const kepalaTTDImg = (i.ttd_kepala_kemenag) ? `<img class="signature-img" src="${i.ttd_kepala_kemenag}" style="max-height:100px;position:absolute;top:-10px;left:50%;transform:translateX(-50%);z-index:1;mix-blend-mode:multiply;background:transparent;" />` : '';
-    const stempelKemenagImg = i.stempel_kemenag ? `<img src="${i.stempel_kemenag}" style="position:absolute;top:50%;left:25%;transform:translate(-50%,-50%);max-height:110px;opacity:0.85;z-index:2;pointer-events:none;mix-blend-mode:multiply;" />` : '';
+    const kepalaTTDImg = (i.ttd_kepala_kemenag) ? `<img class="signature-img" src="${i.ttd_kepala_kemenag}" style="max-height:100px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1;mix-blend-mode:multiply;background:transparent;" />` : '';
+    const stempelKemenagImg = i.stempel_kemenag ? `<img src="${i.stempel_kemenag}" style="position:absolute;top:50%;left:calc(50% + 35px);transform:translate(-50%,-50%);max-height:110px;opacity:0.85;z-index:2;pointer-events:none;mix-blend-mode:multiply;" />` : '';
     const kepalaBlock = stempelKemenagImg ? `${kepalaTTDImg}${stempelKemenagImg}` : kepalaTTDImg;
 
     return `

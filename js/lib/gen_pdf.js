@@ -142,9 +142,10 @@
     let first = true;
 
     // Helper: render a single DOM element to canvas
+    const RENDER_SCALE = 2;
     const renderEl = async (el) => {
       return html2canvas(el, {
-        scale: 2,
+        scale: RENDER_SCALE,
         useCORS: true,
         logging: false,
         backgroundColor: '#ffffff',
@@ -167,9 +168,13 @@
         p.style.pageBreakAfter = 'auto';
 
         const pw = p.offsetWidth || 794;
-        // px per mm ratio: canvas px → mm on page (consistent for width, height, and offset)
+        // px per mm ratio: CSS px (unscaled) → mm on page. html2canvas renders at
+        // RENDER_SCALE× resolution, so canvas pixel dimensions must be divided by
+        // RENDER_SCALE before converting, otherwise width/height end up inflated
+        // and overflow past the page's right edge (looks like content is cut off).
         const mmPerPx = pageW / pw;
         const pxToMm = (px) => px * mmPerPx;
+        const canvasPxToMm = (px) => (px / RENDER_SCALE) * mmPerPx;
         const maxPageMmH = pageH;
         const pageLeft = p.getBoundingClientRect().left;
 
@@ -181,8 +186,8 @@
           const el = children[ci];
           // Render element
           const canvas = await renderEl(el);
-          const elMmH = pxToMm(canvas.height);
-          const elMmW = pxToMm(canvas.width);
+          const elMmH = canvasPxToMm(canvas.height);
+          const elMmW = canvasPxToMm(canvas.width);
           // Preserve the element's real left offset (page padding/margin) instead
           // of stretching content to the full page width at x=0 — that was
           // collapsing the left/right margins and cutting off content.
@@ -211,7 +216,7 @@
               sctx.fillStyle = '#ffffff';
               sctx.fillRect(0, 0, sliceC.width, sliceC.height);
               sctx.drawImage(canvas, 0, y, canvas.width, sh, 0, 0, canvas.width, sh);
-              const shMm = pxToMm(sh);
+              const shMm = canvasPxToMm(sh);
               pdf.addImage(sliceC.toDataURL('image/jpeg', 0.95), 'JPEG', offsetXmm, 0, elMmW, shMm);
               y += sh;
               lastSliceMmH = shMm;

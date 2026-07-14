@@ -223,8 +223,8 @@
     const ketuaTTDImg = (i.ttd_ketua_pokjawas) ? `<img class="signature-img" src="${i.ttd_ketua_pokjawas}" style="max-height:100px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1;mix-blend-mode:multiply;background:transparent;" />` : '';
     const stempelBlock = stempelImg ? `${ketuaTTDImg}${stempelImg}` : ketuaTTDImg;
 
-    const kepalaTTDImg = (i.ttd_kepala_kemenag) ? `<img class="signature-img" src="${i.ttd_kepala_kemenag}" style="max-height:100px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1;mix-blend-mode:multiply;background:transparent;" />` : '';
-    const stempelKemenagImg = i.stempel_kemenag ? `<img src="${i.stempel_kemenag}" style="position:absolute;top:50%;left:calc(50% + 35px);transform:translate(-50%,-50%);max-height:110px;opacity:0.85;z-index:2;pointer-events:none;mix-blend-mode:multiply;" />` : '';
+    const kepalaTTDImg = (i.ttd_kepala_kemenag) ? `<img class="signature-img" src="${i.ttd_kepala_kemenag}" style="max-height:100px;position:absolute;top:60%;left:50%;transform:translate(-50%,-50%);z-index:1;mix-blend-mode:multiply;background:transparent;" />` : '';
+    const stempelKemenagImg = i.stempel_kemenag ? `<img src="${i.stempel_kemenag}" style="position:absolute;top:60%;left:calc(50% + 55px);transform:translate(-50%,-50%);max-height:110px;opacity:0.85;z-index:2;pointer-events:none;mix-blend-mode:multiply;" />` : '';
     const kepalaBlock = stempelKemenagImg ? `${kepalaTTDImg}${stempelKemenagImg}` : kepalaTTDImg;
 
     return `
@@ -247,7 +247,7 @@
       <div style="margin-top:24px;text-align:center;">
         <div>Mengetahui,</div>
         <div>${U.escapeHtml(i.pejabat_penilai.jabatan || 'Kepala Kantor Kementerian Agama Kabupaten Jember')},</div>
-        <div style="height:80px;display:flex;align-items:center;justify-content:center;position:relative;">${kepalaBlock}</div>
+        <div style="height:100px;display:flex;align-items:center;justify-content:center;position:relative;">${kepalaBlock}</div>
         <div style="text-decoration:underline;font-weight:700;white-space:nowrap">${nbsp(i.pejabat_penilai.nama)}</div>
         <div>NIP. ${U.escapeHtml(i.pejabat_penilai.nip)}</div>
       </div>

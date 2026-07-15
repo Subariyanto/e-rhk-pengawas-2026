@@ -141,8 +141,141 @@
     });
   }
 
-  // Use html2canvas directly — no print preview, direct blob download
-  async function htmlToPdfBlob(htmlBody) {
+  // ===== Text-native PDF builder =====
+  // Renders the document as real selectable text via jsPDF's text/table APIs
+  // instead of rasterizing each element with html2canvas. Trade-off (accepted
+  // by Yanto 2026-07-15): a table row may visually split across a page break
+  // if it lands right at the edge; he adjusts margins manually via the Cetak
+  // dialog when that happens. Benefit: real searchable/selectable text, much
+  // smaller file size, and much faster generation (no per-element canvas pass).
+  function buildTextPdf(htmlBody) {
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+    const pageW = 210, pageH = 297;
+    const MARGIN_MM = 0.6 * 25.4;
+    const contentW = pageW - MARGIN_MM * 2;
+    const maxY = pageH - MARGIN_MM;
+    const LINE_H = 5.5;
+    let first = true;
+
+    const tmp = document.createElement('div');
+    tmp.innerHTML = htmlBody;
+    const pages = Array.from(tmp.querySelectorAll('.doc-page'));
+
+    function ensureSpace(y, needed) {
+      if (y + needed > maxY) { pdf.addPage(); return MARGIN_MM; }
+      return y;
+    }
+
+    function drawText(text, y, opts = {}) {
+      const { align = 'left', bold = false, size = 12, indent = 0 } = opts;
+      if (!text) return y;
+      pdf.setFont('times', bold ? 'bold' : 'normal');
+      pdf.setFontSize(size);
+      const usableW = contentW - indent;
+      const lines = pdf.splitTextToSize(text, usableW);
+      for (const line of lines) {
+        y = ensureSpace(y, LINE_H);
+        const x = align === 'center' ? pageW / 2 : MARGIN_MM + indent;
+        pdf.text(line, x, y, { align });
+        y += LINE_H;
+      }
+      return y;
+    }
+
+    function drawTable(tableEl, y) {
+      const rows = Array.from(tableEl.querySelectorAll(':scope > thead > tr, :scope > tbody > tr, :scope > tr'));
+      if (!rows.length) return y;
+      const bodyRows = rows.map((tr) => Array.from(tr.children).map((td) => td.textContent.trim()));
+      const nCols = Math.max(...bodyRows.map((r) => r.length));
+      const colW = contentW / nCols;
+      const pad = 1.5;
+      for (const row of bodyRows) {
+        pdf.setFont('times', 'normal');
+        pdf.setFontSize(10.5);
+        let rowLines = 1;
+        const wrapped = row.map((cell) => {
+          const w = pdf.splitTextToSize(String(cell || ''), colW - pad * 2);
+          rowLines = Math.max(rowLines, w.length);
+          return w;
+        });
+        const rowH = Math.max(6, rowLines * 4.2 + pad * 2);
+        y = ensureSpace(y, rowH);
+        let x = MARGIN_MM;
+        for (let ci = 0; ci < nCols; ci++) {
+          pdf.rect(x, y, colW, rowH);
+          (wrapped[ci] || []).forEach((ln, li) => pdf.text(ln, x + pad, y + pad + 3.6 + li * 4.2));
+          x += colW;
+        }
+        y += rowH;
+      }
+      return y + 2;
+    }
+
+    function drawImageBlock(imgEl, y) {
+      const src = imgEl.getAttribute('src') || '';
+      if (!src.startsWith('data:image')) return y;
+      try {
+        const cssMaxH = parseFloat(imgEl.style.maxHeight) || 60;
+        const hMm = Math.min(30, cssMaxH * 0.264583);
+        y = ensureSpace(y, hMm + 2);
+        const fmt = /png/i.test(src) ? 'PNG' : 'JPEG';
+        pdf.addImage(src, fmt, MARGIN_MM, y, hMm * 1.6, hMm);
+        y += hMm + 2;
+      } catch (e) { /* skip unreadable image */ }
+      return y;
+    }
+
+    function walkNode(node, y) {
+      Array.from(node.children).forEach((child) => {
+        const tag = child.tagName.toLowerCase();
+        if (tag === 'table') { y = drawTable(child, y + 1); return; }
+        if (tag === 'div' && child.children.length === 1 && child.querySelector(':scope > img')) {
+          y = drawImageBlock(child.querySelector('img'), y); return;
+        }
+        if (tag === 'img') { y = drawImageBlock(child, y); return; }
+        if (['h1', 'h2', 'h3', 'h4', 'h5'].includes(tag)) {
+          const style = child.getAttribute('style') || '';
+          const align = /text-align\s*:\s*center/i.test(style) ? 'center' : 'left';
+          y = drawText(child.textContent.trim(), y + 2, { align, bold: true, size: { h1: 15, h2: 14, h3: 13, h4: 12, h5: 12 }[tag] });
+          y += 1;
+          return;
+        }
+        if (tag === 'p') {
+          const style = child.getAttribute('style') || '';
+          const align = /text-align\s*:\s*center/i.test(style) ? 'center' : 'left';
+          const bold = /font-weight\s*:\s*(bold|700)/i.test(style);
+          y = drawText(child.textContent.replace(/\s+/g, ' ').trim(), y, { align, bold });
+          y += 1.5;
+          return;
+        }
+        if (tag === 'div' || tag === 'section') {
+          if (child.children.length) y = walkNode(child, y);
+          else if (child.textContent.trim()) y = drawText(child.textContent.trim(), y);
+          return;
+        }
+        if (child.textContent && child.textContent.trim() && !child.children.length) {
+          y = drawText(child.textContent.trim(), y);
+        } else if (child.children.length) {
+          y = walkNode(child, y);
+        }
+      });
+      return y;
+    }
+
+    for (const p of pages) {
+      if (!first) pdf.addPage();
+      first = false;
+      walkNode(p, MARGIN_MM);
+    }
+
+    return pdf.output('blob');
+  }
+
+  // Use html2canvas directly — no print preview, direct blob download (legacy,
+  // kept for the trial-watermark/canvas path; no longer used by the default
+  // Download PDF button as of 2026-07-15 — see buildTextPdf above).
+  async function htmlToPdfBlobCanvas(htmlBody) {
     if (window.Tier && Tier.blockExportIfTrial && Tier.blockExportIfTrial('Download PDF')) return null;
     const { jsPDF } = window.jspdf;
 
@@ -305,5 +438,17 @@
     U.downloadBlob(blob, (filename || 'eviden') + '.html');
   }
 
-  window.GenPDF = { printHTML, htmlToPdfBlob, htmlAsPrintable, buildFullHTML, watermarkCSS, watermarkHTML };
+  // Default Download PDF entry point: real text-native PDF (buildTextPdf).
+  // Falls back to the html2canvas-based renderer only if buildTextPdf throws.
+  async function htmlToPdfBlob(htmlBody) {
+    if (window.Tier && Tier.blockExportIfTrial && Tier.blockExportIfTrial('Download PDF')) return null;
+    try {
+      return buildTextPdf(htmlBody);
+    } catch (e) {
+      console.error('buildTextPdf failed, falling back to canvas renderer:', e);
+      return htmlToPdfBlobCanvas(htmlBody);
+    }
+  }
+
+  window.GenPDF = { printHTML, htmlToPdfBlob, htmlToPdfBlobCanvas, buildTextPdf, htmlAsPrintable, buildFullHTML, watermarkCSS, watermarkHTML };
 })();

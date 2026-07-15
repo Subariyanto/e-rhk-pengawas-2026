@@ -155,7 +155,7 @@
     const MARGIN_MM = 0.6 * 25.4;
     const contentW = pageW - MARGIN_MM * 2;
     const maxY = pageH - MARGIN_MM;
-    const LINE_H = 4.2; // single spacing (~12pt = 4.2mm line height)
+    const LINE_H = 4.8; // 1.15 spasi (~12pt × 1.15 = 4.8mm line height)
     let first = true;
 
     const tmp = document.createElement('div');
@@ -370,8 +370,7 @@
 
     // Ad-hoc single signature block used by most gen* functions:
     // <div style="display:flex;justify-content:center;..."><div style="width:50%;text-align:center;">...lines/img...</div></div>
-    // Rendered truly centered on the page (per Yanto 2026-07-15: signature
-    // harus center, agak kekiri dari tampilan sebelumnya yang condong ke kanan).
+    // Rendered shifted to the right (per Yanto 2026-07-15: "geser agak ke kanan").
     function isCenteredSignWrap(el) {
       if (el.tagName.toLowerCase() !== 'div') return false;
       const style = el.getAttribute('style') || '';
@@ -390,7 +389,8 @@
           return;
         }
         if (isCenteredSignWrap(child)) {
-          y = drawLinesCentered(collectLines(child.children[0]), y + 2, pageW / 2);
+          // TTD geser agak ke kanan per Yanto 2026-07-15
+          y = drawLinesCentered(collectLines(child.children[0]), y + 2, pageW * 0.62);
           return;
         }
         if (tag === 'table') { y = drawTable(child, y + 1); return; }
@@ -408,11 +408,14 @@
         if (['h1', 'h2', 'h3', 'h4', 'h5'].includes(tag)) {
           const style = child.getAttribute('style') || '';
           const align = /text-align\s*:\s*center/i.test(style) ? 'center' : 'left';
-          // Turunkan judul 2 baris sebelum, dan beri jarak 2 baris setelah judul
-          // sebelum konten di bawahnya (per Yanto 2026-07-15).
-          y += LINE_H * 2;
+          // Judul dokumen (h3): turun 2 baris sebelum.
+          // Judul paragraf (h4, h5 — A. Uraian, B. Hasil, dst): jarak ke
+          // paragraf di bawahnya 1.5 spasi (per Yanto 2026-07-15).
+          const isDocTitle = tag === 'h3';
+          y += isDocTitle ? LINE_H * 2 : LINE_H * 1.2;
           y = drawText(child.textContent.trim(), y, { align, bold: true, size: { h1: 15, h2: 14, h3: 13, h4: 12, h5: 12 }[tag] });
-          y += LINE_H * 2;
+          // After doc title: 2 baris. After sub-heading (h4/h5): 1.5 spasi.
+          y += isDocTitle ? LINE_H * 2 : LINE_H * 0.5;
           return;
         }
         if (tag === 'p') {

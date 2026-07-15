@@ -260,9 +260,21 @@
 
       const pad = 1.5;
       let headerRowH = 0;
+      // Pre-wrap header row for repeat
+      let hWrapped = null;
+      if (bodyRows.length > 0) {
+        const hRow = bodyRows[0];
+        hWrapped = hRow.map((cell, ci) => {
+          const cw = (colWmm[ci] || contentW / nCols) - pad * 2;
+          return pdf.splitTextToSize(String(cell || ''), Math.max(cw, 10));
+        });
+        headerRowH = Math.max(6, Math.max(...hWrapped.map(w => w.length)) * 4.2 + pad * 2);
+      }
+      const hasThead = !!tableEl.querySelector('thead');
+
       for (let ri = 0; ri < bodyRows.length; ri++) {
         const row = bodyRows[ri];
-        const isHeader = ri === 0 && tableEl.querySelector('thead');
+        const isHeader = ri === 0 && hasThead;
         pdf.setFont('times', isHeader ? 'bold' : 'normal');
         pdf.setFontSize(10.5);
         let rowLines = 1;
@@ -274,38 +286,35 @@
         });
         const rowH = Math.max(6, rowLines * 4.2 + pad * 2);
         if (isHeader) headerRowH = rowH;
-        y = ensureSpace(y, rowH);
-        // If page break happened for non-header row, re-draw header
-        if (!isHeader && y === MARGIN_TOP && headerRowH > 0) {
-          const hy = ensureSpace(MARGIN_TOP, headerRowH);
-          let hx = MARGIN_MM;
-          // Re-draw header row
-          const hRow = bodyRows[0];
-          const hWrapped = hRow.map((cell, ci) => {
-            const cw = (colWmm[ci] || contentW / nCols) - pad * 2;
-            return pdf.splitTextToSize(String(cell || ''), Math.max(cw, 10));
-          });
-          pdf.setFont('times', 'bold');
-          pdf.setFontSize(10.5);
-          for (let ci = 0; ci < nCols; ci++) {
-            const cw = colWmm[ci] || contentW / nCols;
-            const hCellStyle = (hRow[ci] && hRow[ci].style) ? hRow[ci].style : {};
-            const hCellCss = typeof hCellStyle.getAttribute === 'function' ? hCellStyle.getAttribute('style') || '' : '';
-            const hHasBorder = !/border\s*:\s*none/i.test(hCellCss);
-            if (hHasBorder) pdf.rect(hx, hy, cw, headerRowH);
-            (hWrapped[ci] || []).forEach((ln, li) => pdf.text(ln, hx + pad, hy + pad + 3.6 + li * 4.2));
-            hx += cw;
+        // Per-row page break: if row doesn't fit, add page + repeat header
+        if (y + rowH > maxY) {
+          pdf.addPage();
+          y = MARGIN_TOP;
+          if (!isHeader && hasThead && hWrapped) {
+            // Repeat header row on new page
+            let hx = MARGIN_MM;
+            pdf.setFont('times', 'bold');
+            pdf.setFontSize(10.5);
+            const origHeaderCells = hasThead ? Array.from(rows[0].children) : [];
+            for (let ci = 0; ci < nCols; ci++) {
+              const cw = colWmm[ci] || contentW / nCols;
+              const cellEl = origHeaderCells[ci];
+              const cellCss = cellEl ? (cellEl.getAttribute('style') || '') : '';
+              if (!/border\s*:\s*none/i.test(cellCss)) pdf.rect(hx, y, cw, headerRowH);
+              (hWrapped[ci] || []).forEach((ln, li) => pdf.text(ln, hx + pad, y + pad + 3.6 + li * 4.2));
+              hx += cw;
+            }
+            y += headerRowH;
           }
-          y = hy + headerRowH;
         }
         let x = MARGIN_MM;
         for (let ci = 0; ci < nCols; ci++) {
           const cw = colWmm[ci] || contentW / nCols;
           // Check if this cell has border:none (skip drawing rect)
-          const cellStyle = (row[ci] && row[ci].style) ? row[ci].style : {};
-          const cellCss = typeof cellStyle.getAttribute === 'function' ? cellStyle.getAttribute('style') || '' : '';
-          const hasBorder = !/border\s*:\s*none/i.test(cellCss);
-          if (hasBorder) pdf.rect(x, y, cw, rowH);
+          const origRow = rows[ri];
+          const cellEl = origRow ? origRow.children[ci] : null;
+          const cellCss = cellEl ? (cellEl.getAttribute('style') || '') : '';
+          if (!/border\s*:\s*none/i.test(cellCss)) pdf.rect(x, y, cw, rowH);
           pdf.setFont('times', isHeader ? 'bold' : 'normal');
           (wrapped[ci] || []).forEach((ln, li) => pdf.text(ln, x + pad, y + pad + 3.6 + li * 4.2));
           x += cw;

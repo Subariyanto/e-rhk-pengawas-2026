@@ -350,37 +350,88 @@
 
     // .ttd row: 2+ signature columns (e.g. Notulis kiri / Pemimpin Rapat
     // kanan) laid out side by side, each centered within its own column.
-    // Both columns are bottom-aligned: the shorter column gets top padding
-    // so that the last line (nama/NIP) of each column is at the same Y
-    // position (sejajar per Yanto 2026-07-15).
+    // Top-aligned: label jabatan ("Notulis," / "Pemimpin Rapat,") start at
+    // the same Y. Then images/space in between, then nama/NIP also aligned
+    // at the same Y across columns (per Yanto 2026-07-15: "Tulisan Notulis
+    // sejajarkan dengan Pemimpin Rapat, Garis sejajarkan dengan nama").
     function drawTtdRow(ttdEl, y) {
       const blocks = Array.from(ttdEl.querySelectorAll(':scope > .ttd-block'));
       if (!blocks.length) return y;
       const colW = contentW / blocks.length;
       const blockLines = blocks.map((b) => collectLines(b));
-      // Calculate height each column would need
-      function calcHeight(lines) {
-        let h = 0;
-        for (const line of lines) {
-          if (line.type === 'img') h += 34; // 30mm img + 2mm spacing + 2mm
-          else h += LINE_H;
+
+      // Split each column's lines into: header (text before img), img, footer (text after img)
+      function splitLines(lines) {
+        const header = [], imgs = [], footer = [];
+        let pastImg = false;
+        for (const l of lines) {
+          if (l.type === 'img') { imgs.push(l); pastImg = true; }
+          else if (pastImg) footer.push(l);
+          else header.push(l);
         }
-        return h;
+        return { header, imgs, footer };
       }
-      const heights = blockLines.map(calcHeight);
-      const maxH = Math.max(...heights);
-      // Ensure enough space for the tallest column
-      y = ensureSpace(y, maxH + 4);
+
+      const splits = blockLines.map(splitLines);
+      // Max image height across columns (for uniform spacing)
+      const imgH = Math.max(...splits.map(s => s.imgs.length > 0 ? 32 : 0));
+      // Max header lines
+      const maxHeaderLines = Math.max(...splits.map(s => s.header.length));
+      // Max footer lines
+      const maxFooterLines = Math.max(...splits.map(s => s.footer.length));
+      const totalH = maxHeaderLines * LINE_H + imgH + maxFooterLines * LINE_H + 4;
+      y = ensureSpace(y, totalH);
       const startY = y;
-      let maxBottom = y;
-      blockLines.forEach((lines, i) => {
+
+      blocks.forEach((b, i) => {
         const colCenterX = MARGIN_MM + colW * i + colW / 2;
-        // Bottom-align: offset shorter columns down
-        const colOffset = maxH - heights[i];
-        const endY = drawLinesCentered(lines, startY + colOffset, colCenterX);
-        maxBottom = Math.max(maxBottom, endY);
+        const { header, imgs, footer } = splits[i];
+        // Draw header lines (label jabatan) top-aligned
+        let cy = startY;
+        for (const line of header) {
+          pdf.setFont('times', line.bold ? 'bold' : 'normal');
+          pdf.setFontSize(12);
+          pdf.text(line.text, colCenterX, cy, { align: 'center' });
+          cy += LINE_H;
+        }
+        // Advance past header section to aligned img zone
+        const imgStartY = startY + maxHeaderLines * LINE_H;
+        // Draw images (TTD) if any
+        if (imgs.length) {
+          for (const img of imgs) {
+            const src = img.el.getAttribute('src') || '';
+            if (!src.startsWith('data:image')) continue;
+            try {
+              const maxImgH = 28, maxImgW = 50;
+              let hMm = maxImgH, wMm = maxImgW;
+              const natW = parseInt(img.el.getAttribute('width')) || img.el.naturalWidth || 0;
+              const natH = parseInt(img.el.getAttribute('height')) || img.el.naturalHeight || 0;
+              if (natW && natH) {
+                const ratio = natW / natH;
+                if (ratio > 1) { wMm = Math.min(maxImgW, maxImgH * ratio); hMm = wMm / ratio; }
+                else { hMm = maxImgH; wMm = maxImgH * ratio; }
+              }
+              pdf.addImage(src, /png/i.test(src) ? 'PNG' : 'JPEG', colCenterX - wMm / 2, imgStartY, wMm, hMm);
+            } catch (e) { /* skip */ }
+          }
+        } else {
+          // No image: draw a line (________________) centered in the img zone
+          const lineY = imgStartY + imgH / 2;
+          pdf.setFont('times', 'normal');
+          pdf.setFontSize(12);
+          pdf.text('________________', colCenterX, lineY, { align: 'center' });
+        }
+        // Draw footer lines (nama/NIP) aligned across columns
+        const footerStartY = imgStartY + imgH + 2;
+        let fy = footerStartY;
+        for (const line of footer) {
+          pdf.setFont('times', line.bold ? 'bold' : 'normal');
+          pdf.setFontSize(12);
+          pdf.text(line.text, colCenterX, fy, { align: 'center' });
+          fy += LINE_H;
+        }
       });
-      return maxBottom + 2;
+      return startY + totalH;
     }
 
     // Ad-hoc single signature block used by most gen* functions:

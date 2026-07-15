@@ -204,14 +204,49 @@
       if (!rows.length) return y;
       const bodyRows = rows.map((tr) => Array.from(tr.children).map((td) => td.textContent.trim()));
       const nCols = Math.max(...bodyRows.map((r) => r.length));
-      const colW = contentW / nCols;
+
+      // Smart column widths: use HTML col widths if available, else auto-size
+      const headerCells = rows[0] ? Array.from(rows[0].children) : [];
+      let colWidths = [];
+      // Try to read width hints from th/td style attributes
+      if (headerCells.length === nCols) {
+        colWidths = headerCells.map(cell => {
+          const style = cell.getAttribute('style') || '';
+          const wMatch = style.match(/width\s*:\s*(\d+)\s*px/i);
+          return wMatch ? parseInt(wMatch[1]) : 0;
+        });
+      }
+      // If we have pixel widths, convert proportionally to mm
+      const totalPx = colWidths.reduce((a, b) => a + b, 0);
+      let colWmm;
+      if (totalPx > 0) {
+        colWmm = colWidths.map(px => px > 0 ? (px / totalPx) * contentW : contentW / nCols);
+      } else {
+        // Auto: measure max content width per column, distribute proportionally
+        pdf.setFontSize(10.5);
+        const maxW = bodyRows[0].map(() => 10);
+        bodyRows.forEach(row => {
+          row.forEach((cell, ci) => {
+            if (ci < nCols) {
+              const w = pdf.getTextWidth(String(cell || '').substring(0, 40)) + 4;
+              maxW[ci] = Math.max(maxW[ci], w);
+            }
+          });
+        });
+        const sumW = maxW.reduce((a, b) => a + b, 0);
+        colWmm = maxW.map(w => (w / sumW) * contentW);
+      }
+
       const pad = 1.5;
-      for (const row of bodyRows) {
-        pdf.setFont('times', 'normal');
+      for (let ri = 0; ri < bodyRows.length; ri++) {
+        const row = bodyRows[ri];
+        const isHeader = ri === 0 && tableEl.querySelector('thead');
+        pdf.setFont('times', isHeader ? 'bold' : 'normal');
         pdf.setFontSize(10.5);
         let rowLines = 1;
-        const wrapped = row.map((cell) => {
-          const w = pdf.splitTextToSize(String(cell || ''), colW - pad * 2);
+        const wrapped = row.map((cell, ci) => {
+          const cw = (colWmm[ci] || contentW / nCols) - pad * 2;
+          const w = pdf.splitTextToSize(String(cell || ''), Math.max(cw, 10));
           rowLines = Math.max(rowLines, w.length);
           return w;
         });
@@ -219,13 +254,17 @@
         y = ensureSpace(y, rowH);
         let x = MARGIN_MM;
         for (let ci = 0; ci < nCols; ci++) {
-          pdf.rect(x, y, colW, rowH);
+          const cw = colWmm[ci] || contentW / nCols;
+          pdf.rect(x, y, cw, rowH);
+          pdf.setFont('times', isHeader ? 'bold' : 'normal');
           (wrapped[ci] || []).forEach((ln, li) => pdf.text(ln, x + pad, y + pad + 3.6 + li * 4.2));
-          x += colW;
+          x += cw;
         }
         y += rowH;
       }
-      return y + 2;
+      // Jarak 1 spasi setelah tabel ke paragraf berikutnya (per Yanto 2026-07-15)
+      y += LINE_H;
+      return y;
     }
 
     function drawImageBlock(imgEl, y) {
@@ -518,7 +557,17 @@
           const isDocTitle = tag === 'h2';
           const isSubTitle = tag === 'h3' || tag === 'h4' || tag === 'h5';
           y += isDocTitle ? LINE_H * 2 : LINE_H * 1.5;
-          y = drawText(child.textContent.trim(), y, { align, bold: true, size: { h1: 15, h2: 14, h3: 13, h4: 12, h5: 12 }[tag] });
+          // Handle <br/> in headings — render each part on separate line
+          const htmlContent = child.innerHTML;
+          const parts = htmlContent.replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '').trim().split('\n').map(s => s.trim()).filter(Boolean);
+          const fontSize = { h1: 15, h2: 14, h3: 13, h4: 12, h5: 12 }[tag];
+          parts.forEach(part => {
+            y = ensureSpace(y, LINE_H);
+            pdf.setFont('times', 'bold');
+            pdf.setFontSize(fontSize);
+            pdf.text(part, align === 'center' ? pageW / 2 : MARGIN_MM, y, { align });
+            y += LINE_H;
+          });
           // After BAB title: 2 spasi. After sub-heading: 1.5 spasi.
           y += isDocTitle ? LINE_H * 2 : LINE_H * 1.5;
           return;

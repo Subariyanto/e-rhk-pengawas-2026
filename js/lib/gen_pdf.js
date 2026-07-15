@@ -318,39 +318,62 @@
     // never look gepeng/stretched (per Yanto 2026-07-15). We determine the
     // natural width:height ratio from the base64 data via a temporary Image.
     function drawLinesCentered(lines, y, centerX) {
-      for (const line of lines) {
+      // Group consecutive images together for overlapping render (stempel + TTD)
+      let i = 0;
+      while (i < lines.length) {
+        const line = lines[i];
         if (line.type === 'img') {
-          const src = line.el.getAttribute('src') || '';
-          if (!src.startsWith('data:image')) continue;
-          try {
-            // Use fixed generous height then derive width from aspect ratio.
-            // If we can't determine aspect ratio, fall back to 30×50.
-            const maxH = 30; // mm — generous vertical space
-            const maxW = 55; // mm — max horizontal space
+          // Collect consecutive images
+          const imgGroup = [];
+          while (i < lines.length && lines[i].type === 'img') {
+            imgGroup.push(lines[i]);
+            i++;
+          }
+          // Determine image dimensions
+          const imgData = imgGroup.map(img => {
+            const src = img.el.getAttribute('src') || '';
+            if (!src.startsWith('data:image')) return null;
+            const maxH = 30, maxW = 55;
             let hMm = maxH, wMm = maxW;
-            // Try to get natural dimensions from the img element attributes
-            const natW = parseInt(line.el.getAttribute('width')) || line.el.naturalWidth || 0;
-            const natH = parseInt(line.el.getAttribute('height')) || line.el.naturalHeight || 0;
+            const natW = parseInt(img.el.getAttribute('width')) || img.el.naturalWidth || 0;
+            const natH = parseInt(img.el.getAttribute('height')) || img.el.naturalHeight || 0;
             if (natW && natH) {
               const ratio = natW / natH;
-              if (ratio > 1) { // landscape signature
-                wMm = Math.min(maxW, maxH * ratio);
-                hMm = wMm / ratio;
-              } else { // portrait or square
-                hMm = maxH;
-                wMm = maxH * ratio;
-              }
+              if (ratio > 1) { wMm = Math.min(maxW, maxH * ratio); hMm = wMm / ratio; }
+              else { hMm = maxH; wMm = maxH * ratio; }
             }
-            y = ensureSpace(y, hMm + 2);
-            pdf.addImage(src, /png/i.test(src) ? 'PNG' : 'JPEG', centerX - wMm / 2, y, wMm, hMm);
-            y += hMm + 2;
-          } catch (e) { /* skip unreadable image */ }
+            // Detect stempel: has opacity or mix-blend-mode in style
+            const style = img.el.getAttribute('style') || '';
+            const isStempel = /opacity/i.test(style) || (/mix-blend-mode/i.test(style) && /pointer-events\s*:\s*none/i.test(style));
+            return { src, hMm, wMm, isStempel, format: /png/i.test(src) ? 'PNG' : 'JPEG' };
+          }).filter(Boolean);
+          if (!imgData.length) continue;
+          const maxImgH = Math.max(...imgData.map(d => d.hMm));
+          y = ensureSpace(y, maxImgH + 2);
+          if (imgData.length >= 2) {
+            // Multiple images: stempel offset to left, TTD centered
+            const ttd = imgData.find(d => !d.isStempel) || imgData[0];
+            const stempel = imgData.find(d => d.isStempel);
+            // Draw TTD centered
+            try { pdf.addImage(ttd.src, ttd.format, centerX - ttd.wMm / 2, y, ttd.wMm, ttd.hMm); } catch(e) {}
+            // Draw stempel overlapping to the left (touching 1/4 of TTD)
+            if (stempel) {
+              const stempelX = centerX - ttd.wMm / 2 - stempel.wMm * 0.75;
+              try { pdf.addImage(stempel.src, stempel.format, stempelX, y, stempel.wMm, stempel.hMm); } catch(e) {}
+            }
+          } else {
+            // Single image: draw centered
+            const d = imgData[0];
+            try { pdf.addImage(d.src, d.format, centerX - d.wMm / 2, y, d.wMm, d.hMm); } catch(e) {}
+          }
+          y += maxImgH + 2;
         } else {
           y = ensureSpace(y, LINE_H);
           pdf.setFont('times', line.bold ? 'bold' : 'normal');
           pdf.setFontSize(12);
           pdf.text(line.text, centerX, y, { align: 'center' });
           y += LINE_H;
+          i++;
         }
       }
       return y;

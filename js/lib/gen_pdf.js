@@ -218,8 +218,6 @@
       try {
         const cssMaxH = parseFloat(imgEl.style.maxHeight) || 60;
         const hMm = Math.min(30, cssMaxH * 0.264583);
-        // Foto documentasi: turunkan 3 baris sebelum gambar (per Yanto 2026-07-15)
-        y += LINE_H * 3;
         y = ensureSpace(y, hMm + 2);
         const fmt = /png/i.test(src) ? 'PNG' : 'JPEG';
         pdf.addImage(src, fmt, MARGIN_MM, y, hMm * 1.6, hMm);
@@ -257,17 +255,19 @@
     }
 
     // Draw flattened lines centered around centerX (mm), returns new y.
-    // Signature images are rendered at original aspect ratio (taller) per
-    // Yanto's request 2026-07-15 to preserve the natural vertical proportion.
+    // Signature images are rendered at generous vertical size to preserve
+    // the natural tall proportion of handwritten signatures (per Yanto:
+    // "pertahankan bentuk asli, jangan gepeng").
     function drawLinesCentered(lines, y, centerX) {
       for (const line of lines) {
         if (line.type === 'img') {
           const src = line.el.getAttribute('src') || '';
           if (!src.startsWith('data:image')) continue;
           try {
-            // Render signature at generous size to preserve vertical stretch
-            const hMm = 22; // ~80px at print scale, preserves natural height
-            const wMm = 48; // ~180px max-width
+            // Render signature tall: 30mm height × 50mm width preserves
+            // the natural vertical stretch of a handwritten signature.
+            const hMm = 30;
+            const wMm = 50;
             y = ensureSpace(y, hMm + 2);
             pdf.addImage(src, /png/i.test(src) ? 'PNG' : 'JPEG', centerX - wMm / 2, y, wMm, hMm);
             y += hMm + 2;
@@ -320,14 +320,19 @@
 
     // .ttd row: 2+ signature columns (e.g. Notulis kiri / Pemimpin Rapat
     // kanan) laid out side by side, each centered within its own column.
+    // Both columns start at the SAME y position (sejajar) per Yanto 2026-07-15.
     function drawTtdRow(ttdEl, y) {
       const blocks = Array.from(ttdEl.querySelectorAll(':scope > .ttd-block'));
       if (!blocks.length) return y;
       const colW = contentW / blocks.length;
+      // First pass: collect lines for each block
+      const blockLines = blocks.map((b) => collectLines(b));
+      // Calculate max height needed across all columns so they align vertically
+      const startY = y;
       let maxBottom = y;
-      blocks.forEach((b, i) => {
+      blockLines.forEach((lines, i) => {
         const colCenterX = MARGIN_MM + colW * i + colW / 2;
-        const endY = drawLinesCentered(collectLines(b), y, colCenterX);
+        const endY = drawLinesCentered(lines, startY, colCenterX);
         maxBottom = Math.max(maxBottom, endY);
       });
       return maxBottom + 2;

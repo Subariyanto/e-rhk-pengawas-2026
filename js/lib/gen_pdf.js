@@ -155,7 +155,7 @@
     const MARGIN_MM = 0.6 * 25.4;
     const contentW = pageW - MARGIN_MM * 2;
     const maxY = pageH - MARGIN_MM;
-    const LINE_H = 5.5;
+    const LINE_H = 4.2; // single spacing (~12pt = 4.2mm line height)
     let first = true;
 
     const tmp = document.createElement('div');
@@ -168,15 +168,31 @@
     }
 
     function drawText(text, y, opts = {}) {
-      const { align = 'left', bold = false, size = 12, indent = 0 } = opts;
+      const { align = 'left', bold = false, size = 12, indent = 0, justify = false } = opts;
       if (!text) return y;
       pdf.setFont('times', bold ? 'bold' : 'normal');
       pdf.setFontSize(size);
       const usableW = contentW - indent;
       const lines = pdf.splitTextToSize(text, usableW);
-      for (const line of lines) {
+      for (let li = 0; li < lines.length; li++) {
+        const line = lines[li];
         y = ensureSpace(y, LINE_H);
         const x = align === 'center' ? pageW / 2 : MARGIN_MM + indent;
+        // Justify: spread words evenly across usableW (except last line)
+        if (justify && align !== 'center' && li < lines.length - 1) {
+          const words = line.split(/\s+/);
+          if (words.length > 1) {
+            const totalTextW = pdf.getTextWidth(words.join(''));
+            const extraSpace = (usableW - totalTextW) / (words.length - 1);
+            let cx = MARGIN_MM + indent;
+            for (let wi = 0; wi < words.length; wi++) {
+              pdf.text(words[wi], cx, y);
+              cx += pdf.getTextWidth(words[wi]) + extraSpace;
+            }
+            y += LINE_H;
+            continue;
+          }
+        }
         pdf.text(line, x, y, { align });
         y += LINE_H;
       }
@@ -404,11 +420,9 @@
           const align = /text-align\s*:\s*center/i.test(style) ? 'center' : 'left';
           const bold = /font-weight\s*:\s*(bold|700)/i.test(style);
           const cls = child.className || '';
-          // "Anda dapat mengubah link ini..." — font 12pt same as rest,
-          // respect right margin (already handled by drawText's usableW)
-          // + remove text-muted small styling difference
-          const fontSize = /\bsmall\b/.test(cls) ? 12 : 12;
-          y = drawText(child.textContent.replace(/\s+/g, ' ').trim(), y, { align, bold, size: fontSize });
+          const fontSize = 12;
+          // Paragraf rata kiri-kanan (justify) per Yanto 2026-07-15
+          y = drawText(child.textContent.replace(/\s+/g, ' ').trim(), y, { align, bold, size: fontSize, justify: align !== 'center' });
           y += 1.5;
           return;
         }

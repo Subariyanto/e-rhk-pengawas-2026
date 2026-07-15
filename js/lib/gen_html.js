@@ -227,6 +227,33 @@
     const stempelKemenagImg = i.stempel_kemenag ? `<img src="${i.stempel_kemenag}" style="position:absolute;top:50%;left:calc(50% - 60px);transform:translate(-50%,-50%);max-height:110px;opacity:0.85;z-index:2;pointer-events:none;mix-blend-mode:multiply;" />` : '';
     const kepalaBlock = stempelKemenagImg ? `${kepalaTTDImg}${stempelKemenagImg}` : kepalaTTDImg;
 
+    // Jika pembuat laporan = Ketua Pokjawas (nama sama), cukup 2 TTD:
+    // Mengetahui Kepala Kemenag di kiri, Ketua Pokjawas di kanan.
+    // Per Yanto 2026-07-15.
+    const isKetuaPokjawas = ketuaPokjawasNama.trim().toLowerCase() === (i.pegawai.nama || '').trim().toLowerCase();
+
+    if (isKetuaPokjawas) {
+      return `
+        <div class="ttd" style="margin-top:36px;">
+          <div class="ttd-block">
+            <div>Mengetahui,</div>
+            <div>${U.escapeHtml(i.pejabat_penilai.jabatan || 'Kepala Kantor Kementerian Agama Kabupaten Jember')},</div>
+            <div style="height:80px;display:flex;align-items:center;justify-content:center;position:relative;">${kepalaBlock}</div>
+            <div style="text-decoration:underline;font-weight:700;white-space:nowrap">${nbsp(i.pejabat_penilai.nama)}</div>
+            <div>NIP. ${U.escapeHtml(i.pejabat_penilai.nip)}</div>
+          </div>
+          <div class="ttd-block" style="padding-right:40px;">
+            <div>${nbsp(kota + ', ' + tanggal)}</div>
+            <div>Ketua Pokjawas Madrasah,</div>
+            <div style="height:80px;display:flex;align-items:center;justify-content:center;position:relative;">${stempelBlock}</div>
+            <div style="text-decoration:underline;font-weight:700">${nbsp(ketuaPokjawasNama)}</div>
+            <div>NIP. ${U.escapeHtml(ketuaPokjawasNIP)}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Default: 3 TTD (Ketua kiri, Pengawas kanan, Mengetahui bawah)
     return `
       <div style="margin-top:24px;text-align:center;">
         <div style="display:inline-block;vertical-align:top;text-align:center;width:45%;margin-right:10px;">

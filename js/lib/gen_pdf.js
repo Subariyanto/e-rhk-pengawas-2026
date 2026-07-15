@@ -212,18 +212,25 @@
       // Smart column widths: use HTML col widths if available, else auto-size
       const headerCells = rows[0] ? Array.from(rows[0].children) : [];
       let colWidths = [];
-      // Try to read width hints from th/td style attributes
+      let hasPct = false;
+      // Try to read width hints from th/td style attributes (px or %)
       if (headerCells.length === nCols) {
         colWidths = headerCells.map(cell => {
           const style = cell.getAttribute('style') || '';
           const wMatch = style.match(/width\s*:\s*(\d+)\s*px/i);
-          return wMatch ? parseInt(wMatch[1]) : 0;
+          if (wMatch) return parseInt(wMatch[1]);
+          const pctMatch = style.match(/width\s*:\s*(\d+)\s*%/i);
+          if (pctMatch) { hasPct = true; return parseInt(pctMatch[1]); }
+          return 0;
         });
       }
       // If we have pixel widths, convert proportionally to mm
       const totalPx = colWidths.reduce((a, b) => a + b, 0);
       let colWmm;
-      if (totalPx > 0) {
+      if (hasPct) {
+        // Percentage widths: convert directly to mm of contentW
+        colWmm = colWidths.map(pct => pct > 0 ? (pct / 100) * contentW : contentW / nCols);
+      } else if (totalPx > 0) {
         colWmm = colWidths.map(px => px > 0 ? (px / totalPx) * contentW : contentW / nCols);
       } else {
         // Auto: measure max content width per column, distribute proportionally

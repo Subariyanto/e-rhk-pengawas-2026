@@ -991,14 +991,16 @@
   // Falls back to the html2canvas-based renderer only if buildTextPdf throws.
   async function htmlToPdfBlob(htmlBody) {
     if (window.Tier && Tier.blockExportIfTrial && Tier.blockExportIfTrial('Download PDF')) return null;
+    // Use html2canvas-based renderer as primary — it matches the browser preview exactly.
+    // Text-native buildTextPdf is maintained as fallback for smaller file size.
     try {
-      console.log('[GenPDF] Using text-native buildTextPdf...');
-      const blob = buildTextPdf(htmlBody);
-      console.log('[GenPDF] buildTextPdf succeeded, blob size:', blob.size);
+      console.log('[GenPDF] Using canvas renderer (html2canvas) for exact preview match...');
+      const blob = await htmlToPdfBlobCanvas(htmlBody);
+      console.log('[GenPDF] Canvas renderer succeeded, blob size:', blob.size);
       return blob;
     } catch (e) {
-      console.error('[GenPDF] buildTextPdf failed, falling back to canvas renderer:', e);
-      return htmlToPdfBlobCanvas(htmlBody);
+      console.error('[GenPDF] Canvas renderer failed, falling back to text-native:', e);
+      return buildTextPdf(htmlBody);
     }
   }
 

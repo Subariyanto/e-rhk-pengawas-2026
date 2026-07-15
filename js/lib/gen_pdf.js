@@ -356,9 +356,10 @@
             const stempel = imgData.find(d => d.isStempel);
             // Draw TTD centered
             try { pdf.addImage(ttd.src, ttd.format, centerX - ttd.wMm / 2, y, ttd.wMm, ttd.hMm); } catch(e) {}
-            // Draw stempel overlapping to the left (touching 1/4 of TTD)
+            // Draw stempel overlapping from the right side of TTD
+            // (menyentuh 1/4 tanda tangan dari kanan) per Yanto 2026-07-15
             if (stempel) {
-              const stempelX = centerX - ttd.wMm / 2 - stempel.wMm * 0.75;
+              const stempelX = centerX - ttd.wMm / 2 - stempel.wMm + (ttd.wMm * 0.25);
               try { pdf.addImage(stempel.src, stempel.format, stempelX, y, stempel.wMm, stempel.hMm); } catch(e) {}
             }
           } else {
@@ -529,10 +530,13 @@
         // Pengesahan-style TTD: div with text-align:center containing
         // inline-block children (multi-column signature layout)
         if (tag === 'div' && /text-align\s*:\s*center/i.test(child.getAttribute('style') || '') && child.querySelectorAll(':scope > div[style*="inline-block"]').length >= 2) {
-          // Treat as dual-column TTD row
+          // Treat as dual-column TTD row — top-aligned (sejajar)
           const cols = Array.from(child.querySelectorAll(':scope > div[style*="inline-block"]'));
           const colW = contentW / cols.length;
-          const colLines = cols.map(c => collectLines(c));
+          const colLines = cols.map(c => {
+            // Filter out nbsp-only lines so columns align properly
+            return collectLines(c).filter(l => !(l.type === 'text' && /^[\s\u00a0]*$/.test(l.text)));
+          });
           // Calculate max height
           function calcColH(lines) {
             let h = 0;
@@ -550,8 +554,9 @@
           return;
         }
         // Single-column "Mengetahui" TTD block (no inline-block, just center text)
+        // Per Yanto 2026-07-15: naikkan 4 baris (reduce gap above)
         if (tag === 'div' && /text-align\s*:\s*center/i.test(child.getAttribute('style') || '') && /margin-top/i.test(child.getAttribute('style') || '') && child.querySelector('div[style*="underline"]')) {
-          y = drawLinesCentered(collectLines(child), y + 2, pageW / 2);
+          y = drawLinesCentered(collectLines(child), y - LINE_H * 2, pageW / 2);
           return;
         }
         if (tag === 'div' && child.classList && child.classList.contains('ttd')) {

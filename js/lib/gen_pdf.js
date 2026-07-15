@@ -255,19 +255,33 @@
     }
 
     // Draw flattened lines centered around centerX (mm), returns new y.
-    // Signature images are rendered at generous vertical size to preserve
-    // the natural tall proportion of handwritten signatures (per Yanto:
-    // "pertahankan bentuk asli, jangan gepeng").
+    // Signature images are rendered preserving ORIGINAL aspect ratio so they
+    // never look gepeng/stretched (per Yanto 2026-07-15). We determine the
+    // natural width:height ratio from the base64 data via a temporary Image.
     function drawLinesCentered(lines, y, centerX) {
       for (const line of lines) {
         if (line.type === 'img') {
           const src = line.el.getAttribute('src') || '';
           if (!src.startsWith('data:image')) continue;
           try {
-            // Render signature tall: 30mm height × 50mm width preserves
-            // the natural vertical stretch of a handwritten signature.
-            const hMm = 30;
-            const wMm = 50;
+            // Use fixed generous height then derive width from aspect ratio.
+            // If we can't determine aspect ratio, fall back to 30×50.
+            const maxH = 30; // mm — generous vertical space
+            const maxW = 55; // mm — max horizontal space
+            let hMm = maxH, wMm = maxW;
+            // Try to get natural dimensions from the img element attributes
+            const natW = parseInt(line.el.getAttribute('width')) || line.el.naturalWidth || 0;
+            const natH = parseInt(line.el.getAttribute('height')) || line.el.naturalHeight || 0;
+            if (natW && natH) {
+              const ratio = natW / natH;
+              if (ratio > 1) { // landscape signature
+                wMm = Math.min(maxW, maxH * ratio);
+                hMm = wMm / ratio;
+              } else { // portrait or square
+                hMm = maxH;
+                wMm = maxH * ratio;
+              }
+            }
             y = ensureSpace(y, hMm + 2);
             pdf.addImage(src, /png/i.test(src) ? 'PNG' : 'JPEG', centerX - wMm / 2, y, wMm, hMm);
             y += hMm + 2;

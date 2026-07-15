@@ -229,7 +229,17 @@
       let colWmm;
       if (hasPct) {
         // Percentage widths: convert directly to mm of contentW
-        colWmm = colWidths.map(pct => pct > 0 ? (pct / 100) * contentW : contentW / nCols);
+        // If nCols === 2 and only col1 has explicit %, col2 fills remaining
+        colWmm = colWidths.map((pct, idx) => {
+          if (pct > 0) return (pct / 100) * contentW;
+          // Zero-width: if it's the last column and other columns have explicit %,
+          // fill remaining space to right margin
+          if (idx === nCols - 1) {
+            const used = colWidths.slice(0, idx).reduce((s, w) => s + (w > 0 ? (w / 100) * contentW : 0), 0);
+            return Math.max(contentW - used, 30);
+          }
+          return contentW / nCols;
+        });
       } else if (totalPx > 0) {
         colWmm = colWidths.map(px => px > 0 ? (px / totalPx) * contentW : contentW / nCols);
       } else {
@@ -594,7 +604,7 @@
           const align = /text-align\s*:\s*center/i.test(style) ? 'center' : 'left';
           // Judul BAB (h2): turun 2 baris sebelum + 2 baris setelah.
           // Sub judul (h3, h4, h5 — A. Latar Belakang, dst): jarak ke
-          // paragraf di bawahnya 1.5 spasi (per Yanto 2026-07-15).
+          // paragraf di bawahnya 1 spasi (per Yanto 2026-07-15).
           const isDocTitle = tag === 'h2';
           const isSubTitle = tag === 'h3' || tag === 'h4' || tag === 'h5';
           y += isDocTitle ? LINE_H * 2 : LINE_H * 1.5;
@@ -609,8 +619,8 @@
             pdf.text(part, align === 'center' ? pageW / 2 : MARGIN_MM, y, { align });
             y += LINE_H;
           });
-          // After BAB title: 2 spasi. After sub-heading: 1.5 spasi.
-          y += isDocTitle ? LINE_H * 2 : LINE_H * 1.5;
+          // After BAB title: 2 spasi. After sub-heading: 1 spasi.
+          y += isDocTitle ? LINE_H * 2 : LINE_H;
           return;
         }
         if (tag === 'p') {

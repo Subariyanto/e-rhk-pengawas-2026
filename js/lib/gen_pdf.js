@@ -155,7 +155,7 @@
     const MARGIN_MM = 0.6 * 25.4;
     const contentW = pageW - MARGIN_MM * 2;
     const maxY = pageH - MARGIN_MM;
-    const LINE_H = 4.8; // 1.15 spasi (~12pt × 1.15 = 4.8mm line height)
+    const LINE_H = 6.0; // 1.5 spasi (~12pt × 1.5 = 6.0mm line height) per Yanto 2026-07-15
     let first = true;
 
     const tmp = document.createElement('div');
@@ -512,14 +512,15 @@
         if (['h1', 'h2', 'h3', 'h4', 'h5'].includes(tag)) {
           const style = child.getAttribute('style') || '';
           const align = /text-align\s*:\s*center/i.test(style) ? 'center' : 'left';
-          // Judul dokumen (h2, h3): turun 2 baris sebelum + 2 baris setelah.
-          // Judul paragraf (h4, h5 — A. Uraian, B. Hasil, dst): jarak ke
+          // Judul BAB (h2): turun 2 baris sebelum + 2 baris setelah.
+          // Sub judul (h3, h4, h5 — A. Latar Belakang, dst): jarak ke
           // paragraf di bawahnya 1.5 spasi (per Yanto 2026-07-15).
-          const isDocTitle = tag === 'h2' || tag === 'h3';
-          y += isDocTitle ? LINE_H * 2 : LINE_H * 1.2;
+          const isDocTitle = tag === 'h2';
+          const isSubTitle = tag === 'h3' || tag === 'h4' || tag === 'h5';
+          y += isDocTitle ? LINE_H * 2 : LINE_H * 1.5;
           y = drawText(child.textContent.trim(), y, { align, bold: true, size: { h1: 15, h2: 14, h3: 13, h4: 12, h5: 12 }[tag] });
-          // After doc title: 2 baris. After sub-heading (h4/h5): 1.5 spasi.
-          y += isDocTitle ? LINE_H * 2 : LINE_H * 0.5;
+          // After BAB title: 2 spasi. After sub-heading: 1.5 spasi.
+          y += isDocTitle ? LINE_H * 2 : LINE_H * 1.5;
           return;
         }
         if (tag === 'p') {
@@ -558,9 +559,112 @@
       return y;
     }
 
+    // ===== Cover page renderer =====
+    function drawCoverPage(pageEl) {
+      // Vertically distribute cover elements across the page
+      const titleEl = pageEl.querySelector('.cover-title');
+      const subEl = pageEl.querySelector('.cover-sub');
+      const idEl = pageEl.querySelector('.cover-id');
+      const footEl = pageEl.querySelector('.cover-foot');
+      let y = MARGIN_MM + 40; // start ~40mm from top
+      if (titleEl) {
+        pdf.setFont('times', 'bold');
+        pdf.setFontSize(18);
+        pdf.text(titleEl.textContent.trim(), pageW / 2, y, { align: 'center' });
+        y += 14;
+      }
+      if (subEl) {
+        pdf.setFont('times', 'bold');
+        pdf.setFontSize(14);
+        const subLines = subEl.innerHTML.replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '').trim().split('\n');
+        subLines.forEach(line => {
+          pdf.text(line.trim(), pageW / 2, y, { align: 'center' });
+          y += 8;
+        });
+        y += 20;
+      }
+      if (idEl) {
+        y = Math.max(y, pageH * 0.4); // at least 40% down
+        pdf.setFont('times', 'normal');
+        pdf.setFontSize(12);
+        Array.from(idEl.children).forEach(div => {
+          const style = div.getAttribute('style') || '';
+          const bold = /font-weight\s*:\s*(bold|700)/i.test(style);
+          pdf.setFont('times', bold ? 'bold' : 'normal');
+          pdf.text(div.textContent.trim(), pageW / 2, y, { align: 'center' });
+          y += LINE_H;
+        });
+        y += 30;
+      }
+      if (footEl) {
+        y = Math.max(y, pageH * 0.75); // at least 75% down
+        pdf.setFont('times', 'bold');
+        pdf.setFontSize(12);
+        Array.from(footEl.children).forEach(div => {
+          pdf.text(div.textContent.trim(), pageW / 2, y, { align: 'center' });
+          y += LINE_H;
+        });
+      }
+    }
+
+    // ===== Daftar Isi renderer (dot-leader, no table) =====
+    function drawDaftarIsi(pageEl) {
+      let y = MARGIN_MM;
+      // Title
+      const h2 = pageEl.querySelector('h2');
+      if (h2) {
+        y += LINE_H * 2;
+        pdf.setFont('times', 'bold');
+        pdf.setFontSize(14);
+        pdf.text(h2.textContent.trim(), pageW / 2, y, { align: 'center' });
+        y += LINE_H * 2;
+      }
+      // Items from table rows or direct items
+      const rows = pageEl.querySelectorAll('table tr');
+      pdf.setFontSize(12);
+      rows.forEach(tr => {
+        const cells = Array.from(tr.children);
+        if (cells.length < 2) return;
+        const label = cells[0].textContent.trim();
+        const pageNum = cells[1].textContent.trim();
+        const isIndented = label.startsWith('  ') || label.startsWith('\u00a0\u00a0');
+        const indent = isIndented ? 8 : 0;
+        const cleanLabel = label.trim();
+        const isBold = !isIndented;
+        pdf.setFont('times', isBold ? 'bold' : 'normal');
+        // Draw label
+        const labelX = MARGIN_MM + indent;
+        const numX = pageW - MARGIN_MM;
+        // Dot leader
+        const labelW = pdf.getTextWidth(cleanLabel);
+        const numW = pdf.getTextWidth(pageNum);
+        const dotW = pdf.getTextWidth('.');
+        const availW = contentW - indent - labelW - numW - 4;
+        const nDots = Math.max(0, Math.floor(availW / dotW));
+        const dots = '.'.repeat(nDots);
+        y = ensureSpace(y, LINE_H);
+        pdf.text(cleanLabel, labelX, y);
+        pdf.setFont('times', 'normal');
+        pdf.text(dots, labelX + labelW + 1, y);
+        pdf.text(pageNum, numX, y, { align: 'right' });
+        y += LINE_H;
+      });
+    }
+
     for (const p of pages) {
       if (!first) pdf.addPage();
       first = false;
+      // Cover page
+      if (p.classList.contains('doc-cover')) {
+        drawCoverPage(p);
+        continue;
+      }
+      // Daftar Isi detection: contains h2 with "DAFTAR ISI" text
+      const h2El = p.querySelector('h2');
+      if (h2El && /daftar isi/i.test(h2El.textContent)) {
+        drawDaftarIsi(p);
+        continue;
+      }
       walkNode(p, MARGIN_MM);
     }
 

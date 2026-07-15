@@ -350,19 +350,34 @@
 
     // .ttd row: 2+ signature columns (e.g. Notulis kiri / Pemimpin Rapat
     // kanan) laid out side by side, each centered within its own column.
-    // Both columns start at the SAME y position (sejajar) per Yanto 2026-07-15.
+    // Both columns are bottom-aligned: the shorter column gets top padding
+    // so that the last line (nama/NIP) of each column is at the same Y
+    // position (sejajar per Yanto 2026-07-15).
     function drawTtdRow(ttdEl, y) {
       const blocks = Array.from(ttdEl.querySelectorAll(':scope > .ttd-block'));
       if (!blocks.length) return y;
       const colW = contentW / blocks.length;
-      // First pass: collect lines for each block
       const blockLines = blocks.map((b) => collectLines(b));
-      // Calculate max height needed across all columns so they align vertically
+      // Calculate height each column would need
+      function calcHeight(lines) {
+        let h = 0;
+        for (const line of lines) {
+          if (line.type === 'img') h += 34; // 30mm img + 2mm spacing + 2mm
+          else h += LINE_H;
+        }
+        return h;
+      }
+      const heights = blockLines.map(calcHeight);
+      const maxH = Math.max(...heights);
+      // Ensure enough space for the tallest column
+      y = ensureSpace(y, maxH + 4);
       const startY = y;
       let maxBottom = y;
       blockLines.forEach((lines, i) => {
         const colCenterX = MARGIN_MM + colW * i + colW / 2;
-        const endY = drawLinesCentered(lines, startY, colCenterX);
+        // Bottom-align: offset shorter columns down
+        const colOffset = maxH - heights[i];
+        const endY = drawLinesCentered(lines, startY + colOffset, colCenterX);
         maxBottom = Math.max(maxBottom, endY);
       });
       return maxBottom + 2;

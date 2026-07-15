@@ -218,6 +218,8 @@
       try {
         const cssMaxH = parseFloat(imgEl.style.maxHeight) || 60;
         const hMm = Math.min(30, cssMaxH * 0.264583);
+        // Foto documentasi: turunkan 3 baris sebelum gambar (per Yanto 2026-07-15)
+        y += LINE_H * 3;
         y = ensureSpace(y, hMm + 2);
         const fmt = /png/i.test(src) ? 'PNG' : 'JPEG';
         pdf.addImage(src, fmt, MARGIN_MM, y, hMm * 1.6, hMm);
@@ -255,15 +257,17 @@
     }
 
     // Draw flattened lines centered around centerX (mm), returns new y.
+    // Signature images are rendered at original aspect ratio (taller) per
+    // Yanto's request 2026-07-15 to preserve the natural vertical proportion.
     function drawLinesCentered(lines, y, centerX) {
       for (const line of lines) {
         if (line.type === 'img') {
           const src = line.el.getAttribute('src') || '';
           if (!src.startsWith('data:image')) continue;
           try {
-            const cssMaxH = parseFloat(line.el.style.maxHeight) || 60;
-            const hMm = Math.min(25, cssMaxH * 0.264583);
-            const wMm = hMm * 1.6;
+            // Render signature at generous size to preserve vertical stretch
+            const hMm = 22; // ~80px at print scale, preserves natural height
+            const wMm = 48; // ~180px max-width
             y = ensureSpace(y, hMm + 2);
             pdf.addImage(src, /png/i.test(src) ? 'PNG' : 'JPEG', centerX - wMm / 2, y, wMm, hMm);
             y += hMm + 2;
@@ -358,19 +362,34 @@
         if (tag === 'div' && child.children.length === 1 && child.querySelector(':scope > img')) {
           y = drawImageBlock(child.querySelector('img'), y); return;
         }
+        // Foto documentation wrapper: div with img + small caption. Render
+        // images but skip date/filename captions (per Yanto 2026-07-15).
+        if (tag === 'div' && child.querySelector(':scope > img') && child.querySelector(':scope > .small, :scope > div.small')) {
+          const imgs = child.querySelectorAll('img');
+          for (const img of imgs) { y = drawImageBlock(img, y); }
+          return;
+        }
         if (tag === 'img') { y = drawImageBlock(child, y); return; }
         if (['h1', 'h2', 'h3', 'h4', 'h5'].includes(tag)) {
           const style = child.getAttribute('style') || '';
           const align = /text-align\s*:\s*center/i.test(style) ? 'center' : 'left';
-          y = drawText(child.textContent.trim(), y + 2, { align, bold: true, size: { h1: 15, h2: 14, h3: 13, h4: 12, h5: 12 }[tag] });
-          y += 1;
+          // Turunkan judul 2 baris sebelum, dan beri jarak 2 baris setelah judul
+          // sebelum konten di bawahnya (per Yanto 2026-07-15).
+          y += LINE_H * 2;
+          y = drawText(child.textContent.trim(), y, { align, bold: true, size: { h1: 15, h2: 14, h3: 13, h4: 12, h5: 12 }[tag] });
+          y += LINE_H * 2;
           return;
         }
         if (tag === 'p') {
           const style = child.getAttribute('style') || '';
           const align = /text-align\s*:\s*center/i.test(style) ? 'center' : 'left';
           const bold = /font-weight\s*:\s*(bold|700)/i.test(style);
-          y = drawText(child.textContent.replace(/\s+/g, ' ').trim(), y, { align, bold });
+          const cls = child.className || '';
+          // "Anda dapat mengubah link ini..." — font 12pt same as rest,
+          // respect right margin (already handled by drawText's usableW)
+          // + remove text-muted small styling difference
+          const fontSize = /\bsmall\b/.test(cls) ? 12 : 12;
+          y = drawText(child.textContent.replace(/\s+/g, ' ').trim(), y, { align, bold, size: fontSize });
           y += 1.5;
           return;
         }

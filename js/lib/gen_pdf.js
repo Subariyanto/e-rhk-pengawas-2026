@@ -226,9 +226,134 @@
       return y;
     }
 
+    // Flatten a signature/KOP sub-block (nested divs wrapping text lines and/or
+    // an <img>) into an ordered list of {type:'text'|'img', ...} lines. Each
+    // leaf div/p becomes one line; images become their own line. Used for
+    // blocks whose original CSS layout (flex centering) the generic per-tag
+    // walker below can't reproduce.
+    function collectLines(el) {
+      const lines = [];
+      function walk(node) {
+        if (node.nodeType !== 1) return;
+        const tag = node.tagName.toLowerCase();
+        if (tag === 'img') { lines.push({ type: 'img', el: node }); return; }
+        if (tag === 'br') return;
+        const hasElementChildren = Array.from(node.children).some((c) => c.tagName.toLowerCase() !== 'br');
+        if (!hasElementChildren) {
+          const text = node.textContent.replace(/\s+/g, ' ').trim();
+          if (text) {
+            const style = node.getAttribute('style') || '';
+            const bold = /font-weight\s*:\s*(bold|700)/i.test(style) || tag === 'strong' || tag === 'b';
+            lines.push({ type: 'text', text, bold });
+          }
+          return;
+        }
+        Array.from(node.children).forEach(walk);
+      }
+      Array.from(el.children).forEach(walk);
+      return lines;
+    }
+
+    // Draw flattened lines centered around centerX (mm), returns new y.
+    function drawLinesCentered(lines, y, centerX) {
+      for (const line of lines) {
+        if (line.type === 'img') {
+          const src = line.el.getAttribute('src') || '';
+          if (!src.startsWith('data:image')) continue;
+          try {
+            const cssMaxH = parseFloat(line.el.style.maxHeight) || 60;
+            const hMm = Math.min(25, cssMaxH * 0.264583);
+            const wMm = hMm * 1.6;
+            y = ensureSpace(y, hMm + 2);
+            pdf.addImage(src, /png/i.test(src) ? 'PNG' : 'JPEG', centerX - wMm / 2, y, wMm, hMm);
+            y += hMm + 2;
+          } catch (e) { /* skip unreadable image */ }
+        } else {
+          y = ensureSpace(y, LINE_H);
+          pdf.setFont('times', line.bold ? 'bold' : 'normal');
+          pdf.setFontSize(12);
+          pdf.text(line.text, centerX, y, { align: 'center' });
+          y += LINE_H;
+        }
+      }
+      return y;
+    }
+
+    // KOP header: logo pinned at the left margin, header lines (l1-l4)
+    // centered over the full page width (mirrors the original flex layout of
+    // logo-left + centered text + equal-width right spacer).
+    function drawKop(kopEl, y) {
+      const logo = kopEl.querySelector('img.logo');
+      const textDiv = kopEl.querySelector('.text');
+      const sizeMm = 18;
+      let logoBottomY = y;
+      if (logo) {
+        const src = logo.getAttribute('src') || '';
+        if (src.startsWith('data:image')) {
+          try {
+            pdf.addImage(src, /png/i.test(src) ? 'PNG' : 'JPEG', MARGIN_MM, y, sizeMm, sizeMm);
+            logoBottomY = y + sizeMm;
+          } catch (e) { /* skip unreadable logo */ }
+        }
+      }
+      let ty = y + 1;
+      if (textDiv) {
+        Array.from(textDiv.children).forEach((line) => {
+          const text = line.textContent.trim();
+          if (!text) return;
+          const bold = /\bl2\b|\bl3\b/.test(line.className || '');
+          pdf.setFont('times', bold ? 'bold' : 'normal');
+          pdf.setFontSize(12);
+          pdf.text(text, pageW / 2, ty, { align: 'center' });
+          ty += LINE_H;
+        });
+      }
+      const bottomY = Math.max(logoBottomY, ty) + 2;
+      pdf.setLineWidth(0.5);
+      pdf.line(MARGIN_MM, bottomY, pageW - MARGIN_MM, bottomY);
+      return bottomY + 4;
+    }
+
+    // .ttd row: 2+ signature columns (e.g. Notulis kiri / Pemimpin Rapat
+    // kanan) laid out side by side, each centered within its own column.
+    function drawTtdRow(ttdEl, y) {
+      const blocks = Array.from(ttdEl.querySelectorAll(':scope > .ttd-block'));
+      if (!blocks.length) return y;
+      const colW = contentW / blocks.length;
+      let maxBottom = y;
+      blocks.forEach((b, i) => {
+        const colCenterX = MARGIN_MM + colW * i + colW / 2;
+        const endY = drawLinesCentered(collectLines(b), y, colCenterX);
+        maxBottom = Math.max(maxBottom, endY);
+      });
+      return maxBottom + 2;
+    }
+
+    // Ad-hoc single signature block used by most gen* functions:
+    // <div style="display:flex;justify-content:center;..."><div style="width:50%;text-align:center;">...lines/img...</div></div>
+    // Rendered truly centered on the page (per Yanto 2026-07-15: signature
+    // harus center, agak kekiri dari tampilan sebelumnya yang condong ke kanan).
+    function isCenteredSignWrap(el) {
+      if (el.tagName.toLowerCase() !== 'div') return false;
+      const style = el.getAttribute('style') || '';
+      return /justify-content\s*:\s*center/i.test(style) && el.children.length === 1;
+    }
+
     function walkNode(node, y) {
       Array.from(node.children).forEach((child) => {
         const tag = child.tagName.toLowerCase();
+        if (tag === 'div' && child.classList && child.classList.contains('kop')) {
+          y = drawKop(child, y + 1);
+          return;
+        }
+        if (tag === 'div' && child.classList && child.classList.contains('ttd')) {
+          y = drawTtdRow(child, y + 2);
+          return;
+        }
+        if (isCenteredSignWrap(child)) {
+          y = drawLinesCentered(collectLines(child.children[0]), y + 2, pageW / 2);
+          return;
+        }
         if (tag === 'table') { y = drawTable(child, y + 1); return; }
         if (tag === 'div' && child.children.length === 1 && child.querySelector(':scope > img')) {
           y = drawImageBlock(child.querySelector('img'), y); return;

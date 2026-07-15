@@ -592,9 +592,12 @@
   async function htmlToPdfBlob(htmlBody) {
     if (window.Tier && Tier.blockExportIfTrial && Tier.blockExportIfTrial('Download PDF')) return null;
     try {
-      return buildTextPdf(htmlBody);
+      console.log('[GenPDF] Using text-native buildTextPdf...');
+      const blob = buildTextPdf(htmlBody);
+      console.log('[GenPDF] buildTextPdf succeeded, blob size:', blob.size);
+      return blob;
     } catch (e) {
-      console.error('buildTextPdf failed, falling back to canvas renderer:', e);
+      console.error('[GenPDF] buildTextPdf failed, falling back to canvas renderer:', e);
       return htmlToPdfBlobCanvas(htmlBody);
     }
   }

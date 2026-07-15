@@ -227,7 +227,7 @@
     // ===== HALAMAN 3: KATA PENGANTAR =====
     const kataPengantar = `
       <div class="doc-page">
-        <h2 style="text-align:center;text-decoration:underline;">KATA PENGANTAR</h2>
+        <h2 style="text-align:center;text-decoration:underline;margin-bottom:20px;">KATA PENGANTAR</h2>
         <p style="text-align:justify;">Puji syukur kami panjatkan kehadirat Allah SWT atas limpahan rahmat, taufik, dan hidayah-Nya, sehingga penyusunan <strong>Laporan ${labelTW(tw)} Tahun ${tahun}</strong> tentang Pelaksanaan Tugas Pokok Pengawas Madrasah dapat diselesaikan tepat waktu. Shalawat dan salam senantiasa tercurah kepada junjungan kita Nabi Muhammad SAW beserta keluarga, sahabat, dan pengikutnya.</p>
         <p style="text-align:justify;">Laporan ini disusun sebagai bentuk pertanggungjawaban pelaksanaan tugas pokok dan fungsi Pengawas Madrasah pada ${labelTW(tw)} (${periodeBulan}) Tahun ${tahun}. Dokumen ini memuat hasil pelaksanaan supervisi akademik dan manajerial pada madrasah binaan, capaian Rencana Hasil Kerja (RHK), kegiatan pendampingan, kendala yang dihadapi, serta rekomendasi tindak lanjut sebagai bahan refleksi dan perbaikan pada periode berikutnya.</p>
         <p style="text-align:justify;">Penyusunan laporan ini mengacu pada Sasaran Kinerja Pegawai (SKP) Pengawas Madrasah Tahun ${tahun} dan Perdirjen GTK Nomor 7328 Tahun 2023 tentang Petunjuk Teknis Pengelolaan Kinerja Pengawas Madrasah, serta berorientasi pada peningkatan mutu layanan pendidikan berbasis Kurikulum Berbasis Cinta dan profil Pelajar Pancasila Rahmatan lil 'Alamin.</p>
@@ -276,7 +276,7 @@
     // ===== HALAMAN 5: BAB I PENDAHULUAN =====
     const bab1 = `
       <div class="doc-page">
-        <h2 style="text-align:center;">BAB I<br/>PENDAHULUAN</h2>
+        <h2 style="text-align:center;margin-bottom:20px;">BAB I<br/>PENDAHULUAN</h2>
 
         <h3>A. Latar Belakang</h3>
         <p style="text-align:justify;">Pengawas Madrasah merupakan tenaga kependidikan yang memiliki tugas pokok melaksanakan supervisi akademik dan manajerial pada madrasah binaan. Sesuai dengan Perdirjen GTK Nomor 7328 Tahun 2023, Pengawas Madrasah dituntut untuk menyusun Sasaran Kinerja Pegawai (SKP) yang memuat Rencana Hasil Kerja (RHK), indikator kinerja, target, serta menyusun laporan pelaksanaan kinerja secara periodik (triwulanan dan tahunan).</p>
@@ -319,7 +319,7 @@
     // ===== HALAMAN: BAB II PELAKSANAAN =====
     const bab2 = `
       <div class="doc-page">
-        <h2 style="text-align:center;">BAB II<br/>PELAKSANAAN KEGIATAN</h2>
+        <h2 style="text-align:center;margin-bottom:20px;">BAB II<br/>PELAKSANAAN KEGIATAN</h2>
 
         <h3>A. Identitas Pengawas</h3>
         <table class="fmt" style="width:100%;margin:8px 0;">
@@ -371,13 +371,15 @@
     `;
 
     // ===== BAB III: PER-RHK =====
-    const bab3Header = `
-      <div class="doc-page">
-        <h2 style="text-align:center;">BAB III<br/>HASIL DAN URAIAN PER-RHK</h2>
+    // Header BAB III digabung dengan halaman RHK pertama (bukan .doc-page
+    // tersendiri) supaya tidak ada ruang kosong besar di halaman header.
+    // Per Yanto 2026-07-15: "Di halaman BAB III masih banyak ruang kosong,
+    // naikkan data dibawahnya biar menyatu".
+    const bab3Intro = `
+        <h2 style="text-align:center;margin-bottom:20px;">BAB III<br/>HASIL DAN URAIAN PER-RHK</h2>
         <p style="text-align:justify;">Bab ini memuat uraian rinci pelaksanaan setiap Rencana Hasil Kerja (RHK) pada ${labelTW(tw)} Tahun ${tahun}, beserta data kegiatan terkait, hasil yang dicapai, dan rekomendasi tindak lanjut. Setiap RHK disajikan dalam halaman tersendiri untuk memudahkan referensi.</p>
-      </div>
     `;
-    const perRhkPages = rhks.map((r, idx) => buildRhkPage(r, kegByRhk[r.id] || [], i, idx + 1)).join('\n');
+    const perRhkPages = rhks.map((r, idx) => buildRhkPage(r, kegByRhk[r.id] || [], i, idx + 1, idx === 0 ? bab3Intro : '')).join('\n');
 
     // Agregasi kendala/solusi/tindak lanjut dari semua kegiatan untuk BAB IV
     const aggregateField = (field) => {
@@ -395,7 +397,7 @@
     // ===== BAB IV: ANALISIS =====
     const bab4 = `
       <div class="doc-page">
-        <h2 style="text-align:center;">BAB IV<br/>ANALISIS, PERMASALAHAN DAN SOLUSI</h2>
+        <h2 style="text-align:center;margin-bottom:20px;">BAB IV<br/>ANALISIS, PERMASALAHAN DAN SOLUSI</h2>
 
         <h3>A. Analisis Capaian</h3>
         <p style="text-align:justify;">Pada ${labelTW(tw)} Tahun ${tahun}, dari total <strong>${rhks.length} RHK</strong> yang direncanakan, telah dilaksanakan sebanyak <strong>${rhkTerlaksana} RHK</strong> (${persentase}%) dengan total <strong>${totalKegiatan} kegiatan</strong> pendampingan/pengawasan pada madrasah binaan. ${persentase >= 80 ? 'Capaian ini menunjukkan tingkat realisasi yang baik dan sesuai dengan rencana yang ditetapkan.' : persentase >= 50 ? 'Capaian ini menunjukkan tingkat realisasi yang cukup memadai, namun masih perlu peningkatan pada periode berikutnya.' : 'Capaian ini masih perlu ditingkatkan secara signifikan pada periode berikutnya.'}</p>
@@ -425,7 +427,7 @@
     // ===== BAB V: PENUTUP =====
     const bab5 = `
       <div class="doc-page">
-        <h2 style="text-align:center;">BAB V<br/>PENUTUP</h2>
+        <h2 style="text-align:center;margin-bottom:20px;">BAB V<br/>PENUTUP</h2>
 
         <h3>A. Simpulan</h3>
         <ol style="text-align:justify;">
@@ -487,10 +489,10 @@
       </div>
     `;
 
-    return cover + pengesahan + kataPengantar + daftarIsi + bab1 + bab2 + bab3Header + perRhkPages + bab4 + bab5 + lampiran;
+    return cover + pengesahan + kataPengantar + daftarIsi + bab1 + bab2 + perRhkPages + bab4 + bab5 + lampiran;
   }
 
-  function buildRhkPage(rhk, kegList, idn, idx) {
+  function buildRhkPage(rhk, kegList, idn, idx, introHtml) {
     const N = window.NARASI_RHK ? { ...(window.NARASI_RHK.default || {}), ...(window.NARASI_RHK[rhk.id] || {}) } : {};
 
     // Pakai kegiatan pertama (atau gabungkan kalau banyak)
@@ -541,6 +543,7 @@
 
     return `
       <div class="doc-page">
+        ${introHtml || ''}
         <h4 style="margin:8px 0 4px;color:#1E2A5A;">${idx}. ${U.escapeHtml(rhk.id)} — ${U.escapeHtml(rhk.nama_eviden)}</h4>
         <div class="text-muted small" style="margin-bottom:10px;font-size:11pt;">${rhk.jenis_kinerja || 'Utama'} · ${kegList.length} kegiatan terkait</div>
 

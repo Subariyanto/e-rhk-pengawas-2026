@@ -474,10 +474,10 @@
         if (['h1', 'h2', 'h3', 'h4', 'h5'].includes(tag)) {
           const style = child.getAttribute('style') || '';
           const align = /text-align\s*:\s*center/i.test(style) ? 'center' : 'left';
-          // Judul dokumen (h3): turun 2 baris sebelum.
+          // Judul dokumen (h2, h3): turun 2 baris sebelum + 2 baris setelah.
           // Judul paragraf (h4, h5 — A. Uraian, B. Hasil, dst): jarak ke
           // paragraf di bawahnya 1.5 spasi (per Yanto 2026-07-15).
-          const isDocTitle = tag === 'h3';
+          const isDocTitle = tag === 'h2' || tag === 'h3';
           y += isDocTitle ? LINE_H * 2 : LINE_H * 1.2;
           y = drawText(child.textContent.trim(), y, { align, bold: true, size: { h1: 15, h2: 14, h3: 13, h4: 12, h5: 12 }[tag] });
           // After doc title: 2 baris. After sub-heading (h4/h5): 1.5 spasi.

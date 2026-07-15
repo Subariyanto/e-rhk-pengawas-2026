@@ -357,10 +357,11 @@
             // Draw TTD centered
             try { pdf.addImage(ttd.src, ttd.format, centerX - ttd.wMm / 2, y, ttd.wMm, ttd.hMm); } catch(e) {}
             // Draw stempel overlapping from the right side of TTD
-            // (menyentuh 1/4 tanda tangan dari kanan) per Yanto 2026-07-15
+            // Geser ke atas dan ke kanan sedikit per Yanto 2026-07-15
             if (stempel) {
-              const stempelX = centerX - ttd.wMm / 2 - stempel.wMm + (ttd.wMm * 0.25);
-              try { pdf.addImage(stempel.src, stempel.format, stempelX, y, stempel.wMm, stempel.hMm); } catch(e) {}
+              const stempelX = centerX - ttd.wMm / 2 - stempel.wMm + (ttd.wMm * 0.35);
+              const stempelY = y - 4; // naik 4mm
+              try { pdf.addImage(stempel.src, stempel.format, stempelX, stempelY, stempel.wMm, stempel.hMm); } catch(e) {}
             }
           } else {
             // Single image: draw centered
@@ -555,8 +556,9 @@
         }
         // Single-column "Mengetahui" TTD block (no inline-block, just center text)
         // Per Yanto 2026-07-15: naikkan 4 baris (reduce gap above)
+        // TTD Kepala Kemenag geser ke kiri sedikit (centerX = pageW/2 - 8)
         if (tag === 'div' && /text-align\s*:\s*center/i.test(child.getAttribute('style') || '') && /margin-top/i.test(child.getAttribute('style') || '') && child.querySelector('div[style*="underline"]')) {
-          y = drawLinesCentered(collectLines(child), y - LINE_H * 2, pageW / 2);
+          y = drawLinesCentered(collectLines(child), y - LINE_H * 2, pageW / 2 - 8);
           return;
         }
         if (tag === 'div' && child.classList && child.classList.contains('ttd')) {

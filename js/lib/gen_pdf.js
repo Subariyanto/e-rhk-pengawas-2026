@@ -446,8 +446,46 @@
     function walkNode(node, y) {
       Array.from(node.children).forEach((child) => {
         const tag = child.tagName.toLowerCase();
+        // Skip style/script tags — jangan render sebagai teks
+        if (tag === 'style' || tag === 'script' || tag === 'link') return;
         if (tag === 'div' && child.classList && child.classList.contains('kop')) {
           y = drawKop(child, y + 1);
+          return;
+        }
+        if (tag === 'div' && child.classList && child.classList.contains('ttd-penutup')) {
+          // TTD Penutup/Kata Pengantar: rendered as right-aligned signature
+          const innerDiv = child.querySelector(':scope > div[style*="float:right"]') || child.querySelector(':scope > div');
+          if (innerDiv) {
+            y = drawLinesCentered(collectLines(innerDiv), y + 2, pageW * 0.62);
+          }
+          return;
+        }
+        // Pengesahan-style TTD: div with text-align:center containing
+        // inline-block children (multi-column signature layout)
+        if (tag === 'div' && /text-align\s*:\s*center/i.test(child.getAttribute('style') || '') && child.querySelectorAll(':scope > div[style*="inline-block"]').length >= 2) {
+          // Treat as dual-column TTD row
+          const cols = Array.from(child.querySelectorAll(':scope > div[style*="inline-block"]'));
+          const colW = contentW / cols.length;
+          const colLines = cols.map(c => collectLines(c));
+          // Calculate max height
+          function calcColH(lines) {
+            let h = 0;
+            for (const l of lines) { h += l.type === 'img' ? 34 : LINE_H; }
+            return h;
+          }
+          const maxH = Math.max(...colLines.map(calcColH));
+          y = ensureSpace(y + 2, maxH + 4);
+          const startY = y;
+          colLines.forEach((lines, ci) => {
+            const cx = MARGIN_MM + colW * ci + colW / 2;
+            drawLinesCentered(lines, startY, cx);
+          });
+          y = startY + maxH + 2;
+          return;
+        }
+        // Single-column "Mengetahui" TTD block (no inline-block, just center text)
+        if (tag === 'div' && /text-align\s*:\s*center/i.test(child.getAttribute('style') || '') && /margin-top/i.test(child.getAttribute('style') || '') && child.querySelector('div[style*="underline"]')) {
+          y = drawLinesCentered(collectLines(child), y + 2, pageW / 2);
           return;
         }
         if (tag === 'div' && child.classList && child.classList.contains('ttd')) {
@@ -493,6 +531,17 @@
           // Paragraf rata kiri-kanan (justify) per Yanto 2026-07-15
           y = drawText(child.textContent.replace(/\s+/g, ' ').trim(), y, { align, bold, size: fontSize, justify: align !== 'center' });
           y += 1.5;
+          return;
+        }
+        if (tag === 'ol' || tag === 'ul') {
+          const items = Array.from(child.querySelectorAll(':scope > li'));
+          items.forEach((li, idx) => {
+            const prefix = tag === 'ol' ? `${idx + 1}. ` : '• ';
+            const txt = li.textContent.replace(/\s+/g, ' ').trim();
+            y = drawText(prefix + txt, y, { indent: 6, justify: true });
+            y += 0.5;
+          });
+          y += 1;
           return;
         }
         if (tag === 'div' || tag === 'section') {

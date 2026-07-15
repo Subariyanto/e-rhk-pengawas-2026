@@ -152,9 +152,13 @@
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
     const pageW = 210, pageH = 297;
-    const MARGIN_MM = 0.6 * 25.4;
-    const contentW = pageW - MARGIN_MM * 2;
-    const maxY = pageH - MARGIN_MM;
+    const MARGIN_LEFT = 25.4; // 1 inchi per Yanto 2026-07-15
+    const MARGIN_TOP = 20.32; // 0.8 inchi
+    const MARGIN_RIGHT = 20.32; // 0.8 inchi
+    const MARGIN_BOTTOM = 20.32; // 0.8 inchi
+    const MARGIN_MM = MARGIN_LEFT; // alias for left margin (used in x positioning)
+    const contentW = pageW - MARGIN_LEFT - MARGIN_RIGHT;
+    const maxY = pageH - MARGIN_BOTTOM;
     const LINE_H = 6.0; // 1.5 spasi (~12pt × 1.5 = 6.0mm line height) per Yanto 2026-07-15
     let first = true;
 
@@ -163,7 +167,7 @@
     const pages = Array.from(tmp.querySelectorAll('.doc-page'));
 
     function ensureSpace(y, needed) {
-      if (y + needed > maxY) { pdf.addPage(); return MARGIN_MM; }
+      if (y + needed > maxY) { pdf.addPage(); return MARGIN_TOP; }
       return y;
     }
 
@@ -615,7 +619,7 @@
       const subEl = pageEl.querySelector('.cover-sub');
       const idEl = pageEl.querySelector('.cover-id');
       const footEl = pageEl.querySelector('.cover-foot');
-      let y = MARGIN_MM + 40; // start ~40mm from top
+      let y = MARGIN_TOP + 40; // start ~40mm from top
       if (titleEl) {
         pdf.setFont('times', 'bold');
         pdf.setFontSize(18);
@@ -658,7 +662,7 @@
 
     // ===== Daftar Isi renderer (dot-leader, no table) =====
     function drawDaftarIsi(pageEl) {
-      let y = MARGIN_MM;
+      let y = MARGIN_TOP;
       // Title
       const h2 = pageEl.querySelector('h2');
       if (h2) {
@@ -682,8 +686,8 @@
         const isBold = !isIndented;
         pdf.setFont('times', isBold ? 'bold' : 'normal');
         // Draw label
-        const labelX = MARGIN_MM + indent;
-        const numX = pageW - MARGIN_MM;
+        const labelX = MARGIN_LEFT + indent;
+        const numX = pageW - MARGIN_RIGHT;
         // Dot leader
         const labelW = pdf.getTextWidth(cleanLabel);
         const numW = pdf.getTextWidth(pageNum);
@@ -714,7 +718,7 @@
         drawDaftarIsi(p);
         continue;
       }
-      walkNode(p, MARGIN_MM);
+      walkNode(p, MARGIN_TOP);
     }
 
     return pdf.output('blob');

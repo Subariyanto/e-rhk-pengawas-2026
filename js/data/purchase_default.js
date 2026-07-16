@@ -43,6 +43,24 @@ window.PURCHASE_DEFAULT = {
 // Kode yang sudah di-consume akan ditandai di localStorage user (per-device).
 // Kode bundled ini SELALU valid lintas device sampai admin hapus dari array di bawah.
 window.BUNDLED_CODES = [
-  // Contoh:
-  // { code: 'FULL-AB12-CD34-EF56', tier: 'full', note: 'Pak Subariyanto' },
+  { code: 'FULL-ZJW4-ZN48-6E3P', tier: 'full', note: '' },
+  { code: 'FULL-AFJV-MCQA-DEBS', tier: 'full', note: '' },
+  { code: 'FULL-JQ5W-2JGR-EMH2', tier: 'full', note: '' },
+  { code: 'FULL-CUN8-XH3S-FGDU', tier: 'full', note: '' },
+  { code: 'FULL-33J8-KU6K-KHJ9', tier: 'full', note: '' },
+  { code: 'FULL-8H4J-W9K5-9B6Q', tier: 'full', note: '' },
+  { code: 'FULL-DB5S-JE3T-NDXH', tier: 'full', note: '' },
+  { code: 'FULL-XU9Y-WUXA-5H7A', tier: 'full', note: '' },
+  { code: 'FULL-JGZV-F8UM-FZG4', tier: 'full', note: '' },
+  { code: 'FULL-997H-9WW2-ZQFS', tier: 'full', note: '' },
+  { code: 'FULL-P9KV-CYPR-VNNU', tier: 'full', note: '' },
+  { code: 'FULL-VYFA-V28E-TYYN', tier: 'full', note: '' },
+  { code: 'FULL-T6GD-W3D4-QVX6', tier: 'full', note: '' },
+  { code: 'FULL-UGBQ-UGMD-L4LX', tier: 'full', note: '' },
+  { code: 'FULL-EFAV-U3HG-K2E3', tier: 'full', note: '' },
+  { code: 'FULL-5HQJ-DBJC-J5U3', tier: 'full', note: '' },
+  { code: 'FULL-RVRF-CSZY-XN8W', tier: 'full', note: '' },
+  { code: 'FULL-DTZG-JWUV-TE83', tier: 'full', note: '' },
+  { code: 'FULL-P2GD-TBWG-886U', tier: 'full', note: '' },
+  { code: 'FULL-EGVR-9J82-AY3N', tier: 'full', note: '' },
 ];

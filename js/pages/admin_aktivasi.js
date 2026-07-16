@@ -513,7 +513,17 @@
       wrap.querySelectorAll('button[data-copy]').forEach(b => b.addEventListener('click', async () => {
         const c = b.dataset.copy;
         try { await navigator.clipboard.writeText(c); UI.toast('Kode tersalin: ' + c); }
-        catch (_) { UI.toast('Gagal salin.', 'danger'); }
+        catch (_) {
+          const ta = document.createElement('textarea');
+          ta.value = c;
+          ta.style.position = 'fixed';
+          ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+          UI.toast('Kode tersalin: ' + c);
+        }
       }));
       wrap.querySelectorAll('button[data-wa]').forEach(b => b.addEventListener('click', () => sendCodeViaWa(b.dataset.wa)));
       wrap.querySelectorAll('button[data-note]').forEach(b => b.addEventListener('click', () => editNote(b.dataset.note)));

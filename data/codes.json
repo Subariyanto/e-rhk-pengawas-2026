@@ -87,7 +87,8 @@
       "createdAt": "2026-07-14T10:33:02.919Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false
+      "revoked": false,
+      "note": "SUBARIYANTO"
     },
     {
       "code": "FULL-P9KV-CYPR-VNNU",
@@ -170,5 +171,5 @@
       "revoked": false
     }
   ],
-  "updatedAt": "2026-07-18T02:01:25.833Z"
+  "updatedAt": "2026-07-18T11:34:49.877Z"
 }

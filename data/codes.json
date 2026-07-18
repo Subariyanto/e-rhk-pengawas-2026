@@ -114,7 +114,8 @@
       "createdAt": "2026-07-13T13:50:14.786Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false
+      "revoked": false,
+      "note": "Sri Wahyuni"
     },
     {
       "code": "FULL-UGBQ-UGMD-L4LX",
@@ -173,5 +174,5 @@
       "revoked": false
     }
   ],
-  "updatedAt": "2026-07-18T13:29:29.241Z"
+  "updatedAt": "2026-07-18T13:29:38.988Z"
 }

@@ -96,7 +96,8 @@
       "createdAt": "2026-07-13T13:50:14.787Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false
+      "revoked": false,
+      "note": "Wadud"
     },
     {
       "code": "FULL-VYFA-V28E-TYYN",
@@ -171,5 +172,5 @@
       "revoked": false
     }
   ],
-  "updatedAt": "2026-07-18T11:34:49.877Z"
+  "updatedAt": "2026-07-18T13:29:14.346Z"
 }

@@ -257,8 +257,9 @@
       "createdAt": "2026-07-13T13:50:14.785Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false
+      "revoked": false,
+      "note": "Hariyanto"
     }
   ],
-  "updatedAt": "2026-07-19T12:00:57.840Z"
+  "updatedAt": "2026-07-19T12:01:09.095Z"
 }

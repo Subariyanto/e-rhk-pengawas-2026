@@ -78,7 +78,8 @@
       "createdAt": "2026-07-18T13:32:12.877Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false
+      "revoked": false,
+      "note": "Syamsul Arifin"
     },
     {
       "code": "FULL-ZJW4-ZN48-6E3P",
@@ -261,5 +262,5 @@
       "note": "Hariyanto"
     }
   ],
-  "updatedAt": "2026-07-21T16:00:01.302Z"
+  "updatedAt": "2026-07-21T16:00:32.155Z"
 }

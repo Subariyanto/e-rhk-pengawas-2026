@@ -42,7 +42,8 @@
       "createdAt": "2026-07-18T13:32:12.879Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false
+      "revoked": false,
+      "note": "Agus Jalaludin"
     },
     {
       "code": "FULL-VEZA-F5ZB-MFEN",
@@ -269,5 +270,5 @@
       "note": "Hariyanto"
     }
   ],
-  "updatedAt": "2026-07-22T04:48:16.896Z"
+  "updatedAt": "2026-07-22T04:48:23.528Z"
 }

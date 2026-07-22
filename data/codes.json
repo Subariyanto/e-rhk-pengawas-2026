@@ -15,7 +15,8 @@
       "createdAt": "2026-07-18T13:32:12.879Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false
+      "revoked": false,
+      "note": "Andriyanto"
     },
     {
       "code": "FULL-LC9J-6PQS-ZH99",
@@ -266,5 +267,5 @@
       "note": "Hariyanto"
     }
   ],
-  "updatedAt": "2026-07-22T04:47:52.767Z"
+  "updatedAt": "2026-07-22T04:48:01.650Z"
 }

@@ -24,7 +24,8 @@
       "createdAt": "2026-07-24T00:19:03.609Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false
+      "revoked": false,
+      "note": "Eko herdiyan"
     },
     {
       "code": "FULL-TCRV-VQBE-96JX",
@@ -370,5 +371,5 @@
       "note": "Hariyanto"
     }
   ],
-  "updatedAt": "2026-07-24T00:23:36.388Z"
+  "updatedAt": "2026-07-24T00:23:40.116Z"
 }

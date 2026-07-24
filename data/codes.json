@@ -33,7 +33,8 @@
       "createdAt": "2026-07-24T00:19:03.609Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false
+      "revoked": false,
+      "note": "Romlah"
     },
     {
       "code": "FULL-9KHC-UUUC-XAUM",
@@ -371,5 +372,5 @@
       "note": "Hariyanto"
     }
   ],
-  "updatedAt": "2026-07-24T00:23:40.116Z"
+  "updatedAt": "2026-07-24T00:23:47.299Z"
 }

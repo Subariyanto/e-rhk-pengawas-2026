@@ -2,14 +2,6 @@
 (function () {
   // Daftar pangkat/golongan PNS standar
   const PANGKAT_GOLONGAN = [
-    'Juru Muda, I/a',
-    'Juru Muda Tingkat I, I/b',
-    'Juru, I/c',
-    'Juru Tingkat I, I/d',
-    'Pengatur Muda, II/a',
-    'Pengatur Muda Tingkat I, II/b',
-    'Pengatur, II/c',
-    'Pengatur Tingkat I, II/d',
     'Penata Muda, III/a',
     'Penata Muda Tingkat I, III/b',
     'Penata, III/c',

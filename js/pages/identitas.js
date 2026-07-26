@@ -1,5 +1,26 @@
 // Identitas Pengawas page
 (function () {
+  // Daftar pangkat/golongan PNS standar
+  const PANGKAT_GOLONGAN = [
+    'Juru Muda, I/a',
+    'Juru Muda Tingkat I, I/b',
+    'Juru, I/c',
+    'Juru Tingkat I, I/d',
+    'Pengatur Muda, II/a',
+    'Pengatur Muda Tingkat I, II/b',
+    'Pengatur, II/c',
+    'Pengatur Tingkat I, II/d',
+    'Penata Muda, III/a',
+    'Penata Muda Tingkat I, III/b',
+    'Penata, III/c',
+    'Penata Tingkat I, III/d',
+    'Pembina, IV/a',
+    'Pembina Tingkat I, IV/b',
+    'Pembina Utama Muda, IV/c',
+    'Pembina Utama Madya, IV/d',
+    'Pembina Utama, IV/e',
+  ];
+
   // Default identitas dari user (Yanto)
   const DEFAULT_IDENTITAS = {
     pegawai: {
@@ -114,11 +135,32 @@
         fields.push({ name: 'kabupaten', label: 'Kabupaten' });
         fields.push({ name: 'wilayah_binaan', label: 'Wilayah Binaan' });
       }
-      return fields.map(f => `
+      return fields.map(f => {
+        if (f.name === 'pangkat_golongan') {
+          const cur = obj[f.name] || '';
+          const opts = PANGKAT_GOLONGAN.map(p =>
+            `<option value="${U.escapeHtml(p)}"${p === cur ? ' selected' : ''}>${U.escapeHtml(p)}</option>`
+          ).join('');
+          // Jika nilai saat ini tidak ada di daftar, tetap tampilkan sebagai opsi pertama
+          const extraOpt = (cur && !PANGKAT_GOLONGAN.includes(cur))
+            ? `<option value="${U.escapeHtml(cur)}" selected>${U.escapeHtml(cur)} (kustom)</option>`
+            : '';
+          return `
+        <div class="col-md-6">
+          <label class="form-label">${f.label}</label>
+          <select class="form-select" name="${prefix}.${f.name}">
+            <option value="">-- Pilih Pangkat/Golongan --</option>
+            ${extraOpt}
+            ${opts}
+          </select>
+        </div>`;
+        }
+        return `
         <div class="col-md-6">
           <label class="form-label">${f.label}</label>
           <input class="form-control" name="${prefix}.${f.name}" value="${U.escapeHtml(obj[f.name] || '')}" />
-        </div>`).join('');
+        </div>`;
+      }).join('');
     }
     function imgUpload(name, label, dataUrl) {
       return `

@@ -1,377 +1,303 @@
 {
   "codes": [
     {
-      "code": "FULL-BF5W-XN48-VNBE",
+      "code": "FULL-DMTZ-SPRJ-DJXB",
       "tier": "full",
-      "createdAt": "2026-07-24T00:19:03.609Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false,
-      "note": "Musairi Miskun"
-    },
-    {
-      "code": "FULL-SKGF-BDV5-4QPG",
-      "tier": "full",
-      "createdAt": "2026-07-24T00:19:03.609Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false,
-      "note": "A. Nur Hidayat"
-    },
-    {
-      "code": "FULL-AQ22-LPAU-WYWX",
-      "tier": "full",
-      "createdAt": "2026-07-24T00:19:03.609Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false,
-      "note": "Eko herdiyan"
-    },
-    {
-      "code": "FULL-TCRV-VQBE-96JX",
-      "tier": "full",
-      "createdAt": "2026-07-24T00:19:03.609Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false,
-      "note": "Romlah"
-    },
-    {
-      "code": "FULL-9KHC-UUUC-XAUM",
-      "tier": "full",
-      "createdAt": "2026-07-24T00:19:03.609Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false,
-      "note": "Muzamil"
-    },
-    {
-      "code": "FULL-EMRU-E7PU-GUQ5",
-      "tier": "full",
-      "createdAt": "2026-07-24T00:19:03.609Z",
+      "createdAt": "2026-06-13T13:53:32.074Z",
       "usedBy": null,
       "usedAt": null,
       "revoked": false
     },
     {
-      "code": "FULL-PLE8-6ZKU-F66M",
+      "code": "FULL-4M57-ECVN-2ZUU",
       "tier": "full",
-      "createdAt": "2026-07-24T00:19:03.609Z",
+      "createdAt": "2026-06-13T11:01:31.781Z",
       "usedBy": null,
       "usedAt": null,
       "revoked": false
     },
     {
-      "code": "FULL-XDWQ-LJAP-DMXB",
+      "code": "FULL-UJT6-8R6W-XFLP",
       "tier": "full",
-      "createdAt": "2026-07-24T00:19:03.609Z",
+      "createdAt": "2026-06-12T16:08:23.806Z",
       "usedBy": null,
       "usedAt": null,
       "revoked": false
     },
     {
-      "code": "FULL-C2QW-BEWP-CVFD",
+      "code": "FULL-YVUZ-JMS4-YMFU",
       "tier": "full",
-      "createdAt": "2026-07-24T00:19:03.609Z",
+      "createdAt": "2026-06-12T16:08:23.805Z",
       "usedBy": null,
       "usedAt": null,
       "revoked": false
     },
     {
-      "code": "FULL-Z87K-7782-483A",
+      "code": "FULL-PZ7A-9KZM-QASF",
       "tier": "full",
-      "createdAt": "2026-07-24T00:19:03.608Z",
+      "createdAt": "2026-06-12T16:08:23.805Z",
       "usedBy": null,
       "usedAt": null,
       "revoked": false
     },
     {
-      "code": "FULL-W9BU-DPR3-TXWW",
+      "code": "FULL-KZXH-AVL3-TR5E",
       "tier": "full",
-      "createdAt": "2026-07-22T06:16:38.855Z",
+      "createdAt": "2026-06-12T16:08:23.804Z",
       "usedBy": null,
       "usedAt": null,
       "revoked": false
     },
     {
-      "code": "FULL-8RS7-AWJA-H62U",
+      "code": "FULL-VTE9-QZSZ-HE3R",
       "tier": "full",
-      "createdAt": "2026-07-22T04:49:15.576Z",
+      "createdAt": "2026-06-12T16:08:23.804Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false,
-      "note": "Ilham Sampang"
+      "revoked": false
     },
     {
-      "code": "FULL-XKRD-MX5N-BKRJ",
+      "code": "FULL-S9S4-6X3K-CK5E",
       "tier": "full",
-      "createdAt": "2026-07-18T13:32:12.879Z",
+      "createdAt": "2026-06-12T16:08:23.803Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false,
-      "note": "Rodijah"
+      "revoked": false
     },
     {
-      "code": "FULL-BBQT-GAJP-QAM5",
+      "code": "FULL-Z5J2-PUTY-GL7T",
       "tier": "full",
-      "createdAt": "2026-07-18T13:32:12.879Z",
+      "createdAt": "2026-06-12T16:08:23.803Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false,
-      "note": "Andriyanto"
+      "revoked": false
     },
     {
-      "code": "FULL-LC9J-6PQS-ZH99",
+      "code": "FULL-JSFS-Y4EF-XGFB",
       "tier": "full",
-      "createdAt": "2026-07-18T13:32:12.879Z",
+      "createdAt": "2026-06-12T16:08:15.934Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false,
-      "note": "Ansaniyatul M"
+      "revoked": false
     },
     {
-      "code": "FULL-HV4L-5RFL-MWHC",
+      "code": "FULL-FURZ-NDTE-QPNZ",
       "tier": "full",
-      "createdAt": "2026-07-18T13:32:12.879Z",
+      "createdAt": "2026-06-12T16:08:15.934Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false,
-      "note": "Moch Amirul F"
+      "revoked": false
     },
     {
-      "code": "FULL-URCA-2N8M-8CRT",
+      "code": "FULL-5FLU-VU4F-GYCG",
       "tier": "full",
-      "createdAt": "2026-07-18T13:32:12.879Z",
+      "createdAt": "2026-06-12T16:08:15.934Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false,
-      "note": "Agus Jalaludin"
+      "revoked": false
     },
     {
-      "code": "FULL-VEZA-F5ZB-MFEN",
+      "code": "FULL-MMEH-PKJA-9BLE",
       "tier": "full",
-      "createdAt": "2026-07-18T13:32:12.878Z",
+      "createdAt": "2026-06-12T16:08:15.934Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false,
-      "note": "Rissaadah"
+      "revoked": false
     },
     {
-      "code": "FULL-PPVC-XPQ5-8GH8",
+      "code": "FULL-LKHZ-WDB9-PGAG",
       "tier": "full",
-      "createdAt": "2026-07-18T13:32:12.878Z",
+      "createdAt": "2026-06-12T16:08:15.933Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false,
-      "note": "Iskak"
+      "revoked": false
     },
     {
-      "code": "FULL-QMKA-UMV7-V622",
+      "code": "FULL-ES92-5DZL-G7W3",
       "tier": "full",
-      "createdAt": "2026-07-18T13:32:12.878Z",
+      "createdAt": "2026-06-12T16:08:15.933Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false,
-      "note": "Agus Hariyanto"
+      "revoked": false
     },
     {
-      "code": "FULL-HN8S-SHE3-SKC8",
+      "code": "FULL-UD7U-FRUY-ZU9U",
       "tier": "full",
-      "createdAt": "2026-07-18T13:32:12.877Z",
+      "createdAt": "2026-06-12T16:08:15.933Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false,
-      "note": "Sakroni"
+      "revoked": false
     },
     {
-      "code": "FULL-AZJ5-549W-N5P2",
+      "code": "FULL-59J8-4D9B-VENT",
       "tier": "full",
-      "createdAt": "2026-07-18T13:32:12.877Z",
+      "createdAt": "2026-06-12T16:08:15.933Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false,
-      "note": "Syamsul Arifin"
+      "revoked": false
     },
     {
-      "code": "FULL-ZJW4-ZN48-6E3P",
+      "code": "FULL-X78C-9PF2-6BCB",
       "tier": "full",
-      "createdAt": "2026-07-14T10:33:02.919Z",
+      "createdAt": "2026-06-12T16:08:15.933Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false,
-      "note": "ABDUL AZIS, S.Ag"
+      "revoked": false
     },
     {
-      "code": "FULL-AFJV-MCQA-DEBS",
+      "code": "FULL-JB6Q-PLER-23KN",
       "tier": "full",
-      "createdAt": "2026-07-14T10:33:02.919Z",
+      "createdAt": "2026-06-12T16:08:15.932Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false,
-      "note": "SAMSUL HIDAYAT, S.Pd"
+      "revoked": false
     },
     {
-      "code": "FULL-JQ5W-2JGR-EMH2",
+      "code": "FULL-D65T-HJNK-TYP9",
       "tier": "full",
-      "createdAt": "2026-07-14T10:33:02.919Z",
+      "createdAt": "2026-06-12T16:08:12.383Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false,
-      "note": "MOHAMMAD JUFRI,  SPd"
+      "revoked": false
     },
     {
-      "code": "FULL-CUN8-XH3S-FGDU",
+      "code": "FULL-UMXC-64ZP-TXFR",
       "tier": "full",
-      "createdAt": "2026-07-14T10:33:02.919Z",
+      "createdAt": "2026-06-12T16:08:12.383Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false,
-      "note": "Akhmad Mujianto, S.Pd.SD"
+      "revoked": false
     },
     {
-      "code": "FULL-33J8-KU6K-KHJ9",
+      "code": "FULL-T3XJ-XUGJ-RVLE",
       "tier": "full",
-      "createdAt": "2026-07-14T10:33:02.919Z",
+      "createdAt": "2026-06-12T16:08:12.383Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false,
-      "note": "Moh. Fausi, S.Pd"
+      "revoked": false
     },
     {
-      "code": "FULL-8H4J-W9K5-9B6Q",
+      "code": "FULL-ECNA-GATC-NYAB",
       "tier": "full",
-      "createdAt": "2026-07-14T10:33:02.919Z",
+      "createdAt": "2026-06-12T16:08:12.382Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false,
-      "note": "Drs. SUBRIYANTO"
+      "revoked": false
     },
     {
-      "code": "FULL-DB5S-JE3T-NDXH",
+      "code": "FULL-49WL-UB3P-T93D",
       "tier": "full",
-      "createdAt": "2026-07-14T10:33:02.919Z",
+      "createdAt": "2026-06-12T16:08:12.382Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false,
-      "note": "MOH. ABD. BARI, S.Ag."
+      "revoked": false
     },
     {
-      "code": "FULL-XU9Y-WUXA-5H7A",
+      "code": "FULL-9J73-L2KT-TBT5",
       "tier": "full",
-      "createdAt": "2026-07-14T10:33:02.919Z",
+      "createdAt": "2026-06-12T16:08:12.382Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false,
-      "note": "Dra. SITI FATIHATUR RIZQI"
+      "revoked": false
     },
     {
-      "code": "FULL-JGZV-F8UM-FZG4",
+      "code": "FULL-T93N-BTC9-LMAS",
       "tier": "full",
-      "createdAt": "2026-07-14T10:33:02.919Z",
+      "createdAt": "2026-06-12T16:08:12.382Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false,
-      "note": "MOH. AGUS J."
+      "revoked": false
     },
     {
-      "code": "FULL-997H-9WW2-ZQFS",
+      "code": "FULL-DXQL-BZAG-VB6Q",
       "tier": "full",
-      "createdAt": "2026-07-14T10:33:02.919Z",
+      "createdAt": "2026-06-12T16:08:12.382Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false,
-      "note": "SUBARIYANTO"
+      "revoked": false
     },
     {
-      "code": "FULL-P9KV-CYPR-VNNU",
+      "code": "FULL-SV9T-Z49R-QPYA",
       "tier": "full",
-      "createdAt": "2026-07-13T13:50:14.787Z",
+      "createdAt": "2026-06-12T16:08:12.381Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false,
-      "note": "Wadud"
+      "revoked": false
     },
     {
-      "code": "FULL-VYFA-V28E-TYYN",
+      "code": "FULL-DC7T-3WBP-5KKJ",
       "tier": "full",
-      "createdAt": "2026-07-13T13:50:14.787Z",
+      "createdAt": "2026-06-12T16:08:12.381Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false,
-      "note": "Muchsin"
+      "revoked": false
     },
     {
-      "code": "FULL-T6GD-W3D4-QVX6",
+      "code": "FULL-S9SQ-SMG9-2NVF",
       "tier": "full",
-      "createdAt": "2026-07-13T13:50:14.786Z",
+      "createdAt": "2026-06-12T16:08:05.564Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false,
-      "note": "Sri Wahyuni"
+      "revoked": false
     },
     {
-      "code": "FULL-UGBQ-UGMD-L4LX",
+      "code": "FULL-HJFU-ZETT-B9YT",
       "tier": "full",
-      "createdAt": "2026-07-13T13:50:14.786Z",
+      "createdAt": "2026-06-12T16:08:05.564Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false,
-      "note": "Eko supriyanto"
+      "revoked": false
     },
     {
-      "code": "FULL-EFAV-U3HG-K2E3",
+      "code": "FULL-B8QS-9MSJ-BQV4",
       "tier": "full",
-      "createdAt": "2026-07-13T13:50:14.786Z",
+      "createdAt": "2026-06-12T16:08:05.563Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false,
-      "note": "Jumaliyah"
+      "revoked": false
     },
     {
-      "code": "FULL-5HQJ-DBJC-J5U3",
+      "code": "FULL-J3MN-2HR9-2EMZ",
       "tier": "full",
-      "createdAt": "2026-07-13T13:50:14.786Z",
+      "createdAt": "2026-06-12T16:08:05.563Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false,
-      "note": "Zaka"
+      "revoked": false
     },
     {
-      "code": "FULL-RVRF-CSZY-XN8W",
+      "code": "FULL-YS2Z-JCNM-L6PM",
       "tier": "full",
-      "createdAt": "2026-07-13T13:50:14.786Z",
+      "createdAt": "2026-06-12T16:08:05.562Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false,
-      "note": "Sulalah"
+      "revoked": false
     },
     {
-      "code": "FULL-DTZG-JWUV-TE83",
+      "code": "FULL-R5Y9-78EC-FZHF",
       "tier": "full",
-      "createdAt": "2026-07-13T13:50:14.786Z",
+      "createdAt": "2026-06-12T16:08:05.562Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false,
-      "note": "Faisal"
+      "revoked": false
     },
     {
-      "code": "FULL-P2GD-TBWG-886U",
+      "code": "FULL-APZ7-VRXX-KUNL",
       "tier": "full",
-      "createdAt": "2026-07-13T13:50:14.786Z",
+      "createdAt": "2026-06-12T16:08:05.562Z",
       "usedBy": null,
       "usedAt": null,
       "revoked": false,
-      "note": "Subaidah"
+      "note": "Widodo"
     },
     {
-      "code": "FULL-EGVR-9J82-AY3N",
+      "code": "FULL-FPX4-FH2F-74LK",
       "tier": "full",
-      "createdAt": "2026-07-13T13:50:14.785Z",
+      "createdAt": "2026-06-12T16:08:05.562Z",
       "usedBy": null,
       "usedAt": null,
       "revoked": false,
-      "note": "Hariyanto"
+      "note": "Ya Salam"
     }
   ],
-  "updatedAt": "2026-07-24T00:24:00.046Z"
+  "updatedAt": "2026-06-13T13:53:39.169Z"
 }

@@ -60,7 +60,8 @@
       "createdAt": "2026-07-24T00:19:03.609Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false
+      "revoked": false,
+      "note": "Syamsudin_Rasyid"
     },
     {
       "code": "FULL-XDWQ-LJAP-DMXB",
@@ -374,5 +375,5 @@
       "note": "Hariyanto"
     }
   ],
-  "updatedAt": "2026-07-26T22:32:55.394Z"
+  "updatedAt": "2026-07-27T14:21:21.485Z"
 }

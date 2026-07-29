@@ -69,7 +69,8 @@
       "createdAt": "2026-07-24T00:19:03.609Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false
+      "revoked": false,
+      "note": "Hatip"
     },
     {
       "code": "FULL-C2QW-BEWP-CVFD",
@@ -375,5 +376,5 @@
       "note": "Hariyanto"
     }
   ],
-  "updatedAt": "2026-07-27T14:21:21.485Z"
+  "updatedAt": "2026-07-29T04:11:27.636Z"
 }

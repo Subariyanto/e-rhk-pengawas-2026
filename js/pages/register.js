@@ -116,14 +116,6 @@
         // Coba 1: kode random (PREFIX-XXXX-XXXX-XXXX) atau master
         const randCode = Codes.findCode(kode);
         if (randCode) {
-          // Cross-device check: cek Supabase apakah kode sudah dipakai di device lain.
-          // Master code selalu boleh (tidak dibatasi 1 device).
-          if (!randCode.master && window.SupabaseSync && window.SupabaseSync.isConfigured()) {
-            const usedCheck = await window.SupabaseSync.isCodeUsed(kode);
-            if (usedCheck.used) {
-              return UI.toast('❌ Kode ini sudah dipakai di device lain. Satu kode hanya berlaku untuk 1 device.', 'danger');
-            }
-          }
           tier = (randCode.tier === 'trial') ? 'trial' : 'full';
           activatedWith = randCode.code;
         } else if (nip && /^[A-Z0-9-]+$/i.test(kodeRaw) && kodeRaw.replace(/-/g, '').length <= 12) {

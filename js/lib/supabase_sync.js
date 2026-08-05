@@ -65,6 +65,25 @@
     }, extra || {});
   }
 
+  // Cek apakah kode sudah dipakai di device lain (real-time cross-device check).
+  // Dipanggil di halaman Register SEBELUM menerima kode.
+  // Return { used: boolean, reason?: string }
+  async function isCodeUsed(codeText) {
+    if (!isConfigured()) return { used: false, reason: 'not-configured' };
+    try {
+      const c = String(codeText || '').toUpperCase().trim();
+      if (!c) return { used: false, reason: 'empty' };
+      const url = endpoint(TABLE) + '?code=eq.' + encodeURIComponent(c) + '&limit=1';
+      const r = await fetch(url, { headers: headers(), cache: 'no-store' });
+      if (!r.ok) return { used: false, reason: 'http-' + r.status };
+      const rows = await r.json();
+      return { used: Array.isArray(rows) && rows.length > 0, count: rows.length };
+    } catch (e) {
+      console.warn('[SupabaseSync] isCodeUsed error:', e.message);
+      return { used: false, reason: 'network', error: e.message };
+    }
+  }
+
   // HP user → POST setelah aktivasi sukses.
   // Best-effort: kalau gagal, aktivasi tetap jalan (admin nanti update manual).
   async function reportActivation(payload) {
@@ -188,6 +207,7 @@
 
   window.SupabaseSync = {
     isConfigured,
+    isCodeUsed,
     reportActivation,
     fetchUnprocessed,
     markProcessed,

@@ -87,7 +87,8 @@
       "createdAt": "2026-07-24T00:19:03.608Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false
+      "revoked": false,
+      "note": "Ridwan Muntu"
     },
     {
       "code": "FULL-W9BU-DPR3-TXWW",
@@ -377,5 +378,5 @@
       "note": "Hariyanto"
     }
   ],
-  "updatedAt": "2026-07-29T06:02:35.207Z"
+  "updatedAt": "2026-08-07T08:45:52.893Z"
 }

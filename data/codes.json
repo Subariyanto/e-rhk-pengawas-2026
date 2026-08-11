@@ -96,7 +96,8 @@
       "createdAt": "2026-07-22T06:16:38.855Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false
+      "revoked": false,
+      "note": "Totok Yulianto"
     },
     {
       "code": "FULL-8RS7-AWJA-H62U",
@@ -378,5 +379,5 @@
       "note": "Hariyanto"
     }
   ],
-  "updatedAt": "2026-08-07T08:45:52.893Z"
+  "updatedAt": "2026-08-11T05:46:10.890Z"
 }

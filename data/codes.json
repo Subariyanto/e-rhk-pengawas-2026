@@ -1,6 +1,86 @@
 {
   "codes": [
     {
+      "code": "FULL-RE5N-FDEC-3BV6",
+      "tier": "full",
+      "createdAt": "2026-08-12T08:34:30.403Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-SBAR-83GX-YWYC",
+      "tier": "full",
+      "createdAt": "2026-08-12T08:34:30.403Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-7E5L-UPTD-LYDZ",
+      "tier": "full",
+      "createdAt": "2026-08-12T08:34:30.402Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-PT2Q-L5BM-NW86",
+      "tier": "full",
+      "createdAt": "2026-08-12T08:34:30.402Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-4BGS-XZ8S-GFGH",
+      "tier": "full",
+      "createdAt": "2026-08-12T08:34:30.402Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-YA6P-Z4ES-7WMP",
+      "tier": "full",
+      "createdAt": "2026-08-12T08:34:30.402Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-EVYS-BP6D-JZFS",
+      "tier": "full",
+      "createdAt": "2026-08-12T08:34:30.402Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-8262-ZLL8-N2BA",
+      "tier": "full",
+      "createdAt": "2026-08-12T08:34:30.402Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-MRWX-JK3R-2BJ7",
+      "tier": "full",
+      "createdAt": "2026-08-12T08:34:30.402Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
+      "code": "FULL-4DE8-WF2X-86NW",
+      "tier": "full",
+      "createdAt": "2026-08-12T08:34:30.402Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
       "code": "FULL-BF5W-XN48-VNBE",
       "tier": "full",
       "createdAt": "2026-07-24T00:19:03.609Z",
@@ -379,5 +459,5 @@
       "note": "Hariyanto"
     }
   ],
-  "updatedAt": "2026-08-11T05:46:14.690Z"
+  "updatedAt": "2026-08-12T08:34:32.226Z"
 }

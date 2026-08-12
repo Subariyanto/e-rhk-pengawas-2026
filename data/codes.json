@@ -6,7 +6,8 @@
       "createdAt": "2026-08-12T08:34:30.403Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false
+      "revoked": false,
+      "note": "Hasan Busri Sampang"
     },
     {
       "code": "FULL-SBAR-83GX-YWYC",
@@ -459,5 +460,5 @@
       "note": "Hariyanto"
     }
   ],
-  "updatedAt": "2026-08-12T08:34:32.226Z"
+  "updatedAt": "2026-08-12T08:34:50.007Z"
 }

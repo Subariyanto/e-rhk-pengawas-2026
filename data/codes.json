@@ -15,7 +15,8 @@
       "createdAt": "2026-08-12T08:34:30.403Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false
+      "revoked": false,
+      "note": "Supandi"
     },
     {
       "code": "FULL-7E5L-UPTD-LYDZ",
@@ -460,5 +461,5 @@
       "note": "Hariyanto"
     }
   ],
-  "updatedAt": "2026-08-14T01:57:15.062Z"
+  "updatedAt": "2026-08-14T01:58:43.385Z"
 }

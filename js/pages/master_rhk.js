@@ -66,7 +66,14 @@
     const fTw = params.get('tw') || '';
     const fQ = (params.get('q') || '').toLowerCase();
 
-    const filtered = list.filter(r => {
+    // Selalu tampilkan urutan berdasarkan triwulan, lalu nomor RHK.
+    // RHK baru pada TW I masuk ke kelompok TW I, bukan di bagian akhir.
+    const ordered = list.slice().sort((a, b) => {
+      const twOrder = { I: 1, II: 2, III: 3, IV: 4, TAMBAHAN: 5 };
+      return (twOrder[a.triwulan] || 99) - (twOrder[b.triwulan] || 99)
+        || (Number(a.nomor_rhk) || 0) - (Number(b.nomor_rhk) || 0);
+    });
+    const filtered = ordered.filter(r => {
       if (fTw && r.triwulan !== fTw) return false;
       if (fQ) {
         const blob = (r.id + ' ' + r.nama_eviden + ' ' + (r.rencana_hasil_kerja || '') + ' ' + (r.indikator_kuantitas || '')).toLowerCase();
@@ -209,7 +216,6 @@
       <tr data-rhk-id="${attr(r.id)}">
         <td rowspan="2" class="cell-id" style="vertical-align:middle;text-align:center;">
           <strong>RHK-${attr(r.nomor_rhk || '—')}</strong>
-          <div class="small text-muted">${attr(r.id)}</div>
           <div class="small mt-1">${tw}</div>
         </td>
         <td rowspan="2" class="cell-wrap" style="vertical-align:middle;">

@@ -29,19 +29,12 @@
   // tampil/penambahan tanpa mengubah ID yang sudah dipakai relasi eviden.
   function normalizeNomorRHK(list) {
     let changed = false;
-    const used = new Set();
-    let next = 1;
-    list.forEach(r => {
-      const n = Number(r.nomor_rhk);
-      if (Number.isInteger(n) && n > 0 && !used.has(n)) {
-        used.add(n);
-        if (n >= next) next = n + 1;
-      } else {
-        while (used.has(next)) next++;
-        r.nomor_rhk = next++;
-        used.add(r.nomor_rhk);
-        changed = true;
-      }
+    const twOrder = { I: 1, II: 2, III: 3, IV: 4, TAMBAHAN: 5 };
+    const ordered = list.slice().sort((a, b) =>
+      (twOrder[a.triwulan] || 99) - (twOrder[b.triwulan] || 99));
+    ordered.forEach((r, i) => {
+      const n = i + 1;
+      if (Number(r.nomor_rhk) !== n) { r.nomor_rhk = n; changed = true; }
     });
     return changed;
   }

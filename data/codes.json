@@ -1,88 +1,22 @@
 {
   "codes": [
     {
-      "code": "FULL-RE5N-FDEC-3BV6",
+      "code": "FULL-CLLN-LR28-3XL5",
       "tier": "full",
-      "createdAt": "2026-08-12T08:34:30.403Z",
+      "createdAt": "2026-08-27T13:17:54.675Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false,
+      "note": "Nurhasanah PM"
+    },
+    {
+      "code": "FULL-DAMX-P4VD-NPRC",
+      "tier": "full",
+      "createdAt": "2026-08-12T08:01:09.061Z",
       "usedBy": null,
       "usedAt": null,
       "revoked": false,
       "note": "Hasan Busri Sampang"
-    },
-    {
-      "code": "FULL-SBAR-83GX-YWYC",
-      "tier": "full",
-      "createdAt": "2026-08-12T08:34:30.403Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false,
-      "note": "Supandi"
-    },
-    {
-      "code": "FULL-7E5L-UPTD-LYDZ",
-      "tier": "full",
-      "createdAt": "2026-08-12T08:34:30.402Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false,
-      "note": "Syaifurrohman"
-    },
-    {
-      "code": "FULL-PT2Q-L5BM-NW86",
-      "tier": "full",
-      "createdAt": "2026-08-12T08:34:30.402Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
-    },
-    {
-      "code": "FULL-4BGS-XZ8S-GFGH",
-      "tier": "full",
-      "createdAt": "2026-08-12T08:34:30.402Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
-    },
-    {
-      "code": "FULL-YA6P-Z4ES-7WMP",
-      "tier": "full",
-      "createdAt": "2026-08-12T08:34:30.402Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
-    },
-    {
-      "code": "FULL-EVYS-BP6D-JZFS",
-      "tier": "full",
-      "createdAt": "2026-08-12T08:34:30.402Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
-    },
-    {
-      "code": "FULL-8262-ZLL8-N2BA",
-      "tier": "full",
-      "createdAt": "2026-08-12T08:34:30.402Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
-    },
-    {
-      "code": "FULL-MRWX-JK3R-2BJ7",
-      "tier": "full",
-      "createdAt": "2026-08-12T08:34:30.402Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false,
-      "note": "Rowiyana"
-    },
-    {
-      "code": "FULL-4DE8-WF2X-86NW",
-      "tier": "full",
-      "createdAt": "2026-08-12T08:34:30.402Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false
     },
     {
       "code": "FULL-BF5W-XN48-VNBE",
@@ -463,5 +397,5 @@
       "note": "Hariyanto"
     }
   ],
-  "updatedAt": "2026-08-16T15:05:38.666Z"
+  "updatedAt": "2026-08-27T14:24:21.752Z"
 }

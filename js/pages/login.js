@@ -66,8 +66,25 @@
     document.getElementById('frmLogin').addEventListener('submit', async (e) => {
       e.preventDefault();
       const fd = new FormData(e.target);
+      const idInput = String(fd.get('email') || '').trim();
+      const pwInput = String(fd.get('password') || '');
       try {
-        await Auth.login({ email: fd.get('email'), password: fd.get('password') });
+        // 1) Verifikasi via server Pusat Lisensi (akun lintas perangkat, pola PKKM).
+        let server = { ok: false, reason: 'no-module' };
+        try { server = await Auth.loginWithServer(idInput, pwInput); } catch (err) { server = { ok: false, reason: 'network' }; }
+        if (server.ok) {
+          try { window.applyTrialWatermark && window.applyTrialWatermark(); } catch (_) {}
+          history.replaceState(null, '', '#/dashboard');
+          Router.dispatch();
+          return;
+        }
+        // 2) Server menolak tegas (akun dinonaktifkan) → blokir.
+        if (server.reason === 'revoked' || server.reason === 'inactive') {
+          UI.toast(Auth.accountReasonMsg(server.reason), 'danger');
+          return;
+        }
+        // 3) Fallback login lokal (offline, akun lama, atau trial tanpa akun server).
+        await Auth.login({ email: idInput, password: pwInput });
         try { window.applyTrialWatermark && window.applyTrialWatermark(); } catch (_) {}
         history.replaceState(null, '', '#/dashboard');
         Router.dispatch();
@@ -186,6 +203,25 @@
 
       const emailFinal = nip ? (nip + '@pengawas.local') : email;
       try {
+        // Daftarkan ke akun server (1 kode = 1 akun) supaya bisa login lintas perangkat.
+        const username = nip || email;
+        let serverHash = null;
+        const sreg = await Auth.registerServerAccount({
+          code: id.code, username: username, password: pw,
+          fullname: nama || ('Pengawas ' + (nip ? nip.slice(-4) : '')), madrasah: '',
+        });
+        if (sreg.ok) {
+          serverHash = sreg.hash || null;
+        } else if (sreg.reason === 'network' || sreg.reason === 'no-module') {
+          UI.toast('Server Pusat Lisensi tidak terjangkau — akun dibuat lokal; sinkron akun menyusul saat online.', 'warning');
+        } else if (sreg.reason === 'account_exists') {
+          return UI.toast('ID akun "' + username + '" sudah terdaftar di server. Silakan login biasa.', 'danger');
+        } else if (sreg.reason === 'code_used') {
+          return UI.toast('Kode ini sudah dipakai akun lain di server.', 'danger');
+        } else if (sreg.reason !== 'invalid_code') {
+          // invalid_code bisa berarti kode legacy (tak terdaftar di licenses) → lanjut lokal.
+          return UI.toast('Registrasi akun ke server gagal: ' + Auth.accountReasonMsg(sreg.reason), 'danger');
+        }
         const u = await Auth.register({
           nama: nama || ('Pengawas ' + (nip ? nip.slice(-4) : '')),
           email: emailFinal,
@@ -195,6 +231,7 @@
           fullExpiresAt: new Date(Date.now() + Tier.LICENSE_DAYS * 86400000).toISOString(),
           activatedWith: id.code,
         });
+        if (serverHash) Auth.updateUser(u.id, { serverHash: serverHash, server_synced: true });
         const ownerInfo = {
           usedBy: Codes.stableOwnerKey({ nip, email: emailFinal }) || u.id,
           ownerName: u.nama,

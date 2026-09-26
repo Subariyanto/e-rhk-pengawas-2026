@@ -218,6 +218,110 @@
     return { merged, pushed, processed, errors };
   }
 
+  // ============================================================
+  // RPC AKUN PUSAT LISENSI — model "1 kode = 1 AKUN" (login lintas perangkat)
+  // Mengikuti pola PKKM. Akun hidup di server (tabel app_accounts),
+  // sehingga akun yang sama bisa login dari perangkat mana pun.
+  // Kode aktivasi tetap satu sumber di tabel `licenses` (dipakai bersama).
+  // ============================================================
+  const PUSAT_APP_SLUG = 'e-rhk-pengawas';
+  const RPC_TIMEOUT_MS = 12000;
+
+  function pusatHeaders() {
+    return {
+      apikey: PUSAT_ANON_KEY,
+      Authorization: 'Bearer ' + PUSAT_ANON_KEY,
+      'Content-Type': 'application/json',
+    };
+  }
+
+  // Panggil RPC di Pusat Lisensi. Return objek hasil, atau null bila gagal jaringan.
+  async function callPusatRpc(fn, args) {
+    try {
+      const ctrl = new AbortController();
+      const to = setTimeout(() => ctrl.abort(), RPC_TIMEOUT_MS);
+      const r = await fetch(PUSAT_URL.replace(/\/$/, '') + '/rest/v1/rpc/' + fn, {
+        method: 'POST',
+        headers: pusatHeaders(),
+        body: JSON.stringify(args || {}),
+        signal: ctrl.signal,
+      });
+      clearTimeout(to);
+      if (!r.ok) {
+        const txt = await r.text().catch(() => '');
+        console.warn('[SupabaseSync] rpc', fn, 'http', r.status, txt.slice(0, 200));
+        return null;
+      }
+      return await r.json();
+    } catch (e) {
+      console.warn('[SupabaseSync] rpc', fn, 'error:', e.message);
+      return null;
+    }
+  }
+
+  // Hash akun server: sha256(username.lower + ':' + password).
+  // HARUS sama dengan yang dihitung server (migrasi 05 & PKKM).
+  async function accountHash(username, password) {
+    try {
+      const enc = new TextEncoder().encode(
+        String(username || '').trim().toLowerCase() + ':' + String(password || '')
+      );
+      const buf = await crypto.subtle.digest('SHA-256', enc);
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    } catch (e) { return ''; }
+  }
+
+  // Klaim kode untuk 1 akun. Return { success, reason } atau { success:null, reason:'network_error' }.
+  async function registerAccount(code, appSlug, username, passwordHash, fullname, madrasah, deviceInfo) {
+    const r = await callPusatRpc('register_account', {
+      p_code: String(code || '').trim().toUpperCase(),
+      p_app_slug: appSlug || PUSAT_APP_SLUG,
+      p_username: String(username || '').trim().toLowerCase(),
+      p_password_hash: passwordHash,
+      p_fullname: fullname || '',
+      p_madrasah: madrasah || '',
+      p_device_info: deviceInfo || (navigator.userAgent || '').slice(0, 200),
+    });
+    if (r === null) return { success: null, reason: 'network_error' };
+    return r;
+  }
+
+  // Autentikasi akun. Return { valid, reason, fullname, madrasah, role, license_code, tier }
+  // atau { valid:null, reason:'network_error' } bila offline.
+  async function loginAccount(username, passwordHash, appSlug, deviceInfo) {
+    const r = await callPusatRpc('login_account', {
+      p_app_slug: appSlug || PUSAT_APP_SLUG,
+      p_username: String(username || '').trim().toLowerCase(),
+      p_password_hash: passwordHash,
+      p_device_info: deviceInfo || (navigator.userAgent || '').slice(0, 200),
+      p_touch: true,
+    });
+    if (r === null) return { valid: null, reason: 'network_error' };
+    return r;
+  }
+
+  // RPC admin akun (butuh admin key Pusat Lisensi). Dipakai panel Pusat Lisensi.
+  function adminListAccounts(adminKey, appSlug) {
+    return callPusatRpc('admin_list_accounts', { p_admin_key: adminKey, p_app_slug: appSlug || PUSAT_APP_SLUG });
+  }
+  function adminRevokeAccount(adminKey, accountId) {
+    return callPusatRpc('admin_revoke_account', { p_admin_key: adminKey, p_account_id: accountId });
+  }
+  function adminReactivateAccount(adminKey, accountId) {
+    return callPusatRpc('admin_reactivate_account', { p_admin_key: adminKey, p_account_id: accountId });
+  }
+  function adminDeleteAccount(adminKey, accountId) {
+    return callPusatRpc('admin_delete_account', { p_admin_key: adminKey, p_account_id: accountId });
+  }
+  function adminResetAccountPassword(adminKey, accountId, newHash) {
+    return callPusatRpc('admin_reset_account_password', {
+      p_admin_key: adminKey, p_account_id: accountId, p_new_password_hash: newHash,
+    });
+  }
+  function adminGetAccountStats(adminKey, appSlug) {
+    return callPusatRpc('admin_get_account_stats', { p_admin_key: adminKey, p_app_slug: appSlug || PUSAT_APP_SLUG });
+  }
+
   window.SupabaseSync = {
     isConfigured,
     verifyMasterCode,
@@ -225,5 +329,18 @@
     fetchUnprocessed,
     markProcessed,
     syncAdminInbox,
+    // Akun server (1 kode = 1 akun)
+    APP_SLUG: PUSAT_APP_SLUG,
+    accountHash,
+    registerAccount,
+    loginAccount,
+    callPusatRpc,
+    // Admin akun (panel Pusat Lisensi)
+    adminListAccounts,
+    adminRevokeAccount,
+    adminReactivateAccount,
+    adminDeleteAccount,
+    adminResetAccountPassword,
+    adminGetAccountStats,
   };
 })();

@@ -178,7 +178,38 @@
           fullExpiresAt = new Date(Date.now() + Tier.LICENSE_DAYS * 86400000).toISOString();
         }
         const email = nip ? (nip + '@pengawas.local') : emailInput.toLowerCase();
+        // Username akun server = NIP (atau email bila tanpa NIP). Ini identitas login lintas perangkat.
+        const username = nip ? nip : emailInput.toLowerCase();
+
+        // ===== AKUN SERVER (Pusat Lisensi) — 1 kode = 1 akun =====
+        // Hanya kode random FULL (non-master, non-legacy) yang didaftarkan ke server,
+        // supaya akun bisa login dari perangkat mana pun. Bila server tak terjangkau,
+        // registrasi tetap lanjut lokal (sinkron server menyusul saat online).
+        let serverSynced = false;
+        let serverHash = null;
+        if (claimedCode) {
+          const sreg = await Auth.registerServerAccount({
+            code: claimedCode, username: username, password: pw, fullname: nama, madrasah: '',
+          });
+          if (sreg.ok) {
+            serverSynced = true;
+            serverHash = sreg.hash || null;
+          } else if (sreg.reason === 'network' || sreg.reason === 'no-module') {
+            UI.toast('Server Pusat Lisensi tidak terjangkau — akun dibuat lokal. Sinkron akun server akan dicoba lagi saat online.', 'warning');
+          } else if (sreg.reason === 'account_exists') {
+            return UI.toast('ID akun "' + username + '" sudah terdaftar di server. Silakan login, atau hubungi admin bila ini akun baru.', 'danger');
+          } else {
+            return UI.toast('Registrasi akun ke server gagal: ' + Auth.accountReasonMsg(sreg.reason), 'danger');
+          }
+        }
+
         await Auth.register({ nama, email, password: pw, nip, tier, trialExpiresAt, fullExpiresAt, activatedWith });
+
+        // Simpan hash server pada user lokal (cache offline) bila terdaftar di server.
+        if (serverSynced && serverHash) {
+          const uTmp = Auth.listUsers().find(x => x.email === email);
+          if (uTmp) Auth.updateUser(uTmp.id, { serverHash: serverHash, server_synced: true });
+        }
 
         // Klaim kode random ke akun ini (master & legacy tidak diklaim).
         // Idempoten: kalau kode sudah milik akun ini, klaim ulang aman.

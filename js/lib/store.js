@@ -84,6 +84,10 @@
     try { alert(msg); } catch (e) {}
   }
 
+  // Hook opsional ke cloud (di-set oleh CloudSync). Tidak boleh melempar error.
+  let _onSetHook = null;
+  function onSet(fn) { _onSetHook = (typeof fn === 'function') ? fn : null; }
+
   function get(scope, fallback) {
     try {
       const raw = localStorage.getItem(userKey(scope));
@@ -93,6 +97,7 @@
   function set(scope, value) {
     if (isTrialLockedNow()) { notifyTrialLockedNow(); return false; }
     localStorage.setItem(userKey(scope), JSON.stringify(value));
+    if (_onSetHook) { try { _onSetHook(scope, value); } catch (e) { console.warn('[Store] onSet hook error:', e); } }
     return true;
   }
   function getGlobal(scope, fallback) {
@@ -156,7 +161,7 @@
   }
 
   window.Store = {
-    get, set, getGlobal, setGlobal, removeGlobal, uid, PREFIX, SESSION_KEY,
+    get, set, getGlobal, setGlobal, removeGlobal, uid, PREFIX, SESSION_KEY, onSet,
     exportAllForUser, importAllForUser,
     activePeriode, setActivePeriode, listPeriode, deletePeriode, clonePeriode, migrateLegacy,
     isTrialLocked: isTrialLockedNow,

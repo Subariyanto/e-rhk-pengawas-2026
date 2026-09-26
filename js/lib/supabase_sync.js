@@ -329,6 +329,11 @@
     fetchUnprocessed,
     markProcessed,
     syncAdminInbox,
+    // Konfigurasi project (URL + anon key publik, by design boleh di frontend)
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY,
+    PUSAT_URL,
+    PUSAT_ANON_KEY,
     // Akun server (1 kode = 1 akun)
     APP_SLUG: PUSAT_APP_SLUG,
     accountHash,

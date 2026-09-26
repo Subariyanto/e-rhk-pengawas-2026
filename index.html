@@ -67,6 +67,7 @@
   <script src="js/lib/aktivasi.js"></script>
   <script src="js/lib/github_sync.js"></script>
   <script src="js/lib/supabase_sync.js"></script>
+  <script src="js/lib/cloud_sync.js"></script>
   <script src="js/lib/tier.js"></script>
   <script src="js/lib/codes.js"></script>
   <script src="js/lib/pengawas_registry.js"></script>
@@ -116,5 +117,6 @@
 
   <!-- App bootstrap -->
   <script src="js/app.js"></script>
+  <script>document.addEventListener('DOMContentLoaded',function(){try{window.CloudSync&&CloudSync.start();}catch(e){console.warn('CloudSync start:',e);}});</script>
 </body>
 </html>

@@ -91,6 +91,7 @@
     if (!u) throw new Error('Email/NIP atau password salah.');
     if (u.status !== 'aktif') throw new Error('Akun tidak aktif.');
     localStorage.setItem(SESSION_KEY, JSON.stringify({ userId: u.id, role: u.role, ts: Date.now() }));
+    try { window.CloudSync && CloudSync.afterLogin && CloudSync.afterLogin(); } catch (e) {}
     return u;
   }
 
@@ -236,6 +237,7 @@
       licenseCode: r.license_code || null,
     });
     localStorage.setItem(SESSION_KEY, JSON.stringify({ userId: u.id, role: u.role, ts: Date.now() }));
+    try { window.CloudSync && CloudSync.afterLogin && CloudSync.afterLogin(); } catch (e) {}
     return { ok: true, user: u };
   }
 

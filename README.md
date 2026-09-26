@@ -30,7 +30,7 @@ Atau gunakan Live Server / static server pilihan Anda.
 9. Rekapitulasi (per RHK, Triwulan, Madrasah) + Export Excel + Cetak.
 10. PWA installable (offline-ready).
 
-## Struktur Data (localStorage)
+## Struktur Data (localStorage) — sumber utama + cache offline
 
 - `erhk2026_users` — daftar akun (global)
 - `erhk2026_session` — sesi login
@@ -40,6 +40,24 @@ Atau gunakan Live Server / static server pilihan Anda.
   - `madrasah` — daftar madrasah binaan
   - `kegiatan` — data kegiatan
   - `eviden` — eviden yang sudah dibuat
+
+## Sinkronisasi Cloud (lintas perangkat, gratis)
+
+Data dapat dibuka dari **perangkat mana pun** memakai akun yang sama.
+Mekanisme: **offline-first** — `localStorage` tetap sumber utama & cache;
+cloud (Supabase Pusat Lisensi) hanya cermin.
+
+- Modul: `js/lib/cloud_sync.js` (`window.CloudSync`)
+- Backend: Supabase **Pusat Lisensi** (project `llaukzsztguwrtwdubpm`), tabel `user_data` + RPC
+  `user_data_set`, `user_data_set_bulk`, `user_data_get` (verifikasi
+  `app_slug + username + sha256(username:password)`).
+- Migrasi SQL: `sql-server/11-cloud-data-sync.sql`
+- Alur: saat login → data ditarik dari cloud; setiap penyimpanan lokal → didorong
+  ke cloud (debounce). Konflik memakai **last-write-wins** berbasis `updated_at`.
+- **PENTING:** fitur ini hanya aktif untuk akun **server** (punya `serverHash`,
+  hasil login/daftar online). Akun **admin** & akun lokal tanpa `serverHash` tidak disinkron.
+- Lampiran (foto/PDF) **tidak** diunggah ke cloud — gunakan **link Google Drive**
+  pada kolom bukti dukung (hemat kuota).
 
 ## Stack
 

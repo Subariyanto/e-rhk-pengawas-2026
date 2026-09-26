@@ -71,18 +71,52 @@
   // Return: null kalau tidak ada / sudah revoked / sudah dipakai (untuk non-master).
   // Untuk konsistensi, MASTER code selalu valid (master=true, tier='full').
   // --- Master code: verifikasi ke server, hasil di-cache per sesi ---
+  // FALLBACK LOKAL (salted SHA-256): dipakai HANYA bila Pusat Lisensi tidak
+  // terjangkau / RPC verify_master_code belum diterapkan di server.
+  // Saat server tersedia, server tetap OTORITATIF (bisa revoke).
+  // Untuk ganti master code: update hash di sini + jalankan admin_set_master_code di server.
+  const MASTER_FALLBACK_HASH = {
+    'e-rhk-pengawas': 'f425c2f485696753cc05ac5d6af24f9164b599f2491b8f55e537e94d53a24ff4',
+  };
+  const MASTER_FALLBACK_SALT = 'pjm-salt-v1-2026-9c4e1a7b3f8d2560';
+
+  async function localMasterMatch(codeText) {
+    const exp = MASTER_FALLBACK_HASH[APP_SLUG];
+    if (!exp) return false;
+    const cr = (typeof window !== 'undefined') ? window.crypto : null;
+    if (!cr || !cr.subtle || typeof TextEncoder === 'undefined') return false;
+    try {
+      const data = new TextEncoder().encode(MASTER_FALLBACK_SALT + ':' + APP_SLUG + ':' + normCode(codeText));
+      const buf = await cr.subtle.digest('SHA-256', data);
+      const hex = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+      return hex === exp;
+    } catch (e) { return false; }
+  }
+
   async function verifyMasterCode(codeText) {
     const c = normCode(codeText);
     if (!c) return { valid: false, reason: 'empty' };
-    if (!window.SupabaseSync || typeof window.SupabaseSync.verifyMasterCode !== 'function') {
-      return { valid: false, reason: 'network' };
+    // 1) Server (otoritatif + bisa revoke)
+    if (window.SupabaseSync && typeof window.SupabaseSync.verifyMasterCode === 'function') {
+      try {
+        const r = await window.SupabaseSync.verifyMasterCode(c, APP_SLUG);
+        if (r && r.valid === true) {
+          try { sessionStorage.setItem(MASTER_CACHE_KEY, c); } catch (e) {}
+          return { valid: true, tier: r.tier || 'full', role: r.role || 'admin', master: true, via: 'server' };
+        }
+        // Server menjawab tegas invalid/revoked → hormati (jangan fallback).
+        if (r && (r.reason === 'invalid' || r.reason === 'revoked')) {
+          return { valid: false, reason: r.reason };
+        }
+        // reason 'network'/tak dikenal → lanjut ke fallback lokal.
+      } catch (e) { /* lanjut fallback */ }
     }
-    const r = await window.SupabaseSync.verifyMasterCode(c, APP_SLUG);
-    if (r && r.valid === true) {
+    // 2) Fallback lokal (server tak tersedia / RPC belum diterapkan)
+    if (await localMasterMatch(c)) {
       try { sessionStorage.setItem(MASTER_CACHE_KEY, c); } catch (e) {}
-      return { valid: true, tier: r.tier || 'full', role: r.role || 'admin', master: true };
+      return { valid: true, tier: 'full', role: 'admin', master: true, via: 'fallback' };
     }
-    return { valid: false, reason: r && r.reason ? r.reason : 'invalid' };
+    return { valid: false, reason: 'invalid' };
   }
 
   function isVerifiedMaster(codeText) {

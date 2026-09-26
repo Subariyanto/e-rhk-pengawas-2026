@@ -452,7 +452,7 @@
       appName: 'e-RHK Pengawas Madrasah 2026',
       appUrl: 'https://subariyanto.github.io/e-rhk-pengawas-2026/',
       orderTemplate: 'Halo Pak Subariyanto, saya ingin membeli Kode Aktivasi FULL aplikasi {APP}.\n\nNama: \nNIP: \nWilayah/KKMA: \n\nMohon info cara pembayarannya. Terima kasih.',
-      sendTemplate: 'Assalamualaikum Bapak/Ibu,\n\nTerima kasih sudah membeli lisensi {APP}.\n\nBerikut Kode Aktivasi FULL Bapak/Ibu:\n\n*{KODE}*\n\nCara pakai:\n1. Buka aplikasi: {URL}\n2. Login (atau daftar pakai mode TRIAL dulu)\n3. Klik banner kuning di dashboard → "Masukkan Kode FULL"\n4. Tempel kode di atas → selesai ✅\n\nKode ini sekali pakai. Simpan baik-baik.\n\nSalam,\nSubariyanto\nKetua Pokjawas Madrasah Kab. Jember',
+      sendTemplate: 'Assalamualaikum Bapak/Ibu,\n\nTerima kasih sudah membeli lisensi {APP}.\n\nBerikut Kode Aktivasi FULL Bapak/Ibu:\n\n*{KODE}*\n\nCara pakai:\n1. Buka aplikasi: {URL}\n2. Login (atau daftar pakai mode TRIAL dulu)\n3. Klik banner kuning di dashboard → "Masukkan Kode FULL"\n4. Tempel kode di atas → selesai ✅\n5. Di perangkat baru: halaman Login → "Masuk pakai Kode Aktivasi"\n\nKode ini terikat ke 1 akun (NIP/email), bisa dipakai dari perangkat mana pun. Simpan baik-baik.\n\nSalam,\nSubariyanto\nKetua Pokjawas Madrasah Kab. Jember',
     };
     let saved = null;
     try { saved = Store.getGlobal(SETTINGS_KEY, null); } catch (e) {}

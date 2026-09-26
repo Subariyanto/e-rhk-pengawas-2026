@@ -338,19 +338,25 @@
       saveCodes(list);
       return;
     }
-    // Bundled code yang baru pertama dipakai — catat sebagai consumed di local
+    // Kode yang TIDAK ada di list lokal (bundled / remote gh-pages) tapi baru
+    // pertama dipakai di device ini — catat sebagai consumed di lokal supaya
+    // device ini mengingat klaim tsb (dan tidak menawarkannya lagi).
     const bundled = (typeof window !== 'undefined' && Array.isArray(window.BUNDLED_CODES)) ? window.BUNDLED_CODES : [];
+    const remote = (typeof window !== 'undefined' && Array.isArray(window.REMOTE_CODES)) ? window.REMOTE_CODES : [];
     const bHit = bundled.find(x => normCode(x.code) === c);
-    if (bHit) {
+    const rHit = remote.find(x => normCode(x.code) === c);
+    const src = bHit || rHit;
+    if (src) {
       const item = {
-        code: bHit.code,
-        tier: (bHit.tier || 'full').toLowerCase(),
-        bundled: true,
+        code: src.code,
+        tier: (src.tier || 'full').toLowerCase(),
         createdAt: new Date().toISOString(),
         usedBy: null,
         usedAt: null,
         revoked: false,
       };
+      if (bHit) item.bundled = true;
+      else item.remote = true;
       patchOwner(item);
       list.unshift(item);
       saveCodes(list);

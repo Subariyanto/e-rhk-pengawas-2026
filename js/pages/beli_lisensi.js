@@ -115,25 +115,7 @@
         UI.toast('Memuat daftar kode terbaru...', 'info');
         try { await window.GithubSync.refreshFromPublic(); } catch (e) { console.warn('refresh failed:', e); }
       }
-      // Diagnostik bertingkat
-      const found = Codes.findCode(c);
-      if (!found) {
-        // Kode benar-benar tidak ada di registry, ATAU sudah dipakai / dicabut
-        const any = Codes.findCodeAny(c);
-        if (any) {
-          if (any.usedBy) return UI.toast('Kode "' + c.toUpperCase() + '" sudah pernah dipakai oleh akun lain. Hubungi admin untuk kode baru.', 'danger');
-          if (any.revoked) return UI.toast('Kode "' + c.toUpperCase() + '" sudah dicabut/expired oleh admin.', 'danger');
-        }
-        // Kode benar-benar tidak ada → kasih hint cross-device
-        const msg = 'Kode "' + c.toUpperCase() + '" tidak ditemukan.\n\nKemungkinan penyebab:\n1. Salah ketik (cek huruf O vs angka 0, I vs 1)\n2. Kode di-generate di browser/device lain (localStorage tidak sinkron lintas device)\n3. Belum dideploy ke gh-pages (kalau pakai bundled codes)\n\nUntuk admin: cek halaman Kode Aktivasi di device yang sama dengan tempat generate, atau coba master code POKJAWAS-JEMBER-ERHK-2026.';
-        if (window.confirm) alert(msg);
-        else UI.toast('Kode tidak ditemukan. Cek pesan di console.', 'danger');
-        console.warn('[Aktivasi] kode tidak ditemukan:', c.toUpperCase(), '\nKode di registry:', Codes.getCodes().length, 'item');
-        return;
-      }
-      if (found.tier !== 'full') {
-        return UI.toast('Kode "' + c.toUpperCase() + '" valid tapi tier-nya "' + found.tier + '", bukan FULL. Untuk upgrade FULL, butuh kode FULL-* atau master code.', 'warning');
-      }
+      // Diagnostik bertingkat — validasi kepemilikan (1 kode = 1 AKUN).
       const cur = Auth.currentUser();
       if (!cur) {
         UI.toast('Anda perlu login terlebih dahulu untuk aktivasi. Silakan login dulu, kemudian masukkan kode dari banner dashboard.', 'warning');
@@ -141,14 +123,35 @@
         Router.dispatch();
         return;
       }
+      // Kode milik akun ini boleh dipakai ulang (re-klaim) di perangkat mana pun;
+      // kode milik akun lain ditolak.
+      const v = await Codes.validateForUser(c, { nip: cur.nip, email: cur.email });
+      if (!v.ok) {
+        if (v.reason === 'used-by-other') return UI.toast('Kode "' + c.toUpperCase() + '" sudah diaktifkan untuk akun lain (aturan: 1 kode = 1 akun). Hubungi admin bila Anda merasa berhak.', 'danger');
+        if (v.reason === 'revoked') return UI.toast('Kode "' + c.toUpperCase() + '" sudah dicabut/expired oleh admin.', 'danger');
+        // not-found → kasih hint
+        const msg = 'Kode "' + c.toUpperCase() + '" tidak ditemukan.\n\nKemungkinan penyebab:\n1. Salah ketik (cek huruf O vs angka 0, I vs 1)\n2. Kode belum dideploy ke gh-pages (kalau pakai bundled codes)\n\nUntuk admin: cek halaman Kode Aktivasi, atau gunakan master code dari pengelola.';
+        if (window.confirm) alert(msg);
+        else UI.toast('Kode tidak ditemukan. Cek pesan di console.', 'danger');
+        console.warn('[Aktivasi] kode tidak ditemukan:', c.toUpperCase(), '\nKode di registry:', Codes.getCodes().length, 'item');
+        return;
+      }
+      if (v.tier !== 'full') {
+        return UI.toast('Kode "' + c.toUpperCase() + '" valid tapi tier-nya "' + v.tier + '", bukan FULL. Untuk upgrade FULL, butuh kode FULL-* atau master code.', 'warning');
+      }
       const wasFull = (cur.tier === 'full') && cur.fullExpiresAt;
       Tier.upgradeUserToFull(cur.id);
       try { window.applyTrialWatermark && window.applyTrialWatermark(); } catch (_) {}
-      if (!found.master) {
-        Codes.consumeCode(c, cur.id);
+      if (!v.master) {
+        Codes.consumeCode(v.code || c, cur.id, {
+          usedBy: Codes.stableOwnerKey(cur) || cur.id,
+          ownerName: cur.nama,
+          ownerNip: cur.nip || null,
+          ownerEmail: (cur.email && cur.email.indexOf('@') >= 0 && !cur.email.endsWith('@pengawas.local')) ? cur.email : null,
+        });
         if (window.SupabaseSync && window.SupabaseSync.isConfigured()) {
           window.SupabaseSync.reportActivation({
-            code: c,
+            code: v.code || c,
             nama: cur.nama || cur.email,
             nip: cur.nip || null,
             email: cur.email,

@@ -133,12 +133,12 @@
     // Wire trial banner button
     const btnKodeFull = document.getElementById('btnInputKodeFull');
     if (btnKodeFull) {
-      btnKodeFull.addEventListener('click', () => {
+      btnKodeFull.addEventListener('click', async () => {
         const kode = prompt('Masukkan Kode Aktivasi FULL untuk upgrade/perpanjang akun ini:');
         if (kode == null) return;
         const c = String(kode).trim();
         if (!c) return;
-        const found = Codes.findCode(c);
+        const found = await Codes.findCode(c);
         if (!found || found.tier !== 'full') {
           return UI.toast('Kode tidak valid, sudah dipakai, atau bukan kode FULL.', 'danger');
         }

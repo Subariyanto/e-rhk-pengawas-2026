@@ -2,8 +2,11 @@
 //   1. NIP kosong + Kode kosong → tier=trial (5 hari, 10 kegiatan), butuh field Nama
 //   2. NIP diisi + Kode kosong → tier=trial (5 hari), nama auto-lookup dari registry
 //   3. NIP diisi + Kode legacy (XXXX-XXXX) → verify pakai KodeAktivasi.verify (per-NIP) → tier=full
-//   4. Kode random PREFIX-XXXX-XXXX-XXXX (TRIAL/FULL) → cek di Codes.findCode → tier sesuai
-//   5. Master code POKJAWAS-JEMBER-ERHK-2026 → tier=full
+//   4. Kode random PREFIX-XXXX-XXXX-XXXX (TRIAL/FULL) → cek kepemilikan (1 kode = 1 AKUN):
+//        - kode belum diklaim → klaim untuk akun ini
+//        - sudah diklaim akun ini → ok (re-klaim, mis. daftar ulang di perangkat baru)
+//        - sudah diklaim akun LAIN → ditolak
+//   5. Master code (diverifikasi server via Codes.verifyMasterCode) → tier=full
 (function () {
   Page.Register = function () {
     UI.bareShell(`
@@ -105,6 +108,8 @@
       let tier = 'trial';
       let activatedWith = null;
       let trialExpiresAt = null;
+      let claimedCode = null;      // kode random (non-master) yang akan diklaim ke akun ini
+      let claimedReclaim = false;  // true kalau kode sudah milik akun ini (daftar ulang perangkat baru)
 
       if (kode) {
         // SELALU refresh REMOTE_CODES dari gh-pages sebelum validasi.
@@ -113,11 +118,18 @@
         if (window.GithubSync) {
           try { await window.GithubSync.refreshFromPublic(); } catch (e) { console.warn('[register] refresh failed:', e); }
         }
-        // Coba 1: kode random (PREFIX-XXXX-XXXX-XXXX) atau master
-        const randCode = Codes.findCode(kode);
-        if (randCode) {
-          tier = (randCode.tier === 'trial') ? 'trial' : 'full';
-          activatedWith = randCode.code;
+        // Coba 1: kode random (PREFIX-XXXX-XXXX-XXXX) atau master.
+        // Kepemilikan = per AKUN (NIP/email), bukan per perangkat. Akun yang sama
+        // boleh memakai ulang kodenya di perangkat lain.
+        const v = await Codes.validateForUser(kode, { nip: nip || null, email: emailInput || null });
+        if (v.ok) {
+          tier = (v.tier === 'trial') ? 'trial' : 'full';
+          activatedWith = v.code;
+          if (!v.master) { claimedCode = v.code; claimedReclaim = !!v.reclaim; }
+        } else if (v.reason === 'used-by-other') {
+          return UI.toast('Kode "' + kode + '" sudah diaktifkan untuk akun lain (aturan: 1 kode = 1 akun). Kalau Anda pemiliknya, login pakai akun tersebut; kalau bukan, minta kode baru ke admin.', 'danger');
+        } else if (v.reason === 'revoked') {
+          return UI.toast('Kode "' + kode + '" sudah dicabut/expired oleh admin.', 'danger');
         } else if (nip && /^[A-Z0-9-]+$/i.test(kodeRaw) && kodeRaw.replace(/-/g, '').length <= 12) {
           // Coba 2: kode legacy deterministik per-NIP (8 hex char, format XXXX-XXXX)
           try {
@@ -168,30 +180,35 @@
         const email = nip ? (nip + '@pengawas.local') : emailInput.toLowerCase();
         await Auth.register({ nama, email, password: pw, nip, tier, trialExpiresAt, fullExpiresAt, activatedWith });
 
-        // Konsumsi kode random (master tidak dihabiskan, legacy juga tidak)
-        if (kode) {
-          const randCode = Codes.findCode(kode);
-          if (randCode && !randCode.master) {
-            // Cari user yang baru dibuat untuk consume berdasarkan id
-            const u = Auth.listUsers().find(x => x.email === email);
-            Codes.consumeCode(kode, u ? u.id : email);
-            // Best-effort relay ke Supabase supaya admin laptop bisa auto-update
-            // kolom "Dipakai Oleh". No-op kalau Supabase belum dikonfigurasi.
-            if (window.SupabaseSync && window.SupabaseSync.isConfigured()) {
-              window.SupabaseSync.reportActivation({
-                code: kode,
-                nama,
-                nip: nip || null,
-                email,
-                tier,
-              }).catch(() => {});
-            }
+        // Klaim kode random ke akun ini (master & legacy tidak diklaim).
+        // Idempoten: kalau kode sudah milik akun ini, klaim ulang aman.
+        if (claimedCode) {
+          const u = Auth.listUsers().find(x => x.email === email);
+          const ownerKey = Codes.stableOwnerKey({ nip, email });
+          const ownerInfo = {
+            usedBy: ownerKey || (u ? u.id : email),
+            ownerName: nama,
+            ownerNip: nip || null,
+            ownerEmail: (email && email.indexOf('@') >= 0 && !email.endsWith('@pengawas.local')) ? email : null,
+          };
+          Codes.consumeCode(claimedCode, u ? u.id : email, ownerInfo);
+          // Best-effort relay ke Supabase supaya admin laptop bisa auto-update
+          // kolom "Dipakai Oleh". No-op kalau Supabase belum dikonfigurasi.
+          if (window.SupabaseSync && window.SupabaseSync.isConfigured()) {
+            window.SupabaseSync.reportActivation({
+              code: claimedCode,
+              nama,
+              nip: nip || null,
+              email,
+              tier,
+            }).catch(() => {});
           }
         }
 
         const loginId = nip || email;
         let pesan = 'Pendaftaran berhasil. Silakan login pakai ' + loginId + '.';
         if (tier === 'trial') pesan = '✅ TRIAL sukses (' + Tier.TRIAL_DAYS + ' hari, max ' + Tier.TRIAL_MAX_KEGIATAN + ' kegiatan). Login pakai: ' + loginId;
+        else if (claimedReclaim) pesan = '✅ Akun FULL berhasil dibuat ulang di perangkat ini (kode sudah terdaftar atas nama Anda). Login pakai: ' + loginId;
         else pesan = '🎉 FULL sukses (berlaku ' + Tier.LICENSE_DAYS + ' hari = 1 tahun). Login pakai: ' + loginId;
         UI.toast(pesan);
         // Pre-fill login field via sessionStorage agar mudah

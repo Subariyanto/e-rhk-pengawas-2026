@@ -1,10 +1,26 @@
 // Admin > Kode Aktivasi — generate kode untuk NIP pengawas + import dari Excel + rotate secret.
 (function () {
+  // Label pemilik kode untuk tampilan admin (model 1 kode = 1 akun).
+  // Fallback ke metadata ownerName/Nip/Email untuk kode milik akun di perangkat lain.
+  function ownerLabel(c) {
+    const raw = c && c.usedBy;
+    if (!raw) return '';
+    const u = (Auth.listUsers() || []).find(x => x.id === raw);
+    if (u) return (u.nama || u.email || '') + (u.nip ? ' (' + u.nip + ')' : '');
+    const s = String(raw);
+    const nip = c.ownerNip || (/^\d{8,}$/.test(s) ? s : '');
+    const em = c.ownerEmail || (s.indexOf('@') >= 0 && !s.toLowerCase().endsWith('@pengawas.local') ? s : '');
+    const nm = c.ownerName || '';
+    let out = nm || em || nip || s;
+    if (nip && out !== nip) out += ' (' + nip + ')';
+    return out;
+  }
+
   Page.AdminAktivasi = function () {
     UI.shell('Kode Aktivasi', `
       <div class="alert alert-light border mb-3">
         <i class="bi bi-shield-check text-success"></i>
-        Kelola <strong>kode aktivasi</strong> (TRIAL/FULL) untuk pengawas. Kode dibuat random format <code>FULL-XXXX-XXXX-XXXX</code>, sekali pakai. Lisensi FULL berlaku <strong>1 tahun</strong> sejak aktivasi.
+        Kelola <strong>kode aktivasi</strong> (TRIAL/FULL) untuk pengawas. Kode dibuat random format <code>FULL-XXXX-XXXX-XXXX</code>, berlaku <strong>1 kode = 1 akun</strong>. Lisensi FULL berlaku <strong>1 tahun</strong> sejak aktivasi.
       </div>
 
       <ul class="nav nav-tabs mb-3" id="aktTab" role="tablist">
@@ -17,7 +33,7 @@
         <div class="tab-pane fade show active" id="tabRandom">
           <div class="card mb-3"><div class="card-body">
             <h5 class="card-title mb-2"><i class="bi bi-shuffle"></i> Generate Kode Random (TRIAL / FULL)</h5>
-            <p class="small text-muted mb-3">Format <code>PREFIX-XXXX-XXXX-XXXX</code>. Sekali pakai, tidak terkait NIP. Cocok untuk lisensi yang dijual via WhatsApp.</p>
+            <p class="small text-muted mb-3">Format <code>PREFIX-XXXX-XXXX-XXXX</code>. Terikat ke <strong>1 AKUN (NIP/email)</strong>, bukan 1 perangkat — akun yang sama bisa dipakai dari perangkat mana pun. Cocok untuk lisensi yang dijual via WhatsApp.</p>
             <div class="d-flex flex-wrap gap-2">
               <button class="btn btn-success btn-sm" id="btnGenFull"><i class="bi bi-plus-circle"></i> 1 Kode FULL</button>
               <button class="btn btn-outline-success btn-sm" id="btnGen10Full"><i class="bi bi-collection"></i> 10 Kode FULL</button>
@@ -26,12 +42,12 @@
               <button class="btn btn-outline-secondary btn-sm ms-auto" id="btnClearUsed"><i class="bi bi-eraser"></i> Hapus Kode Terpakai/Cabut</button>
             </div>
             <div class="alert alert-warning mt-3 small mb-0">
-              <i class="bi bi-exclamation-triangle"></i> <strong>Penting (cross-device):</strong> Kode random tersimpan di localStorage device ini saja. Supaya user bisa aktivasi dari HP / device lain, klik <strong>📤 Export untuk Bundled</strong> di bawah, lalu paste hasilnya ke file <code>js/data/purchase_default.js</code> (atau kirim via chat ke Bari) → commit + push gh-pages.
+              <i class="bi bi-exclamation-triangle"></i> <strong>Penting (cross-device):</strong> Kode terikat ke <strong>akun</strong> (NIP/email), bukan perangkat. Supaya user bisa aktivasi/masuk dari HP / device lain, daftar kode harus ter-deploy ke gh-pages: pakai <strong>PAT + Sinkronisasi</strong> (otomatis), atau <strong>📤 Export untuk Bundled</strong> lalu paste ke <code>js/data/purchase_default.js</code> → commit + push gh-pages.
             </div>
             <div class="alert alert-info mt-2 small mb-0">
-              <i class="bi bi-key"></i> Kode <strong>master</strong> (selalu aktif, hard-coded di source):
-              <code style="font-family:monospace;font-weight:600;">${U.escapeHtml(Codes.MASTER_CODE)}</code>
-              &mdash; ganti + redeploy kalau bocor.
+              <i class="bi bi-key"></i> Kode <strong>master</strong> (selalu aktif, diverifikasi server):
+              <span class="text-muted">hubungi pengelola untuk kodenya.</span>
+              &mdash; kode master tidak lagi ditampilkan di sini demi keamanan.
             </div>
           </div></div>
           <div class="card"><div class="card-body">
@@ -458,7 +474,7 @@
               <th style="min-width:18rem;">Kode</th>
               <th>Tier</th>
               <th>Status</th>
-              <th>Dipakai Oleh</th>
+              <th>Pemilik (Akun)</th>
               <th style="min-width:12rem;">Catatan / Pemilik</th>
               <th>Tanggal</th>
               <th class="text-end" style="width:16rem;">Aksi</th>
@@ -474,10 +490,7 @@
                 else if (c.usedBy) status = '<span class="badge bg-secondary">Terpakai</span>';
                 else status = '<span class="badge bg-success-subtle text-success border border-success">Aktif</span>';
                 let usedBy = '-';
-                if (c.usedBy) {
-                  const u = (Auth.listUsers() || []).find(x => x.id === c.usedBy);
-                  usedBy = u ? (U.escapeHtml(u.nama || u.email) + (u.nip ? ' (' + u.nip + ')' : '')) : U.escapeHtml(c.usedBy);
-                }
+                if (c.usedBy) { usedBy = U.escapeHtml(ownerLabel(c)); }
                 const noteText = c.note ? U.escapeHtml(c.note) : '<span class="text-muted fst-italic">— belum diisi —</span>';
                 const tgl = c.usedAt
                   ? ('dipakai: ' + (U.fmtTanggalISO ? U.fmtTanggalISO(c.usedAt) : c.usedAt.slice(0,10)))
@@ -606,7 +619,7 @@
     function exportRandomCsv() {
       const list = Codes.getCodes();
       if (!list.length) return UI.toast('Tidak ada kode untuk di-export.', 'warning');
-      const head = ['No', 'Kode', 'Tier', 'Status', 'Dipakai Oleh', 'Catatan / Pemilik', 'Tanggal Dibuat', 'Tanggal Dipakai'];
+      const head = ['No', 'Kode', 'Tier', 'Status', 'Pemilik (Akun)', 'Catatan / Pemilik', 'Tanggal Dibuat', 'Tanggal Dipakai'];
       const lines = [head.join(',')];
       list.forEach((c, i) => {
         const tier = (c.tier || 'full').toUpperCase();
@@ -614,10 +627,7 @@
         if (c.revoked) status = 'Dicabut';
         else if (c.usedBy) status = 'Terpakai';
         let usedBy = '';
-        if (c.usedBy) {
-          const u = (Auth.listUsers() || []).find(x => x.id === c.usedBy);
-          usedBy = u ? (u.nama || u.email || '') + (u.nip ? ' (' + u.nip + ')' : '') : c.usedBy;
-        }
+        if (c.usedBy) { usedBy = ownerLabel(c); }
         const cols = [
           i + 1,
           c.code,
@@ -642,7 +652,7 @@
       const wb = new ExcelJS.Workbook();
       wb.creator = 'Pokjawas Madrasah Kab. Jember';
       const ws = wb.addWorksheet('Kode Aktivasi');
-      const head = ['No', 'Kode Aktivasi', 'Tier', 'Status', 'Dipakai Oleh', 'Catatan / Pemilik', 'Tanggal Dibuat', 'Tanggal Dipakai'];
+      const head = ['No', 'Kode Aktivasi', 'Tier', 'Status', 'Pemilik (Akun)', 'Catatan / Pemilik', 'Tanggal Dibuat', 'Tanggal Dipakai'];
       ws.addRow(head);
       const headerRow = ws.getRow(1);
       headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
@@ -655,10 +665,7 @@
         if (c.revoked) status = 'Dicabut';
         else if (c.usedBy) status = 'Terpakai';
         let usedBy = '';
-        if (c.usedBy) {
-          const u = (Auth.listUsers() || []).find(x => x.id === c.usedBy);
-          usedBy = u ? (u.nama || u.email || '') + (u.nip ? ' (' + u.nip + ')' : '') : c.usedBy;
-        }
+        if (c.usedBy) { usedBy = ownerLabel(c); }
         ws.addRow([
           i + 1,
           c.code,
@@ -739,10 +746,7 @@
         if (c.revoked) status = 'Dicabut';
         else if (c.usedBy) status = 'Terpakai';
         let usedBy = '-';
-        if (c.usedBy) {
-          const u = (Auth.listUsers() || []).find(x => x.id === c.usedBy);
-          usedBy = u ? (U.escapeHtml(u.nama || u.email || '') + (u.nip ? ' (' + u.nip + ')' : '')) : U.escapeHtml(c.usedBy);
-        }
+        if (c.usedBy) { usedBy = U.escapeHtml(ownerLabel(c)); }
         return `<tr><td>${i + 1}</td><td class="kode">${U.escapeHtml(c.code)}</td><td>${tier}</td><td>${status}</td><td>${usedBy}</td><td>${U.escapeHtml(c.note || '')}</td><td>${c.createdAt ? c.createdAt.slice(0, 10) : ''}</td><td>${c.usedAt ? c.usedAt.slice(0, 10) : ''}</td></tr>`;
       }).join('');
       const aktif = list.filter(c => !c.usedBy && !c.revoked).length;
@@ -762,7 +766,7 @@
         <h2>Daftar Kode Aktivasi Random e-RHK Pengawas Madrasah 2026</h2>
         <div class="sub">Pokjawas Kab. Jember &mdash; ${U.fmtTanggal ? U.fmtTanggal(new Date()) : new Date().toLocaleDateString('id-ID')} &mdash; Total: ${list.length} (Aktif: ${aktif}, Terpakai: ${dipakai}, Dicabut: ${dicabut})</div>
         <table><thead><tr>
-          <th>No</th><th>Kode</th><th>Tier</th><th>Status</th><th>Dipakai Oleh</th><th>Catatan / Pemilik</th><th>Dibuat</th><th>Dipakai</th>
+          <th>No</th><th>Kode</th><th>Tier</th><th>Status</th><th>Pemilik (Akun)</th><th>Catatan / Pemilik</th><th>Dibuat</th><th>Dipakai</th>
         </tr></thead><tbody>${rowsHtml}</tbody></table>
         <p class="noprint"><button onclick="window.print()">Cetak</button></p>
       </body></html>`);

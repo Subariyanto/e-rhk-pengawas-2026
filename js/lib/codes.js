@@ -3,10 +3,15 @@
 // dipakai untuk 59 pengawas yang sudah dapat kode legacy.
 //
 // Storage key: erhk2026_activation_codes (via Store.setGlobal/getGlobal).
-// Master code hard-coded: POKJAWAS-JEMBER-ERHK-2026 → tier=full, master=true.
+// Master code TIDAK lagi hard-coded di sini — diverifikasi di server via
+// SupabaseSync.verifyMasterCode (RPC verify_master_code). Ganti/cabut dari server.
 (function () {
   const STORE_KEY = 'activation_codes';
-  const MASTER_CODE = 'POKJAWAS-JEMBER-ERHK-2026';
+  const APP_SLUG = 'e-rhk-pengawas';
+
+  // Sesudah verifikasi server sukses, kode master di-cache sementara di sesi ini
+  // supaya pemakaian berikutnya sinkron (mis. consumeCode yang melewati master).
+  const MASTER_CACHE_KEY = 'erhk2026_master_verified';
 
   function normCode(s) { return String(s || '').toUpperCase().replace(/\s+/g, '').trim(); }
 
@@ -65,12 +70,37 @@
   // Cari kode di list random codes; juga deteksi MASTER code hardcoded + BUNDLED codes.
   // Return: null kalau tidak ada / sudah revoked / sudah dipakai (untuk non-master).
   // Untuk konsistensi, MASTER code selalu valid (master=true, tier='full').
+  // --- Master code: verifikasi ke server, hasil di-cache per sesi ---
+  async function verifyMasterCode(codeText) {
+    const c = normCode(codeText);
+    if (!c) return { valid: false, reason: 'empty' };
+    if (!window.SupabaseSync || typeof window.SupabaseSync.verifyMasterCode !== 'function') {
+      return { valid: false, reason: 'network' };
+    }
+    const r = await window.SupabaseSync.verifyMasterCode(c, APP_SLUG);
+    if (r && r.valid === true) {
+      try { sessionStorage.setItem(MASTER_CACHE_KEY, c); } catch (e) {}
+      return { valid: true, tier: r.tier || 'full', role: r.role || 'admin', master: true };
+    }
+    return { valid: false, reason: r && r.reason ? r.reason : 'invalid' };
+  }
+
+  function isVerifiedMaster(codeText) {
+    const c = normCode(codeText);
+    if (!c) return false;
+    try { return sessionStorage.getItem(MASTER_CACHE_KEY) === c; } catch (e) { return false; }
+  }
+
+  // Isi hasil cache sesi → bentuk objek master (dipakai findCode/findCodeAny/lookupAnywhere).
+  function cachedMasterObject(codeText) {
+    const c = normCode(codeText);
+    return { code: c, tier: 'full', master: true, usedBy: null, _cached: true };
+  }
+
   function findCode(codeText) {
     const c = normCode(codeText);
     if (!c) return null;
-    if (c === MASTER_CODE) {
-      return { code: MASTER_CODE, tier: 'full', master: true, usedBy: null };
-    }
+    if (isVerifiedMaster(c)) return cachedMasterObject(c);
     const list = getCodes();
     const localHit = list.find(x => normCode(x.code) === c && !x.usedBy && !x.revoked);
     if (localHit) return localHit;
@@ -99,7 +129,7 @@
   function findCodeAny(codeText) {
     const c = normCode(codeText);
     if (!c) return null;
-    if (c === MASTER_CODE) return { code: MASTER_CODE, tier: 'full', master: true, usedBy: null };
+    if (isVerifiedMaster(c)) return cachedMasterObject(c);
     const list = getCodes();
     const localHit = list.find(x => normCode(x.code) === c);
     if (localHit) return localHit;
@@ -112,21 +142,165 @@
     return null;
   }
 
+  // ===== MODEL "1 KODE = 1 AKUN" (Opsi B) =====
+  // Kode diikat ke sebuah IDENTITAS AKUN yang stabil lintas perangkat:
+  //   - NIP (kalau ada)      → identik di semua perangkat
+  //   - email (trial tanpa NIP)
+  // Akun yang SAMA boleh memakai kembali kodenya di perangkat lain (re-klaim).
+  // Akun LAIN tetap ditolak selama kode sudah diklaim (sampai admin revoke/hapus).
+
+  // Normalisasi identitas akun → array kunci pembanding.
+  function ownerKeysOf(o) {
+    const keys = [];
+    if (o == null) return keys;
+    if (typeof o === 'object') {
+      const nip = String(o.nip || '').replace(/[^0-9]/g, '');
+      const email = String(o.email || '').trim().toLowerCase();
+      if (nip) keys.push('nip:' + nip);
+      if (email && email.indexOf('@') >= 0 && !email.endsWith('@pengawas.local')) keys.push('email:' + email);
+      return keys;
+    }
+    const s = String(o).trim();
+    if (!s) return keys;
+    const low = s.toLowerCase();
+    if (low.indexOf('nip:') === 0) {
+      const d = low.slice(4).replace(/[^0-9]/g, '');
+      if (d) keys.push('nip:' + d);
+      return keys;
+    }
+    if (low.indexOf('email:') === 0) {
+      const e = low.slice(6).replace(/^(nip|email):/, '');
+      if (e && e.indexOf('@') >= 0 && !e.endsWith('@pengawas.local')) keys.push('email:' + e);
+      return keys;
+    }
+    if (/^\d{8,}$/.test(s)) keys.push('nip:' + s);
+    else if (s.indexOf('@') >= 0 && !low.endsWith('@pengawas.local')) keys.push('email:' + low);
+    else keys.push('raw:' + low);
+    return keys;
+  }
+
+  // Kunci identitas dari nilai usedBy (bisa userId lokal, email, atau NIP).
+  function ownerKeysOfUsedBy(usedBy) {
+    if (!usedBy) return [];
+    try {
+      const us = (window.Auth && Auth.listUsers) ? Auth.listUsers() : [];
+      const u = us.find(x => x.id === usedBy);
+      if (u) return ownerKeysOf(u);
+    } catch (e) {}
+    return ownerKeysOf(usedBy);
+  }
+
+  function isSameOwner(usedBy, user) {
+    const a = ownerKeysOfUsedBy(usedBy);
+    const b = ownerKeysOf(user);
+    return a.length > 0 && b.length > 0 && a.some(k => b.indexOf(k) >= 0);
+  }
+
+  // Kunci identitas stabil untuk disimpan sebagai usedBy (lintas perangkat).
+  function stableOwnerKey(user) {
+    if (!user) return '';
+    const nip = String(user.nip || '').replace(/[^0-9]/g, '');
+    if (nip) return nip;
+    const email = String(user.email || '').trim().toLowerCase();
+    if (email && email.indexOf('@') >= 0 && !email.endsWith('@pengawas.local')) return email;
+    return email || '';
+  }
+
+  // Cari kode di semua sumber (local → remote gh-pages → bundled), tanpa filter.
+  function lookupAnywhere(codeText) {
+    const c = normCode(codeText);
+    if (!c) return null;
+    if (isVerifiedMaster(c)) return cachedMasterObject(c);
+    const list = getCodes();
+    const local = list.find(x => normCode(x.code) === c);
+    if (local) return local;
+    const remote = (typeof window !== 'undefined' && Array.isArray(window.REMOTE_CODES)) ? window.REMOTE_CODES : [];
+    const r = remote.find(x => normCode(x.code) === c);
+    if (r) return r;
+    const bundled = (typeof window !== 'undefined' && Array.isArray(window.BUNDLED_CODES)) ? window.BUNDLED_CODES : [];
+    const b = bundled.find(x => normCode(x.code) === c);
+    if (b) return b;
+    return null;
+  }
+
+  // Validasi kode untuk sebuah USER (akun):
+  //   { ok:true, tier, code, master?, reclaim? } | { ok:false, reason, owner? }
+  // reason: 'empty' | 'not-found' | 'revoked' | 'used-by-other'
+  // Akun yang sama → ok (reclaim). Akun lain → 'used-by-other'.
+  async function validateForUser(codeText, user) {
+    const c = normCode(codeText);
+    if (!c) return { ok: false, reason: 'empty' };
+    if (isVerifiedMaster(c)) return { ok: true, tier: 'full', code: c, master: true };
+    if (!c.startsWith('FULL-') && !c.startsWith('TRIAL-')) {
+      const mv = await verifyMasterCode(c);
+      if (mv.valid) return { ok: true, tier: mv.tier || 'full', code: c, master: true };
+    }
+    const hit = lookupAnywhere(c);
+    if (!hit) return { ok: false, reason: 'not-found' };
+    if (hit.revoked) return { ok: false, reason: 'revoked' };
+    const tier = (hit.tier || 'full').toLowerCase();
+    if (!hit.usedBy) return { ok: true, tier, code: hit.code };
+    if (isSameOwner(hit.usedBy, user)) return { ok: true, tier, code: hit.code, reclaim: true };
+    return { ok: false, reason: 'used-by-other', owner: hit.usedBy };
+  }
+
+  // Identifikasi kode + pemiliknya (dipakai alur "masuk dengan kode" di perangkat baru).
+  //   { ok:true, claimed:boolean, tier, code, master?, owner:{nip,email,name} }
+  //   { ok:false, reason:'empty'|'not-found'|'revoked' }
+  async function identifyCode(codeText) {
+    const c = normCode(codeText);
+    if (!c) return { ok: false, reason: 'empty' };
+    if (isVerifiedMaster(c)) return { ok: true, claimed: false, tier: 'full', code: c, master: true };
+    if (!c.startsWith('FULL-') && !c.startsWith('TRIAL-')) {
+      const mv = await verifyMasterCode(c);
+      if (mv.valid) return { ok: true, claimed: false, tier: mv.tier || 'full', code: c, master: true };
+    }
+    const hit = lookupAnywhere(c);
+    if (!hit) return { ok: false, reason: 'not-found' };
+    if (hit.revoked) return { ok: false, reason: 'revoked' };
+    const tier = (hit.tier || 'full').toLowerCase();
+    if (!hit.usedBy) return { ok: true, claimed: false, tier, code: hit.code };
+    const owner = { nip: hit.ownerNip || '', email: hit.ownerEmail || '', name: hit.ownerName || '' };
+    try {
+      const us = (window.Auth && Auth.listUsers) ? Auth.listUsers() : [];
+      const u = us.find(x => x.id === hit.usedBy);
+      if (u) {
+        owner.nip = owner.nip || u.nip || '';
+        owner.email = owner.email || u.email || '';
+        owner.name = owner.name || u.nama || '';
+      }
+    } catch (e) {}
+    if (!owner.nip && !owner.email) {
+      const s = String(hit.usedBy);
+      if (/^\d{8,}$/.test(s)) owner.nip = s;
+      else if (s.indexOf('@') >= 0 && !s.toLowerCase().endsWith('@pengawas.local')) owner.email = s.toLowerCase();
+    }
+    return { ok: true, claimed: true, tier, code: hit.code, owner };
+  }
+
   function getTier(codeText) {
     const c = findCode(codeText);
     return c ? (c.tier || 'full') : null;
   }
 
-  // Tandai kode sebagai dipakai. Master code tidak dihabiskan.
-  // Untuk bundled code: kalau belum ada di local list, push entry baru sebagai marker.
-  function consumeCode(codeText, userId) {
+  // Klaim kode untuk sebuah akun (1 kode = 1 akun). Master code tidak dihabiskan.
+  // userId/ownerInfo disimpan supaya admin (dan perangkat lain) tahu kode ini milik akun siapa.
+  // Re-klaim oleh akun yang sama aman & idempoten (dipakai saat login di perangkat baru).
+  function consumeCode(codeText, userId, ownerInfo) {
     const c = normCode(codeText);
-    if (!c || c === MASTER_CODE) return;
+    if (!c || isVerifiedMaster(c)) return;
+    const ownedBy = (ownerInfo && ownerInfo.usedBy) ? ownerInfo.usedBy : userId;
+    const patchOwner = (obj) => {
+      if (ownedBy) obj.usedBy = ownedBy;
+      if (ownerInfo && ownerInfo.ownerName) obj.ownerName = ownerInfo.ownerName;
+      if (ownerInfo && ownerInfo.ownerNip) obj.ownerNip = ownerInfo.ownerNip;
+      if (ownerInfo && ownerInfo.ownerEmail) obj.ownerEmail = ownerInfo.ownerEmail;
+      obj.usedAt = new Date().toISOString();
+    };
     const list = getCodes();
     const idx = list.findIndex(x => normCode(x.code) === c);
     if (idx >= 0) {
-      list[idx].usedBy = userId;
-      list[idx].usedAt = new Date().toISOString();
+      patchOwner(list[idx]);
       saveCodes(list);
       return;
     }
@@ -134,15 +308,17 @@
     const bundled = (typeof window !== 'undefined' && Array.isArray(window.BUNDLED_CODES)) ? window.BUNDLED_CODES : [];
     const bHit = bundled.find(x => normCode(x.code) === c);
     if (bHit) {
-      list.unshift({
+      const item = {
         code: bHit.code,
         tier: (bHit.tier || 'full').toLowerCase(),
         bundled: true,
         createdAt: new Date().toISOString(),
-        usedBy: userId,
-        usedAt: new Date().toISOString(),
+        usedBy: null,
+        usedAt: null,
         revoked: false,
-      });
+      };
+      patchOwner(item);
+      list.unshift(item);
       saveCodes(list);
     }
   }
@@ -278,12 +454,18 @@
   }
 
   window.Codes = {
-    MASTER_CODE,
+    APP_SLUG,
+    verifyMasterCode,
+    isVerifiedMaster,
     STORE_KEY,
     SETTINGS_KEY,
+    normCode,
     getCodes, saveCodes,
     genCode,
     findCode, findCodeAny, getTier,
+    // Model 1 kode = 1 akun (Opsi B)
+    ownerKeysOf, isSameOwner, stableOwnerKey,
+    lookupAnywhere, validateForUser, identifyCode,
     consumeCode,
     addNewCode, addNewCodesBatch,
     revokeCode, deleteCode, clearUsedAndRevoked,

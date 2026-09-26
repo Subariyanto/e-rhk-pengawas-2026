@@ -49,6 +49,11 @@
   const SUPABASE_ANON_KEY = 'sb_publishable_bVcuJGs0k97BC18BkkgeYA_IOgDT16h';
   const TABLE = 'aktivasi_log';
 
+  // === PUSAT LISENSI APLIKASI (verifikasi master code terpusat) ===
+  // Kode master tidak disimpan di aplikasi; diverifikasi di server Pusat Lisensi.
+  const PUSAT_URL = 'https://llaukzsztguwrtwdubpm.supabase.co';
+  const PUSAT_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxsYXVrenN6dGd1d3J0d2R1YnBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcxOTI1NDgsImV4cCI6MjEwMjc2ODU0OH0.DqKtA0aus9nOLViMEWjAPvYIAdLS_EKU3H8dYKe_Zhk';
+
   function isConfigured() {
     return !!(SUPABASE_URL && SUPABASE_ANON_KEY);
   }
@@ -63,6 +68,28 @@
       Authorization: 'Bearer ' + SUPABASE_ANON_KEY,
       'Content-Type': 'application/json',
     }, extra || {});
+  }
+
+  // Verifikasi master/owner code ke pusat lisensi (SECURITY DEFINER RPC).
+  // Kode asli TIDAK pernah disimpan di file aplikasi.
+  // Return: { valid:true, tier, role } | { valid:false, reason }
+  async function verifyMasterCode(code, appSlug) {
+    try {
+      const r = await fetch(PUSAT_URL.replace(/\/$/, '') + '/rest/v1/rpc/verify_master_code', {
+        method: 'POST',
+        headers: {
+          apikey: PUSAT_ANON_KEY,
+          Authorization: 'Bearer ' + PUSAT_ANON_KEY,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ p_app_slug: appSlug || 'e-rhk-pengawas', p_code: String(code || '').trim() }),
+      });
+      if (!r.ok) { console.warn('[SupabaseSync] verifyMasterCode http', r.status); return { valid: false, reason: 'network' }; }
+      return await r.json();
+    } catch (e) {
+      console.warn('[SupabaseSync] verifyMasterCode error:', e.message);
+      return { valid: false, reason: 'network' };
+    }
   }
 
   // HP user → POST setelah aktivasi sukses.
@@ -160,8 +187,13 @@
       const noteText = noteParts.filter(Boolean).join(' · ') + ' · auto ' + new Date(row.activated_at).toLocaleDateString('id-ID');
       if (idx >= 0) {
         if (!list[idx].usedBy) {
+          // Simpan identitas pemilik secara eksplisit supaya lintas perangkat & tampilan admin
+          // tahu kode ini milik akun siapa (model 1 kode = 1 akun).
           list[idx].usedBy = row.email || row.nip || row.nama;
           list[idx].usedAt = row.activated_at;
+          list[idx].ownerName = list[idx].ownerName || row.nama || '';
+          list[idx].ownerNip = list[idx].ownerNip || row.nip || '';
+          list[idx].ownerEmail = list[idx].ownerEmail || row.email || '';
         }
         // Selalu update note kalau belum di-set manual (atau auto-prefix).
         if (!list[idx].note || list[idx].note.startsWith('auto:') || list[idx].note === '') {
@@ -188,6 +220,7 @@
 
   window.SupabaseSync = {
     isConfigured,
+    verifyMasterCode,
     reportActivation,
     fetchUnprocessed,
     markProcessed,

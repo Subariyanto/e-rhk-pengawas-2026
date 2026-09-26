@@ -20,7 +20,10 @@
             </div>
             <div class="mb-3">
               <label class="form-label">Password</label>
-              <input class="form-control" type="password" name="password" required />
+              <div class="input-group">
+                <input class="form-control" type="password" name="password" id="loginPw" required />
+                <button class="btn btn-outline-secondary" type="button" id="btnToggleLoginPw" tabindex="-1" title="Lihat password" aria-label="Lihat password"><i class="bi bi-eye"></i></button>
+              </div>
             </div>
             <button class="btn btn-success w-100" type="submit"><i class="bi bi-box-arrow-in-right"></i> Masuk</button>
           </form>
@@ -38,8 +41,8 @@
               <div class="mb-2"><label class="form-label mb-1">Nama Lengkap</label><input class="form-control" id="clNama" /></div>
               <div class="mb-2"><label class="form-label mb-1">NIP <span class="text-muted small">(opsional)</span></label><input class="form-control" id="clNip" inputmode="numeric" maxlength="18" /></div>
               <div class="mb-2"><label class="form-label mb-1">Email <span class="text-muted small">(wajib bila tanpa NIP)</span></label><input class="form-control" type="email" id="clEmail" autocomplete="email" /></div>
-              <div class="mb-2"><label class="form-label mb-1">Password (min 6)</label><input class="form-control" type="password" id="clPw" /></div>
-              <div class="mb-2"><label class="form-label mb-1">Konfirmasi Password</label><input class="form-control" type="password" id="clPw2" /></div>
+              <div class="mb-2"><label class="form-label mb-1">Password (min 6)</label><div class="input-group"><input class="form-control" type="password" id="clPw" /><button class="btn btn-outline-secondary" type="button" id="btnToggleClPw" tabindex="-1" title="Lihat password" aria-label="Lihat password"><i class="bi bi-eye"></i></button></div></div>
+              <div class="mb-2"><label class="form-label mb-1">Konfirmasi Password</label><div class="input-group"><input class="form-control" type="password" id="clPw2" /><button class="btn btn-outline-secondary" type="button" id="btnToggleClPw2" tabindex="-1" title="Lihat password" aria-label="Lihat password"><i class="bi bi-eye"></i></button></div></div>
               <button class="btn btn-success w-100" id="clSubmit" type="button"><i class="bi bi-person-check"></i> Klaim &amp; Masuk</button>
             </div>
           </div>
@@ -62,6 +65,25 @@
         sessionStorage.removeItem('erhk2026_last_login');
       }
     } catch (e) {}
+
+    // ===== Toggle lihat/sembunyikan password (ikon mata) =====
+    function bindPwToggle(btnId, inputId) {
+      const b = document.getElementById(btnId);
+      const i = document.getElementById(inputId);
+      if (!b || !i) return;
+      b.addEventListener('click', () => {
+        const show = i.type === 'password';
+        i.type = show ? 'text' : 'password';
+        const ic = b.querySelector('i');
+        if (ic) ic.className = show ? 'bi bi-eye-slash' : 'bi bi-eye';
+        const lbl = show ? 'Sembunyikan password' : 'Lihat password';
+        b.title = lbl; b.setAttribute('aria-label', lbl);
+        try { i.focus({ preventScroll: true }); } catch (_) {}
+      });
+    }
+    bindPwToggle('btnToggleLoginPw', 'loginPw');
+    bindPwToggle('btnToggleClPw', 'clPw');
+    bindPwToggle('btnToggleClPw2', 'clPw2');
 
     document.getElementById('frmLogin').addEventListener('submit', async (e) => {
       e.preventDefault();

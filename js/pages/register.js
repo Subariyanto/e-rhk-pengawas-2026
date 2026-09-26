@@ -110,6 +110,7 @@
       let trialExpiresAt = null;
       let claimedCode = null;      // kode random (non-master) yang akan diklaim ke akun ini
       let claimedReclaim = false;  // true kalau kode sudah milik akun ini (daftar ulang perangkat baru)
+      let legacyCode = null;       // kode legacy per-NIP (XXXX-XXXX) yang dipakai (untuk daftar akun server)
 
       if (kode) {
         // SELALU refresh REMOTE_CODES dari gh-pages sebelum validasi.
@@ -137,6 +138,7 @@
             if (ok) {
               tier = 'full';
               activatedWith = '(legacy:' + kodeRaw.toUpperCase() + ')';
+              legacyCode = kodeRaw.toUpperCase();
             } else {
               return UI.toast('Kode aktivasi tidak cocok dengan NIP ini, atau kode tidak valid/sudah dipakai.', 'danger');
             }
@@ -182,14 +184,15 @@
         const username = nip ? nip : emailInput.toLowerCase();
 
         // ===== AKUN SERVER (Pusat Lisensi) — 1 kode = 1 akun =====
-        // Hanya kode random FULL (non-master, non-legacy) yang didaftarkan ke server,
-        // supaya akun bisa login dari perangkat mana pun. Bila server tak terjangkau,
-        // registrasi tetap lanjut lokal (sinkron server menyusul saat online).
+        // Kode random FULL / kode legacy (per-NIP) didaftarkan ke server supaya akun
+        // bisa login dari perangkat mana pun. Bila server tak terjangkau, registrasi
+        // tetap lanjut lokal (sinkron server menyusul saat online).
         let serverSynced = false;
         let serverHash = null;
-        if (claimedCode) {
+        const codeForServer = claimedCode || legacyCode;
+        if (codeForServer) {
           const sreg = await Auth.registerServerAccount({
-            code: claimedCode, username: username, password: pw, fullname: nama, madrasah: '',
+            code: codeForServer, username: username, password: pw, fullname: nama, madrasah: '',
           });
           if (sreg.ok) {
             serverSynced = true;
@@ -197,8 +200,14 @@
           } else if (sreg.reason === 'network' || sreg.reason === 'no-module') {
             UI.toast('Server Pusat Lisensi tidak terjangkau — akun dibuat lokal. Sinkron akun server akan dicoba lagi saat online.', 'warning');
           } else if (sreg.reason === 'account_exists') {
-            return UI.toast('ID akun "' + username + '" sudah terdaftar di server. Silakan login, atau hubungi admin bila ini akun baru.', 'danger');
-          } else {
+            // Untuk kode legacy: NIP sudah punya akun server dgn kode lain → tetap lanjut lokal.
+            if (!legacyCode) {
+              return UI.toast('ID akun "' + username + '" sudah terdaftar di server. Silakan login, atau hubungi admin bila ini akun baru.', 'danger');
+            }
+          } else if (sreg.reason === 'code_used' && !legacyCode) {
+            return UI.toast('Kode ini sudah dipakai akun lain di server.', 'danger');
+          } else if (sreg.reason !== 'invalid_code' && sreg.reason !== 'code_used') {
+            // invalid_code: kode belum terdaftar di server (mis. legacy lama) → lanjut lokal.
             return UI.toast('Registrasi akun ke server gagal: ' + Auth.accountReasonMsg(sreg.reason), 'danger');
           }
         }

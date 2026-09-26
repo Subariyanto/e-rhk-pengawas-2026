@@ -85,6 +85,14 @@
         }
         // 3) Fallback login lokal (offline, akun lama, atau trial tanpa akun server).
         await Auth.login({ email: idInput, password: pwInput });
+        // Migrasi akun lokal lama → akun server (best-effort, hanya saat online).
+        // Tidak memblokir login; kegagalan hanya di-log.
+        try {
+          const cu = Auth.currentUser();
+          if (cu) Auth.migrateLocalAccountToServer(cu, pwInput)
+            .then(r => { if (r === 'migrated') console.log('[migrasi] akun lokal terdaftar ke server:', cu.nip || cu.email); })
+            .catch(() => {});
+        } catch (_) {}
         try { window.applyTrialWatermark && window.applyTrialWatermark(); } catch (_) {}
         history.replaceState(null, '', '#/dashboard');
         Router.dispatch();
@@ -243,6 +251,11 @@
           window.SupabaseSync.reportActivation({ code: id.code, nama: u.nama, nip: nip || null, email: emailFinal, tier: 'full' }).catch(() => {});
         }
         await Auth.login({ email: emailFinal, password: pw });
+        // Migrasi akun lokal lama (mis. kode legacy) → akun server (best-effort).
+        try {
+          const cu = Auth.currentUser();
+          if (cu) Auth.migrateLocalAccountToServer(cu, pw).catch(() => {});
+        } catch (_) {}
         try { window.applyTrialWatermark && window.applyTrialWatermark(); } catch (_) {}
         UI.toast('✅ Berhasil. Akun FULL aktif di perangkat ini.');
         history.replaceState(null, '', '#/dashboard');

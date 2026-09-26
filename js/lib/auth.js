@@ -257,10 +257,65 @@
     return { ok: false, reason: r.reason || 'failed' };
   }
 
+  // ============================================================
+  // MIGRASI AKUN LOKAL LAMA → AKUN SERVER (lazy/otomatis)
+  // Akun lama (admin + pengawas legacy) sudah ada di perangkat dengan password
+  // hash LOKAL (sha256(pw)). Saat mereka login online, kita daftarkan juga
+  // ke server dengan hash SERVER (sha256(username:password)) memakai kode
+  // aktivasi yang menandai akun mereka (legacy = kode legacy per-NIP;
+  // kode FULL → sudah didaftarkan saat registrasi).
+  //  * Hanya saat ONLINE & password BENAR (dipanggil setelah login lokal sukses).
+  //  * Idempoten: re-claim oleh username yang sama → 'claimed'.
+  //  * Tidak pernah menimpa akun milik orang lain ('code_used'/'account_exists').
+  //  * Tidak memblokir login: kegagalan apa pun hanya di-log.
+  // Return: 'already' | 'migrated' | 'code_used' | 'invalid_code' | 'skipped' | 'error'
+  // ============================================================
+  async function migrateLocalAccountToServer(user, password) {
+    if (!user || user.role === 'admin') return 'skipped';
+    if (!window.SupabaseSync || typeof SupabaseSync.registerAccount !== 'function') return 'skipped';
+    if (!password) return 'skipped';
+    // Pengaman: pastikan password cocok dengan akun LOKAL ini sebelum migrasi.
+    // (Di UI migrasi selalu dipanggil setelah login lokal sukses, tapi ini bikin
+    //  fungsi aman walau dipanggil dari mana pun.)
+    try {
+      if (user.password) {
+        const localHash = await hashPassword(password);
+        if (localHash !== user.password) return 'skipped';
+      }
+    } catch (e) {}
+    const username = _normId(user.nip || (user.email && !/@pengawas\.local$/i.test(user.email) ? user.email : ''));
+    if (!username || username.length < 4) return 'skipped';
+    const hash = await SupabaseSync.accountHash(username, password);
+    if (!hash) return 'error';
+    // Sudah terdaftar sebagai akun server (pernah login online)? Cukup cek via login.
+    try {
+      const chk = await SupabaseSync.loginAccount(username, hash, SupabaseSync.APP_SLUG);
+      if (chk && chk.valid === true) return 'already';
+    } catch (e) { /* lanjut coba registrasi */ }
+
+    // Kode aktivasi yang menandai akun ini.
+    let code = String(user.activatedWith || '').trim();
+    if (/^\(legacy:/.test(code)) code = code.replace(/^\(legacy:/, '').replace(/\)$/, '').trim();
+    if (!code) return 'skipped';
+
+    const r = await SupabaseSync.registerAccount(
+      code, SupabaseSync.APP_SLUG, username, hash, user.nama || '', '',
+      (navigator.userAgent || '').slice(0, 200)
+    );
+    if (r === null || r.success === null) return 'error';
+    if (r.success === true) {
+      updateUser(user.id, { serverHash: hash, server_synced: true });
+      return 'migrated';
+    }
+    return r.reason || 'error';
+  }
+
   window.Auth = {
     ensureAdminSeeded, register, login, logout, currentSession, currentUser,
     listUsers, updateUser, changePassword, deleteUser, hashPassword,
     // Akun server (Pusat Lisensi)
     accountReasonMsg, findLocalById, upsertLocalFromServer, loginWithServer, registerServerAccount,
+    // Migrasi akun lokal lama → server
+    migrateLocalAccountToServer,
   };
 })();

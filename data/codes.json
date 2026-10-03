@@ -6,7 +6,8 @@
       "createdAt": "2026-10-03T12:29:08.613Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false
+      "revoked": false,
+      "note": "Elin"
     },
     {
       "code": "FULL-JRDJ-MAVM-J49X",
@@ -803,5 +804,5 @@
       "note": "Ya Salam"
     }
   ],
-  "updatedAt": "2026-10-03T12:29:10.354Z"
+  "updatedAt": "2026-10-03T12:29:16.296Z"
 }

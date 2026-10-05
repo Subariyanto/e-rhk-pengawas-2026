@@ -6,7 +6,8 @@
       "createdAt": "2026-10-05T10:04:14.009Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false
+      "revoked": false,
+      "note": "Sampang"
     },
     {
       "code": "FULL-9EA5-TBLT-7YLQ",
@@ -812,5 +813,5 @@
       "note": "Ya Salam"
     }
   ],
-  "updatedAt": "2026-10-05T10:04:15.591Z"
+  "updatedAt": "2026-10-05T10:04:26.043Z"
 }

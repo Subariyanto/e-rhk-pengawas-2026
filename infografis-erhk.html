@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-font-smoothing:antialiased; }
+  body {
+    font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background:#0f1e3d;
+    display:flex; justify-content:center; align-items:flex-start;
+    padding:0; margin:0; color:#1a2233;
+  }
+  .poster {
+    width:1080px; background:#f6f8fb; overflow:hidden; position:relative;
+  }
+  /* ============ HEADER ============ */
+  .header {
+    background:linear-gradient(135deg,#12275a 0%, #1e40af 55%, #2b5cc4 100%);
+    color:#fff; padding:52px 56px 40px; position:relative;
+  }
+  .header::after {
+    content:""; position:absolute; right:-120px; top:-120px; width:340px; height:340px;
+    background:radial-gradient(circle,#f59e0b33,#f59e0b00 70%); border-radius:50%;
+  }
+  .brand {
+    display:flex; align-items:center; gap:14px; margin-bottom:18px;
+    font-size:22px; font-weight:600; letter-spacing:.3px; color:#fbd38d;
+  }
+  .brand .dot { width:12px; height:12px; background:#f59e0b; border-radius:50%; box-shadow:0 0 12px #f59e0b; }
+  .title {
+    font-size:58px; font-weight:800; line-height:1.05; letter-spacing:-.5px;
+  }
+  .title .accent { color:#f59e0b; }
+  .subtitle {
+    font-size:26px; font-weight:500; margin-top:12px; opacity:.95; color:#cfddf7;
+  }
+  .tagline {
+    display:inline-block; margin-top:22px; background:#f59e0b; color:#12275a;
+    font-weight:800; font-size:25px; padding:12px 26px; border-radius:40px;
+  }
+  /* ============ HERO CHIPS ============ */
+  .hero {
+    background:#fff; margin:26px 40px 0; border-radius:22px;
+    box-shadow:0 12px 40px rgba(18,39,90,.12);
+    padding:34px 40px; display:flex; justify-content:space-between;
+  }
+  .hero-stat { text-align:center; flex:1; }
+  .hero-stat .num { font-size:42px; font-weight:800; color:#1e40af; line-height:1; }
+  .hero-stat .lbl { font-size:17px; color:#5b6b85; margin-top:8px; font-weight:600; }
+  .hero-stat + .hero-stat { border-left:1px solid #eef1f7; }
+  /* ============ SECTION ============ */
+  .section {
+    margin:34px 40px 0;
+  }
+  .section-head {
+    display:flex; align-items:center; gap:12px; margin-bottom:20px;
+  }
+  .section-head .bar { width:7px; height:30px; background:#f59e0b; border-radius:6px; }
+  .section-head h2 { font-size:30px; font-weight:800; color:#12275a; letter-spacing:-.3px; }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  /* feature card */
+  .feature {
+    background:#fff; border-radius:16px; padding:22px 24px;
+    display:flex; gap:16px; align-items:flex-start;
+    box-shadow:0 6px 20px rgba(18,39,90,.07);
+    border:1px solid #edf0f6;
+  }
+  .feature .ico {
+    width:56px; height:56px; border-radius:14px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; font-size:30px;
+    background:#eef3ff;
+  }
+  .feature h3 { font-size:20px; font-weight:800; color:#12275a; margin-bottom:4px; }
+  .feature p { font-size:15.5px; color:#5b6b85; line-height:1.45; }
+  /* ============ DOC BADGES ============ */
+  .docs {
+    background:#fff; border-radius:18px; padding:26px 28px;
+    box-shadow:0 6px 20px rgba(18,39,90,.07); border:1px solid #edf0f6;
+  }
+  .docs h3 { font-size:20px; font-weight:800; color:#12275a; margin-bottom:16px; text-align:center; }
+  .doc-row { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; }
+  .doc-chip {
+    background:#f2f6ff; border:1px solid #dde6fb; color:#1e40af;
+    font-size:15px; font-weight:600; padding:9px 16px; border-radius:30px;
+  }
+  /* ============ PRICE CTA ============ */
+  .cta {
+    margin:36px 40px 46px;
+    background:linear-gradient(135deg,#f59e0b,#fbbf24);
+    border-radius:24px; padding:38px 44px; text-align:center;
+    box-shadow:0 16px 44px rgba(245,158,11,.35);
+    position:relative; overflow:hidden;
+  }
+  .cta::after {
+    content:""; position:absolute; left:-60px; bottom:-80px; width:200px; height:200px;
+    background:radial-gradient(circle,#fff4,#fff0 70%); border-radius:50%;
+  }
+  .cta .eyebrow { font-size:20px; font-weight:700; color:#7c3d00; margin-bottom:6px; }
+  .cta .price { font-size:76px; font-weight:900; color:#1e1f2e; line-height:1; letter-spacing:-2px; }
+  .cta .price small { font-size:26px; font-weight:700; }
+  .cta .desc { font-size:19px; font-weight:700; color:#5a3200; margin-top:8px; }
+  .btn {
+    display:inline-block; margin-top:22px; background:#12275a; color:#fff;
+    font-size:26px; font-weight:800; padding:20px 52px; border-radius:60px;
+    box-shadow:0 10px 24px rgba(18,39,90,.35);
+  }
+  /* ============ FOOTER ============ */
+  .footer {
+    background:#12275a; color:#b9c8e6; text-align:center; padding:22px;
+    font-size:17px; letter-spacing:.3px;
+  }
+  .footer b { color:#fbd38d; }
+</style>
+</head>
+<body>
+<div class="poster">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="brand"><span class="dot"></span> Pokjawas Madrasah Kab. Jember</div>
+    <div class="title">e-RHK Pengawas <span class="accent">Madrasah</span> 2026</div>
+    <div class="subtitle">Otomatisasi Eviden RHK Pengawas berbasis SKP 2026</div>
+    <div class="tagline">⚡ Semua Dokumen Eviden Jadi Otomatis</div>
+  </div>
+
+  <!-- HERO CHIPS -->
+  <div class="hero">
+    <div class="hero-stat"><div class="num">15+</div><div class="lbl">Jenis Dokumen Otomatis</div></div>
+    <div class="hero-stat"><div class="num">∞</div><div class="lbl">Kegiatan &amp; Eviden</div></div>
+    <div class="hero-stat"><div class="num">100%</div><div class="lbl">Offline-Ready (PWA)</div></div>
+  </div>
+
+  <!-- FEATURES -->
+  <div class="section">
+    <div class="section-head"><div class="bar"></div><h2>Kenapa Pengawas Wajib Punya?</h2></div>
+    <div class="grid">
+      <div class="feature"><div class="ico">📄</div><div><h3>Dokumen Lengkap Otomatis</h3><p>Cover, Pengesahan, Kata Pengantar, Daftar Isi, BAB I–IV, Surat Tugas, Undangan, Daftar Hadir, Notulen &amp; Berita Acara.</p></div></div>
+      <div class="feature"><div class="ico">📊</div><div><h3>Rekap &amp; Analisis Instan</h3><p>Instrumen, Rekap, Analisis &amp; Rekomendasi tersusun rapi. Export ke Excel untuk rekap triwulan &amp; per madrasah.</p></div></div>
+      <div class="feature"><div class="ico">🖨️</div><div><h3>Cetak Word / PDF / HTML</h3><p>Unduh per dokumen, per RHK, per triwulan, atau dalam satu ZIP. Word &amp; PDF siap serahkan ke atasan.</p></div></div>
+      <div class="feature"><div class="ico">🏫</div><div><h3>Kelola Madrasah Binaan</h3><p>Impor/ekspor data madrasah &amp; kegiatan, lengkap dengan foto dan lampiran bukti dukung.</p></div></div>
+      <div class="feature"><div class="ico">📱</div><div><h3>Bisa Dipakai di HP</h3><p>Instal sebagai aplikasi (PWA) dan tetap jalan walau tanpa internet. Data tersimpan aman di perangkat.</p></div></div>
+      <div class="feature"><div class="ico">🔒</div><div><h3>Tanpa Watermark Trial</h3><p>Aktif selamanya, tanpa batas waktu, tanpa batas jumlah kegiatan &amp; eviden. Backup &amp; restore data per akun.</p></div></div>
+    </div>
+  </div>
+
+  <!-- DOC TYPES -->
+  <div class="section">
+    <div class="section-head"><div class="bar"></div><h2>Duduki Semua Kebutuhan RHK</h2></div>
+    <div class="docs">
+      <div class="doc-row">
+        <span class="doc-chip">Cover</span>
+        <span class="doc-chip">Pengesahan</span>
+        <span class="doc-chip">Kata Pengantar</span>
+        <span class="doc-chip">Daftar Isi</span>
+        <span class="doc-chip">BAB I–IV</span>
+        <span class="doc-chip">Surat Tugas</span>
+        <span class="doc-chip">Undangan</span>
+        <span class="doc-chip">Daftar Hadir</span>
+        <span class="doc-chip">Notulen</span>
+        <span class="doc-chip">Berita Acara</span>
+        <span class="doc-chip">Instrumen</span>
+        <span class="doc-chip">Rekap</span>
+        <span class="doc-chip">Analisis</span>
+        <span class="doc-chip">Rekomendasi</span>
+        <span class="doc-chip">Foto Dokumentasi</span>
+        <span class="doc-chip">Link Drive</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta">
+    <div class="eyebrow">HARGA PROMO BELI SEKARANG</div>
+    <div class="price"><small>Rp</small> 150.000 <small>/ lifetime</small></div>
+    <div class="desc">Aktif selamanya • untuk 1 akun pengawas</div>
+    <div class="btn">💬 Pesan via WhatsApp</div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <b>erhk.pokjawasjember.com</b> &nbsp;•&nbsp; Kunci kecepatan &amp; kerapian eviden RHK Anda
+  </div>
+
+</div>
+</body>
+</html>

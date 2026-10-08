@@ -322,6 +322,56 @@
     return callPusatRpc('admin_get_account_stats', { p_admin_key: adminKey, p_app_slug: appSlug || PUSAT_APP_SLUG });
   }
 
+  // ==== Terbitkan kode LANGSUNG di server Pusat Lisensi (cross-device) ====
+  // Tanpa ini, kode buatan panel admin lokal hanya ada di gh-pages/localStorage
+  // dan TIDAK bisa dipakai login dari perangkat lain (HP) karena server tak kenal kodenya.
+  // Butuh admin key Pusat Lisensi (disimpan lokal di perangkat admin).
+
+  // Daftarkan satu kode eksplisit (format persis dari panel, mis. FULL-XXXX-XXXX-XXXX).
+  async function adminRegisterCode(adminKey, code, appSlug, tier, recipient, appName) {
+    if (!adminKey) return { success: false, reason: 'no_admin_key' };
+    const r = await callPusatRpc('admin_register_code', {
+      p_admin_key: adminKey,
+      p_code: String(code || '').trim().toUpperCase(),
+      p_app_slug: appSlug || PUSAT_APP_SLUG,
+      p_tier: tier || 'pro',
+      p_recipient: recipient || '',
+      p_app_name: appName || '',
+    });
+    if (r === null) return { success: null, reason: 'network_error' };
+    return r;
+  }
+
+  // Daftarkan banyak kode sekaligus (batch).
+  async function adminRegisterCodes(adminKey, codes, appSlug, tier, appName) {
+    if (!adminKey) return { success: false, reason: 'no_admin_key' };
+    const r = await callPusatRpc('admin_register_codes', {
+      p_admin_key: adminKey,
+      p_codes: Array.isArray(codes) ? codes.map(c => String(c || '').trim().toUpperCase()) : [],
+      p_app_slug: appSlug || PUSAT_APP_SLUG,
+      p_tier: tier || 'pro',
+      p_app_name: appName || '',
+    });
+    if (r === null) return { success: null, reason: 'network_error' };
+    return r;
+  }
+
+  async function adminRevokeCodeByCode(adminKey, code, appSlug) {
+    if (!adminKey) return { success: false, reason: 'no_admin_key' };
+    return callPusatRpc('admin_revoke_code_by_code', {
+      p_admin_key: adminKey, p_code: String(code || '').trim().toUpperCase(),
+      p_app_slug: appSlug || PUSAT_APP_SLUG,
+    });
+  }
+
+  async function adminDeleteCodeByCode(adminKey, code, appSlug) {
+    if (!adminKey) return { success: false, reason: 'no_admin_key' };
+    return callPusatRpc('admin_delete_code_by_code', {
+      p_admin_key: adminKey, p_code: String(code || '').trim().toUpperCase(),
+      p_app_slug: appSlug || PUSAT_APP_SLUG,
+    });
+  }
+
   window.SupabaseSync = {
     isConfigured,
     verifyMasterCode,
@@ -347,5 +397,10 @@
     adminDeleteAccount,
     adminResetAccountPassword,
     adminGetAccountStats,
+    // Terbitkan/kelola kode langsung di server (cross-device)
+    adminRegisterCode,
+    adminRegisterCodes,
+    adminRevokeCodeByCode,
+    adminDeleteCodeByCode,
   };
 })();

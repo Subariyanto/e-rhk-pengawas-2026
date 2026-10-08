@@ -16,6 +16,52 @@
     return out;
   }
 
+  // ==== Sinkron kode ke SERVER Pusat Lisensi (cross-device) ====
+  // Kode yang dibuat panel lokal dulu hanya masuk gh-pages/localStorage,
+  // sehingga TIDAK bisa dipakai login dari HP. Fungsi di bawah mendaftarkan
+  // kode ke server (butuh Admin Key Pusat Lisensi). Sekali set, kode baru
+  // otomatis terdaftar di server sehingga "1 kode = 1 akun" jalan lintas perangkat.
+  const ADMIN_KEY_STORE = 'erhk2026_pusat_admin_key';
+  function getAdminKey() {
+    try { return localStorage.getItem(ADMIN_KEY_STORE) || ''; } catch (e) { return ''; }
+  }
+  // Daftarkan kode ke server (best-effort). Return { ok, reason }.
+  async function registerCodeToServer(code, tier) {
+    const key = getAdminKey();
+    if (!key) return { ok: false, reason: 'no_admin_key' };
+    if (!window.SupabaseSync || typeof SupabaseSync.adminRegisterCode !== 'function') {
+      return { ok: false, reason: 'no_module' };
+    }
+    try {
+      const r = await SupabaseSync.adminRegisterCode(key, code, SupabaseSync.APP_SLUG, tier || 'pro');
+      if (r && r.success) return { ok: true, existed: !!r.existed, reason: r.reason };
+      return { ok: false, reason: (r && r.reason) || 'error' };
+    } catch (e) { return { ok: false, reason: e.message }; }
+  }
+  async function registerCodesToServer(codes, tier) {
+    const key = getAdminKey();
+    if (!key) return { ok: false, reason: 'no_admin_key' };
+    if (!window.SupabaseSync || typeof SupabaseSync.adminRegisterCodes !== 'function') {
+      return { ok: false, reason: 'no_module' };
+    }
+    try {
+      const r = await SupabaseSync.adminRegisterCodes(key, codes, SupabaseSync.APP_SLUG, tier || 'pro');
+      if (r && r.success) return { ok: true, count: r.count, reason: r.reason };
+      return { ok: false, reason: (r && r.reason) || 'error' };
+    } catch (e) { return { ok: false, reason: e.message }; }
+  }
+  // Pesan status sink untuk ditampilkan di toast/info.
+  function syncReasonMsg(reason) {
+    switch (reason) {
+      case 'no_admin_key': return 'Admin Key belum diisi (isi di kartu "Terbitkan Kode ke Server").';
+      case 'no_module': return 'Modul server belum termuat. Refresh halaman.';
+      case 'network_error': return 'Server tidak terjangkau. Coba lagi.';
+      case 'invalid_admin_key': return 'Admin Key salah.';
+      case 'invalid_code': return 'Kode tidak valid.';
+      default: return reason || 'gagal';
+    }
+  }
+
   Page.AdminAktivasi = function () {
     UI.shell('Kode Aktivasi', `
       <div class="alert alert-light border mb-3">
@@ -31,6 +77,21 @@
 
       <div class="tab-content">
         <div class="tab-pane fade show active" id="tabRandom">
+          <div class="card mb-3 border-success"><div class="card-body">
+            <h5 class="card-title mb-2"><i class="bi bi-cloud-upload text-success"></i> Terbitkan Kode ke Server (cross-device)</h5>
+            <p class="small text-muted mb-2">Isi <strong>Admin Key Pusat Lisensi</strong> sekali saja di perangkat ini. Setelah itu, setiap kode yang Anda <em>generate</em> di bawah otomatis terdaftar ke server, sehingga pengawas bisa langsung <strong>login dari HP</strong> (tanpa lapor manual / tanpa set PAT dulu).</p>
+            <div class="row g-2 align-items-end">
+              <div class="col-md-8">
+                <label class="form-label small mb-1">Admin Key Pusat Lisensi</label>
+                <input id="akServerKey" class="form-control form-control-sm" type="password" placeholder="PJWS-ADM-..." autocomplete="off" />
+              </div>
+              <div class="col-md-4 d-grid">
+                <button class="btn btn-sm btn-success" id="btnSaveAkServer"><i class="bi bi-shield-check"></i> Simpan Key</button>
+              </div>
+            </div>
+            <div id="akServerStatus" class="small mt-2"></div>
+          </div></div>
+
           <div class="card mb-3"><div class="card-body">
             <h5 class="card-title mb-2"><i class="bi bi-shuffle"></i> Generate Kode Random (TRIAL / FULL)</h5>
             <p class="small text-muted mb-3">Format <code>PREFIX-XXXX-XXXX-XXXX</code>. Terikat ke <strong>1 AKUN (NIP/email)</strong>, bukan 1 perangkat — akun yang sama bisa dipakai dari perangkat mana pun. Cocok untuk lisensi yang dijual via WhatsApp.</p>
@@ -544,11 +605,30 @@
         if (!await UI.confirmDialog('Cabut kode ' + b.dataset.revoke + '? Tidak bisa dipakai lagi.')) return;
         Codes.revokeCode(b.dataset.revoke);
         renderRandomList();
+        const key = getAdminKey();
+        if (key && window.SupabaseSync && SupabaseSync.adminRevokeCodeByCode) {
+          try {
+            const r = await SupabaseSync.adminRevokeCodeByCode(key, b.dataset.revoke, SupabaseSync.APP_SLUG);
+            if (r && r.success) UI.toast('Kode dicabut (server juga).', 'success');
+            else if (r && r.reason === 'not_found') UI.toast('Dicabut lokal (kode tidak ada di server).', 'info');
+            else UI.toast('Dicabut lokal — server: ' + syncReasonMsg(r && r.reason), 'warning');
+          } catch (e) { UI.toast('Dicabut lokal — server error: ' + e.message, 'warning'); }
+        }
       }));
       wrap.querySelectorAll('button[data-del]').forEach(b => b.addEventListener('click', async () => {
         if (!await UI.confirmDialog('Hapus kode ' + b.dataset.del + ' dari daftar?')) return;
         Codes.deleteCode(b.dataset.del);
         renderRandomList();
+        const key = getAdminKey();
+        if (key && window.SupabaseSync && SupabaseSync.adminDeleteCodeByCode) {
+          try {
+            const r = await SupabaseSync.adminDeleteCodeByCode(key, b.dataset.del, SupabaseSync.APP_SLUG);
+            if (r && r.success) UI.toast('Kode dihapus (server juga).', 'success');
+            else if (r && r.reason === 'has_account') UI.toast('Dihapus lokal — kode di server masih terpakai akun.', 'info');
+            else if (r && r.reason === 'not_found') UI.toast('Dihapus lokal (kode tidak ada di server).', 'info');
+            else UI.toast('Dihapus lokal — server: ' + syncReasonMsg(r && r.reason), 'warning');
+          } catch (e) { UI.toast('Dihapus lokal — server error: ' + e.message, 'warning'); }
+        }
       }));
     }
 
@@ -582,31 +662,60 @@
       UI.toast('Catatan tersimpan.');
     }
 
+    // ==== Panel Admin Key untuk sink kode ke server ====
+    const akInput = document.getElementById('akServerKey');
+    const akStatus = document.getElementById('akServerStatus');
+    function renderAkStatus() {
+      if (!akStatus) return;
+      const k = getAdminKey();
+      akStatus.innerHTML = k
+        ? '<span class="text-success"><i class="bi bi-check-circle"></i> Admin Key tersimpan di perangkat ini — kode baru akan otomatis terdaftar ke server (login HP jalan).</span>'
+        : '<span class="text-warning"><i class="bi bi-exclamation-triangle"></i> Admin Key belum diisi — kode baru BELUM terdaftar di server (login lintas perangkat belum jalan).</span>';
+    }
+    if (akInput) akInput.value = getAdminKey();
+    renderAkStatus();
+    const btnSaveAk = document.getElementById('btnSaveAkServer');
+    if (btnSaveAk) btnSaveAk.addEventListener('click', () => {
+      const v = String(akInput.value || '').trim();
+      if (!v) { try { localStorage.removeItem(ADMIN_KEY_STORE); } catch (e) {} renderAkStatus(); return UI.toast('Admin Key dihapus dari perangkat ini.', 'info'); }
+      try { localStorage.setItem(ADMIN_KEY_STORE, v); } catch (e) {}
+      renderAkStatus();
+      UI.toast('Admin Key disimpan. Kode baru akan otomatis terdaftar ke server.', 'success');
+    });
+
     const btnGenFull = document.getElementById('btnGenFull');
-    if (btnGenFull) btnGenFull.addEventListener('click', () => {
+    if (btnGenFull) btnGenFull.addEventListener('click', async () => {
       const c = Codes.addNewCode('full');
       renderRandomList();
-      UI.toast('Kode FULL dibuat: ' + c.code);
+      const s = await registerCodeToServer(c.code, 'pro');
+      if (s.ok) UI.toast('Kode FULL dibuat & terdaftar di server: ' + c.code, 'success');
+      else UI.toast('Kode FULL dibuat: ' + c.code + ' — server: ' + syncReasonMsg(s.reason), getAdminKey() ? 'warning' : 'info');
     });
     const btnGenTrial = document.getElementById('btnGenTrial');
-    if (btnGenTrial) btnGenTrial.addEventListener('click', () => {
+    if (btnGenTrial) btnGenTrial.addEventListener('click', async () => {
       const c = Codes.addNewCode('trial');
       renderRandomList();
-      UI.toast('Kode TRIAL dibuat: ' + c.code);
+      const s = await registerCodeToServer(c.code, 'trial');
+      if (s.ok) UI.toast('Kode TRIAL dibuat & terdaftar di server: ' + c.code, 'success');
+      else UI.toast('Kode TRIAL dibuat: ' + c.code + ' — server: ' + syncReasonMsg(s.reason), getAdminKey() ? 'warning' : 'info');
     });
     const btnGen10Full = document.getElementById('btnGen10Full');
     if (btnGen10Full) btnGen10Full.addEventListener('click', async () => {
       if (!await UI.confirmDialog('Generate 10 kode FULL random sekaligus?')) return;
-      Codes.addNewCodesBatch('full', 10);
+      const arr = Codes.addNewCodesBatch('full', 10);
       renderRandomList();
-      UI.toast('10 kode FULL berhasil dibuat.');
+      const s = await registerCodesToServer(arr.map(x => x.code), 'pro');
+      if (s.ok) UI.toast('10 kode FULL dibuat & ' + (s.count || 10) + ' terdaftar di server.', 'success');
+      else UI.toast('10 kode FULL dibuat — server: ' + syncReasonMsg(s.reason), getAdminKey() ? 'warning' : 'info');
     });
     const btnGen10Trial = document.getElementById('btnGen10Trial');
     if (btnGen10Trial) btnGen10Trial.addEventListener('click', async () => {
       if (!await UI.confirmDialog('Generate 10 kode TRIAL random sekaligus?')) return;
-      Codes.addNewCodesBatch('trial', 10);
+      const arr = Codes.addNewCodesBatch('trial', 10);
       renderRandomList();
-      UI.toast('10 kode TRIAL berhasil dibuat.');
+      const s = await registerCodesToServer(arr.map(x => x.code), 'trial');
+      if (s.ok) UI.toast('10 kode TRIAL dibuat & ' + (s.count || 10) + ' terdaftar di server.', 'success');
+      else UI.toast('10 kode TRIAL dibuat — server: ' + syncReasonMsg(s.reason), getAdminKey() ? 'warning' : 'info');
     });
     const btnClearUsed = document.getElementById('btnClearUsed');
     if (btnClearUsed) btnClearUsed.addEventListener('click', async () => {

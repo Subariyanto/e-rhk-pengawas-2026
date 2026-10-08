@@ -1,6 +1,14 @@
 {
   "codes": [
     {
+      "code": "FULL-9DFF-9SFA-DREB",
+      "tier": "full",
+      "createdAt": "2026-10-08T09:01:17.831Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
       "code": "FULL-B3PN-2YRJ-Y22Y",
       "tier": "full",
       "createdAt": "2026-10-08T08:59:47.352Z",
@@ -842,5 +850,5 @@
       "note": "Ya Salam"
     }
   ],
-  "updatedAt": "2026-10-08T08:59:49.091Z"
+  "updatedAt": "2026-10-08T09:01:19.532Z"
 }

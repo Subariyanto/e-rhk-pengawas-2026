@@ -6,7 +6,8 @@
       "createdAt": "2026-10-08T08:58:36.588Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false
+      "revoked": false,
+      "note": "Akhmad2"
     },
     {
       "code": "FULL-ALSS-XXLG-AJKF",
@@ -833,5 +834,5 @@
       "note": "Ya Salam"
     }
   ],
-  "updatedAt": "2026-10-08T08:58:38.193Z"
+  "updatedAt": "2026-10-08T08:58:46.129Z"
 }

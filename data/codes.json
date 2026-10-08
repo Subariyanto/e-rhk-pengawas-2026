@@ -6,7 +6,8 @@
       "createdAt": "2026-10-08T08:50:12.933Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false
+      "revoked": false,
+      "note": "Akhmad Subaidi"
     },
     {
       "code": "FULL-VS9G-7KLT-N539",
@@ -824,5 +825,5 @@
       "note": "Ya Salam"
     }
   ],
-  "updatedAt": "2026-10-08T08:50:14.694Z"
+  "updatedAt": "2026-10-08T08:50:23.784Z"
 }

@@ -522,7 +522,8 @@
       "createdAt": "2026-06-13T13:53:32.074Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false
+      "revoked": false,
+      "note": "Sampang"
     },
     {
       "code": "FULL-4M57-ECVN-2ZUU",
@@ -815,5 +816,5 @@
       "note": "Ya Salam"
     }
   ],
-  "updatedAt": "2026-10-07T13:55:53.769Z"
+  "updatedAt": "2026-10-08T08:43:16.787Z"
 }

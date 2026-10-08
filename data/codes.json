@@ -1,6 +1,14 @@
 {
   "codes": [
     {
+      "code": "FULL-ALRH-MZ9N-T2MK",
+      "tier": "full",
+      "createdAt": "2026-10-08T08:58:36.588Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
       "code": "FULL-ALSS-XXLG-AJKF",
       "tier": "full",
       "createdAt": "2026-10-08T08:50:12.933Z",
@@ -825,5 +833,5 @@
       "note": "Ya Salam"
     }
   ],
-  "updatedAt": "2026-10-08T08:58:29.953Z"
+  "updatedAt": "2026-10-08T08:58:38.193Z"
 }

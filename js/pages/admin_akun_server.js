@@ -17,15 +17,40 @@
     if (!iso) return '-';
     try { return new Date(iso).toLocaleString('id-ID'); } catch (e) { return iso; }
   }
+  // Pesan alasan gagal (dipakai beberapa panel).
+  function reasonMsg(r) {
+    const m = {
+      no_admin_key: 'Admin Key belum diisi.',
+      invalid_admin_key: 'Admin Key salah.',
+      network_error: 'Server tidak terjangkau.',
+      not_found: 'Kode tidak ada di server.',
+      has_account: 'Kode masih terpakai akun (hapus akunnya dulu).',
+    };
+    return m[(r && r.reason)] || ((r && r.reason) || 'gagal');
+  }
+  function codePrefix(c) {
+    // Ambil prefix sebelum segmen acak pertama, mis. 'FULL-' / 'E-RHK-PENGAWAS-'
+    const i = String(c).indexOf('-');
+    return i > 0 ? String(c).slice(0, i + 1) : '';
+  }
 
   Page.AdminAkunServer = function () {
+    return renderPage('akun');
+  };
+
+  // Halaman khusus: Daftar Kode & status aktivasi
+  Page.AdminKodeServer = function () {
+    return renderPage('kode');
+  };
+
+  function renderPage(defaultTab) {
     const ready = !!(window.SupabaseSync && typeof SupabaseSync.adminListAccounts === 'function');
     const appSlug = (window.SupabaseSync && SupabaseSync.APP_SLUG) || 'e-rhk-pengawas';
 
-    UI.shell('Akun Server', `
+    UI.shell('Akun & Kode Server', `
       <div class="alert alert-light border mb-3">
         <i class="bi bi-cloud-check text-primary"></i>
-        Panel ini mengelola <strong>akun server</strong> di <em>Pusat Lisensi</em> (model <strong>1 kode = 1 akun</strong>).
+        Panel ini mengelola <strong>akun & kode</strong> di <em>Pusat Lisensi</em> (model <strong>1 kode = 1 akun</strong>).
         Akun server membuat pengguna bisa <strong>login dari perangkat mana pun</strong>. Data RHK tetap tersimpan lokal per perangkat.
         <div class="small text-muted mt-1">App slug: <code>${U.escapeHtml(appSlug)}</code></div>
       </div>
@@ -37,7 +62,7 @@
         <div class="input-group mb-2">
           <input class="form-control" id="akKey" type="password" placeholder="PJWS-ADM-..." autocomplete="off" />
           <button class="btn btn-outline-secondary" id="akToggle" type="button"><i class="bi bi-eye"></i></button>
-          <button class="btn btn-primary" id="akLoad" type="button"><i class="bi bi-arrow-clockwise"></i> Muat Akun</button>
+          <button class="btn btn-primary" id="akLoad" type="button"><i class="bi bi-arrow-clockwise"></i> Muat Data</button>
         </div>
         <div class="form-check">
           <input class="form-check-input" type="checkbox" id="akRemember" />
@@ -46,8 +71,14 @@
         <div class="small text-muted mt-1">Key tidak dikirim ke mana pun kecuali ke Pusat Lisensi via HTTPS.</div>
       </div></div>
 
+      <ul class="nav nav-tabs mb-3" id="akTabs">
+        <li class="nav-item"><a class="nav-link${defaultTab === 'kode' ? '' : ' active'}" href="#" data-tab="akun"><i class="bi bi-people"></i> Akun</a></li>
+        <li class="nav-item"><a class="nav-link${defaultTab === 'kode' ? ' active' : ''}" href="#" data-tab="kode"><i class="bi bi-upc-scan"></i> Kode</a></li>
+      </ul>
+
       <div id="akStats" class="mb-2"></div>
-      <div id="akList"><div class="text-muted small">Muat akun untuk melihat daftar.</div></div>
+      <div id="akPanelAkun"><div class="text-muted small">Muat data untuk melihat daftar akun.</div></div>
+      <div id="akPanelKode" style="display:none;"><div class="text-muted small">Muat data untuk melihat daftar kode.</div></div>
     `);
 
     const keyInput = document.getElementById('akKey');
@@ -55,26 +86,113 @@
     keyInput.value = getKey();
     remember.checked = !!getKey();
 
+    // Tab switching
+    let activeTab = defaultTab === 'kode' ? 'kode' : 'akun';
+    const panelAkun = document.getElementById('akPanelAkun');
+    const panelKode = document.getElementById('akPanelKode');
+    const listElAkun = panelAkun;
+    const listElKode = panelKode;
+    document.querySelectorAll('#akTabs a[data-tab]').forEach(a => a.addEventListener('click', (e) => {
+      e.preventDefault();
+      activeTab = a.dataset.tab;
+      document.querySelectorAll('#akTabs a').forEach(x => x.classList.remove('active'));
+      a.classList.add('active');
+      listElAkun.style.display = activeTab === 'akun' ? '' : 'none';
+      listElKode.style.display = activeTab === 'kode' ? '' : 'none';
+    }));
+
     document.getElementById('akToggle').addEventListener('click', () => {
       keyInput.type = keyInput.type === 'password' ? 'text' : 'password';
     });
 
     document.getElementById('akLoad').addEventListener('click', load);
 
+    function renderCodes(codes) {
+      const total = codes.length;
+      const used = codes.filter(c => c.account_username).length;
+      const unused = total - used;
+      const revoked = codes.filter(c => c.is_active === false).length;
+      document.getElementById('akStats').innerHTML = `
+        <div class="row g-2 mb-2">
+          <div class="col-6 col-md-3"><div class="border rounded p-2 text-center"><div class="h5 mb-0">${total}</div><div class="small text-muted">Total kode</div></div></div>
+          <div class="col-6 col-md-3"><div class="border rounded p-2 text-center"><div class="h5 mb-0 text-danger">${used}</div><div class="small text-muted">Sudah diaktivasi</div></div></div>
+          <div class="col-6 col-md-3"><div class="border rounded p-2 text-center"><div class="h5 mb-0 text-success">${unused}</div><div class="small text-muted">Belum dipakai</div></div></div>
+          <div class="col-6 col-md-3"><div class="border rounded p-2 text-center"><div class="h5 mb-0 text-secondary">${revoked}</div><div class="small text-muted">Dicabut</div></div></div>
+        </div>`;
+
+      const filter = String((document.getElementById('akCodeFilter') || {}).value || '').toUpperCase();
+      const onlyUsed = !!(document.getElementById('akOnlyUsed') || {}).checked;
+      let rows = codes.slice().sort((a, b) => String(b.created_at || '').localeCompare(String(a.created_at || '')));
+      if (filter) rows = rows.filter(c => (c.code || '').toUpperCase().includes(filter) || String(c.account_username || '').toUpperCase().includes(filter) || String(c.account_fullname || '').toUpperCase().includes(filter));
+      if (onlyUsed) rows = rows.filter(c => !!c.account_username);
+
+      document.getElementById('akPanelKode').innerHTML = `
+        <div class="row g-2 align-items-end mb-2">
+          <div class="col-md-6">
+            <input class="form-control form-control-sm" id="akCodeFilter" placeholder="Cari kode / username / nama…" value="${U.escapeHtml(filter)}" />
+          </div>
+          <div class="col-md-6">
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="akOnlyUsed" ${onlyUsed ? 'checked' : ''} />
+              <label class="form-check-label small" for="akOnlyUsed">Tampilkan hanya yang sudah diaktivasi</label>
+            </div>
+          </div>
+        </div>
+        <div class="card"><div class="table-responsive"><table class="table table-sm table-hover align-middle mb-0">
+          <thead><tr>
+            <th>Kode</th><th>Status</th><th>Diaktivasi oleh</th><th>Nama</th><th>Login terakhir</th><th>Dibuat</th><th class="text-end" style="width:7rem;">Aksi</th>
+          </tr></thead>
+          <tbody>
+            ${rows.map(c => {
+              const aktiv = !!c.account_username;
+              const st = c.is_active === false ? '<span class="badge bg-secondary">dicabut</span>' : (aktiv ? '<span class="badge bg-danger">terpakai</span>' : '<span class="badge bg-success">tersedia</span>');
+              return `<tr>
+                <td style="font-family:'Courier New',monospace;font-size:.82em;">${U.escapeHtml(c.code)}${c.recipient ? `<div class="small text-muted">${U.escapeHtml(c.recipient)}</div>` : ''}</td>
+                <td>${st}</td>
+                <td style="font-family:'Courier New',monospace;font-size:.82em;">${U.escapeHtml(c.account_username || '—')}</td>
+                <td>${U.escapeHtml(c.account_fullname || '—')}</td>
+                <td class="small text-muted">${fmt(c.account_last_login)}</td>
+                <td class="small text-muted">${fmt(c.created_at)}</td>
+                <td class="text-end"><button class="btn btn-sm btn-outline-secondary" data-copy="${U.escapeHtml(c.code)}" title="Salin kode">📋</button></td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table></div></div>
+        <div class="small text-muted mt-2">Kode <strong>terpakai</strong> = sudah diaktivasi jadi akun (1 kode = 1 akun). Untuk membebaskan kode, hapus akunnya di tab <em>Akun</em>.</div>`;
+
+      const f = document.getElementById('akCodeFilter');
+      if (f) f.addEventListener('input', () => renderCodes(codes));
+      const ou = document.getElementById('akOnlyUsed');
+      if (ou) ou.addEventListener('change', () => renderCodes(codes));
+      document.querySelectorAll('#akPanelKode button[data-copy]').forEach(b => b.addEventListener('click', () => {
+        if (navigator.clipboard) navigator.clipboard.writeText(b.dataset.copy);
+        UI.toast('Kode disalin: ' + b.dataset.copy, 'success');
+      }));
+    }
+
     async function load() {
       const key = String(keyInput.value || '').trim();
       if (!key) return UI.toast('Admin key kosong.', 'danger');
       if (remember.checked) setKey(key); else setKey('');
-      const listEl = document.getElementById('akList');
       const statsEl = document.getElementById('akStats');
-      listEl.innerHTML = '<div class="text-muted small"><span class="spinner-border spinner-border-sm"></span> Memuat…</div>';
+      listElAkun.innerHTML = '<div class="text-muted small"><span class="spinner-border spinner-border-sm"></span> Memuat…</div>';
+      listElKode.innerHTML = '<div class="text-muted small"><span class="spinner-border spinner-border-sm"></span> Memuat…</div>';
       statsEl.innerHTML = '';
 
-      const [res, stats] = await Promise.all([
+      const [res, stats, codesRes] = await Promise.all([
         SupabaseSync.adminListAccounts(key, appSlug),
         SupabaseSync.adminGetAccountStats(key, appSlug),
+        (SupabaseSync.adminListCodes ? SupabaseSync.adminListCodes(key, appSlug) : Promise.resolve(null)),
       ]);
 
+      // Panel Kode (status aktivasi tiap kode)
+      if (codesRes && codesRes.success === true) {
+        renderCodes(codesRes.codes || []);
+      } else if (codesRes) {
+        listElKode.innerHTML = `<div class="alert alert-danger mb-0"><i class="bi bi-x-circle"></i> Gagal memuat daftar kode. ${U.escapeHtml(reasonMsg(codesRes))}</div>`;
+      }
+
+      let listEl = listElAkun;
       if (!res || res.success !== true) {
         listEl.innerHTML = `<div class="alert alert-danger mb-0"><i class="bi bi-x-circle"></i> Gagal memuat. ${
           res && res.reason === 'invalid_admin_key'

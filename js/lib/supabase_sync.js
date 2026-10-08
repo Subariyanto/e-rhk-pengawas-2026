@@ -322,6 +322,11 @@
     return callPusatRpc('admin_get_account_stats', { p_admin_key: adminKey, p_app_slug: appSlug || PUSAT_APP_SLUG });
   }
 
+  // Daftar kode + status aktivasi (username pemakai, nama, login terakhir).
+  function adminListCodes(adminKey, appSlug) {
+    return callPusatRpc('admin_list_codes', { p_admin_key: adminKey, p_app_slug: appSlug || PUSAT_APP_SLUG });
+  }
+
   // ==== Terbitkan kode LANGSUNG di server Pusat Lisensi (cross-device) ====
   // Tanpa ini, kode buatan panel admin lokal hanya ada di gh-pages/localStorage
   // dan TIDAK bisa dipakai login dari perangkat lain (HP) karena server tak kenal kodenya.
@@ -397,6 +402,7 @@
     adminDeleteAccount,
     adminResetAccountPassword,
     adminGetAccountStats,
+    adminListCodes,
     // Terbitkan/kelola kode langsung di server (cross-device)
     adminRegisterCode,
     adminRegisterCodes,

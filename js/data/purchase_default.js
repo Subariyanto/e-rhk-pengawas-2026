@@ -26,11 +26,12 @@ window.PURCHASE_DEFAULT = {
     '1. Buka aplikasi: {URL}\n' +
     '2. Login (atau daftar pakai mode TRIAL dulu)\n' +
     '3. Klik banner kuning di dashboard → "Masukkan Kode FULL"\n' +
-    '4. Tempel kode di atas → selesai ✅\n\n' +
-    'Kode ini sekali pakai. Simpan baik-baik.\n\nSalam,\nSubariyanto\nKetua Pokjawas Madrasah Kab. Jember',
+    '4. Tempel kode di atas → selesai ✅\n' +
+    '5. Di perangkat baru: halaman Login → "Masuk pakai Kode Aktivasi"\n\n' +
+    'Kode ini terikat ke 1 akun (NIP/email), bisa dipakai dari perangkat mana pun. Simpan baik-baik.\n\nSalam,\nSubariyanto\nKetua Pokjawas Madrasah Kab. Jember',
 };
 
-// BUNDLED CODES — kode aktivasi yang ikut dideploy ke gh-pages.
+// BUNDLED CODES — kode aktivasi cadangan yang ikut ter-deploy bersama aplikasi.
 // Manfaatnya: admin generate kode di laptop, tapi user bisa aktivasi dari HP manapun
 // (localStorage HP user kosong, tapi codes ini ikut load dari file ini).
 //
@@ -38,9 +39,10 @@ window.PURCHASE_DEFAULT = {
 //   1. Admin login di laptop → Admin > Kode Aktivasi > Generate kode FULL
 //   2. Salin kode hasil generate, paste ke array di bawah dengan format:
 //        { code: 'FULL-XXXX-XXXX-XXXX', tier: 'full', note: 'untuk Pak Fulan' }
-//   3. Commit + push ke gh-pages → dalam ~1 menit semua device bisa pakai kode ini.
+//   3. Commit + push ke `main` (deploy situs) → dalam ~1 menit semua device bisa pakai kode ini.
+//      (Cara yang lebih praktis: tombol auto-sync admin yang push ke relay gh-pages/data/codes.json.)
 //
-// Kode yang sudah di-consume akan ditandai di localStorage user (per-device).
+// Kode yang sudah di-consume ditandai di localStorage device ini (terikat ke AKUN via usedBy/NIP).
 // Kode bundled ini SELALU valid lintas device sampai admin hapus dari array di bawah.
 window.BUNDLED_CODES = [
   { code: 'FULL-ZJW4-ZN48-6E3P', tier: 'full', note: '' },

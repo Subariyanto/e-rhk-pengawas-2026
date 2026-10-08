@@ -26,6 +26,7 @@
     Router.on('/periode', () => Page.Periode(), { requireAuth: true });
     Router.on('/backup', () => Page.Backup(), { requireAuth: true });
     Router.on('/admin/users', () => Page.AdminUsers(), { requireAuth: true, role: 'admin' });
+    Router.on('/admin/akun-server', () => Page.AdminAkunServer(), { requireAuth: true, role: 'admin' });
     Router.on('/admin/aktivasi', () => Page.AdminAktivasi(), { requireAuth: true, role: 'admin' });
     Router.on('/admin/pembelian', () => Page.AdminPembelian(), { requireAuth: true, role: 'admin' });
   }

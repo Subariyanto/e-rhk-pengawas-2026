@@ -110,6 +110,15 @@
         </div>
       </div>
 
+      <div class="card mb-3" id="cardSyncAkun">
+        <div class="card-header"><i class="bi bi-cloud-arrow-up"></i> Sinkronisasi Akun</div>
+        <div class="card-body">
+          <div id="syncAkunInfo" class="small mb-2"></div>
+          <button id="btnSyncAkun" class="btn btn-primary"><i class="bi bi-cloud-arrow-up"></i> Sinkronkan Akun ke Server</button>
+          <div id="syncAkunResult" class="mt-2 small"></div>
+        </div>
+      </div>
+
       <div class="card">
         <div class="card-header"><i class="bi bi-list-ul"></i> Status RHK 1—30</div>
         <div class="card-body">
@@ -133,12 +142,12 @@
     // Wire trial banner button
     const btnKodeFull = document.getElementById('btnInputKodeFull');
     if (btnKodeFull) {
-      btnKodeFull.addEventListener('click', () => {
+      btnKodeFull.addEventListener('click', async () => {
         const kode = prompt('Masukkan Kode Aktivasi FULL untuk upgrade/perpanjang akun ini:');
         if (kode == null) return;
         const c = String(kode).trim();
         if (!c) return;
-        const found = Codes.findCode(c);
+        const found = await Codes.findCode(c);
         if (!found || found.tier !== 'full') {
           return UI.toast('Kode tidak valid, sudah dipakai, atau bukan kode FULL.', 'danger');
         }
@@ -189,6 +198,86 @@
       });
     } catch (e) {
       console.warn('Chart skipped:', e.message);
+    }
+
+    // ===== Sinkronisasi Akun ke Server =====
+    const syncInfo = document.getElementById('syncAkunInfo');
+    const btnSync = document.getElementById('btnSyncAkun');
+    const syncResult = document.getElementById('syncAkunResult');
+    if (syncInfo && btnSync) {
+      const cur = Auth.currentUser();
+      const isSynced = cur && cur.server_synced;
+      const username = cur ? (cur.nip || (cur.email && !/@pengawas\.local$/.test(cur.email) ? cur.email : '')) : '';
+      if (cur && cur.role === 'admin') {
+        syncInfo.innerHTML = '<span class="text-muted">Akun admin tidak perlu disinkronkan ke server.</span>';
+        btnSync.style.display = 'none';
+      } else if (isSynced) {
+        syncInfo.innerHTML = '<span class="text-success"><i class="bi bi-check-circle"></i> Akun sudah tersinkron di server. Login dari HP/perangkat lain: masukkan <strong>' + U.escapeHtml(username || 'NIP/email Anda') + '</strong> + password yang sama.</span>';
+        btnSync.style.display = 'none';
+      } else if (!cur) {
+        syncInfo.innerHTML = '<span class="text-muted">Silakan login dulu.</span>';
+        btnSync.style.display = 'none';
+      } else {
+        syncInfo.innerHTML = '<span class="text-warning"><i class="bi bi-exclamation-triangle"></i> Akun Anda <strong>belum terdaftar di server</strong>. Login di HP/perangkat lain tidak akan berhasil. Klik tombol di bawah untuk mendaftarkan akun ini ke server Pusat Lisensi.</span>';
+        btnSync.style.display = '';
+      }
+      if (btnSync) btnSync.addEventListener('click', async () => {
+        if (!cur) return;
+        btnSync.disabled = true;
+        btnSync.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Mendaftarkan...';
+        syncResult.innerHTML = '';
+        try {
+          // Validasi: akun butuh kode aktivasi untuk didaftarkan ke server
+          let code = String(cur.activatedWith || '').trim();
+          if (/^\(legacy:/.test(code)) code = code.replace(/^\(legacy:/, '').replace(/\)$/, '').trim();
+          if (!code) {
+            // Akun trial tanpa kode — tidak bisa daftar ke server
+            syncResult.innerHTML = '<span class="text-danger">Akun TRIAL tanpa kode aktivasi tidak bisa disinkronkan ke server. Hubungi admin untuk dapatkan kode FULL.</span>';
+            btnSync.disabled = false;
+            btnSync.innerHTML = '<i class="bi bi-cloud-arrow-up"></i> Sinkronkan Akun ke Server';
+            return;
+          }
+          // Coba migrasi akun lokal → server
+          const r = await Auth.migrateLocalAccountToServer(cur, cur.__pw || '');
+          // migrateLocalAccountToServer butuh password — kita tidak punya plaintext.
+          // Pakai pendekatan langsung: daftar ulang ke server pakai prompt password.
+          if (r === 'already') {
+            syncResult.innerHTML = '<span class="text-success"><i class="bi bi-check-circle"></i> Akun sudah terdaftar di server. Sekarang bisa login dari HP.</span>';
+            syncInfo.innerHTML = '<span class="text-success"><i class="bi bi-check-circle"></i> Akun sudah tersinkron di server.</span>';
+            btnSync.style.display = 'none';
+          } else if (r === 'migrated') {
+            syncResult.innerHTML = '<span class="text-success"><i class="bi bi-check-circle"></i> Akun berhasil didaftarkan ke server! Sekarang login dari HP pakai <strong>' + U.escapeHtml(username || 'NIP/email') + '</strong> + password yang sama.</span>';
+            syncInfo.innerHTML = '<span class="text-success"><i class="bi bi-check-circle"></i> Akun sudah tersinkron di server.</span>';
+            btnSync.style.display = 'none';
+          } else {
+            // Migrasi butuh password — prompt user
+            const pw = prompt('Masukkan password akun Anda untuk konfirmasi sinkronisasi:');
+            if (!pw) {
+              btnSync.disabled = false;
+              btnSync.innerHTML = '<i class="bi bi-cloud-arrow-up"></i> Sinkronkan Akun ke Server';
+              return;
+            }
+            const r2 = await Auth.migrateLocalAccountToServer(cur, pw);
+            if (r2 === 'already' || r2 === 'migrated') {
+              syncResult.innerHTML = '<span class="text-success"><i class="bi bi-check-circle"></i> Akun berhasil disinkronkan ke server! Sekarang login dari HP pakai <strong>' + U.escapeHtml(username || 'NIP/email') + '</strong> + password yang sama.</span>';
+              syncInfo.innerHTML = '<span class="text-success"><i class="bi bi-check-circle"></i> Akun sudah tersinkron di server.</span>';
+              btnSync.style.display = 'none';
+            } else if (r2 === 'code_used') {
+              syncResult.innerHTML = '<span class="text-danger">Kode aktivasi ini sudah dipakai akun lain di server. Hubungi admin.</span>';
+            } else if (r2 === 'invalid_code') {
+              syncResult.innerHTML = '<span class="text-danger">Kode aktivasi tidak terdaftar di server. Hubungi admin untuk seed kode ke server.</span>';
+            } else if (r2 === 'skipped') {
+              syncResult.innerHTML = '<span class="text-danger">Password tidak cocok dengan akun lokal. Coba lagi.</span>';
+            } else {
+              syncResult.innerHTML = '<span class="text-danger">Gagal sinkronisasi: ' + U.escapeHtml(r2 || 'error tidak diketahui') + '. Periksa koneksi internet lalu coba lagi.</span>';
+            }
+          }
+        } catch (err) {
+          syncResult.innerHTML = '<span class="text-danger">Error: ' + U.escapeHtml(err.message) + '</span>';
+        }
+        btnSync.disabled = false;
+        btnSync.innerHTML = '<i class="bi bi-cloud-arrow-up"></i> Sinkronkan Akun ke Server';
+      });
     }
 
     function stat(icon, label, num, cls) {

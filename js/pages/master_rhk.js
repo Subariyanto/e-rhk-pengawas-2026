@@ -24,6 +24,21 @@
   }
   function saveMaster(list) { Store.set('master_rhk', list); }
 
+  // Nomor RHK adalah nomor urut global, bukan ID teknis.  Saat data lama
+  // belum memiliki nomor atau ada nomor ganda, rapikan berdasarkan urutan
+  // tampil/penambahan tanpa mengubah ID yang sudah dipakai relasi eviden.
+  function normalizeNomorRHK(list) {
+    let changed = false;
+    const twOrder = { I: 1, II: 2, III: 3, IV: 4, TAMBAHAN: 5 };
+    const ordered = list.slice().sort((a, b) =>
+      (twOrder[a.triwulan] || 99) - (twOrder[b.triwulan] || 99));
+    ordered.forEach((r, i) => {
+      const n = i + 1;
+      if (Number(r.nomor_rhk) !== n) { r.nomor_rhk = n; changed = true; }
+    });
+    return changed;
+  }
+
   function getColWidths() {
     const saved = Store.getGlobal(COL_WIDTH_KEY, null);
     const widths = COLS.map(c => c.width);
@@ -39,11 +54,19 @@
 
   Page.MasterRHK = function () {
     const list = getMaster();
+    if (normalizeNomorRHK(list)) saveMaster(list);
     const params = new URLSearchParams(location.hash.split('?')[1] || '');
     const fTw = params.get('tw') || '';
     const fQ = (params.get('q') || '').toLowerCase();
 
-    const filtered = list.filter(r => {
+    // Selalu tampilkan urutan berdasarkan triwulan, lalu nomor RHK.
+    // RHK baru pada TW I masuk ke kelompok TW I, bukan di bagian akhir.
+    const ordered = list.slice().sort((a, b) => {
+      const twOrder = { I: 1, II: 2, III: 3, IV: 4, TAMBAHAN: 5 };
+      return (twOrder[a.triwulan] || 99) - (twOrder[b.triwulan] || 99)
+        || (Number(a.nomor_rhk) || 0) - (Number(b.nomor_rhk) || 0);
+    });
+    const filtered = ordered.filter(r => {
       if (fTw && r.triwulan !== fTw) return false;
       if (fQ) {
         const blob = (r.id + ' ' + r.nama_eviden + ' ' + (r.rencana_hasil_kerja || '') + ' ' + (r.indikator_kuantitas || '')).toLowerCase();
@@ -135,7 +158,7 @@
       const newId = 'RHK-CUST-' + Date.now().toString(36).slice(-5).toUpperCase();
       const blank = {
         id: newId,
-        nomor_rhk: cur.length + 1,
+        nomor_rhk: cur.reduce((max, r) => Math.max(max, Number(r.nomor_rhk) || 0), 0) + 1,
         triwulan: 'I',
         jenis_kinerja: 'Utama',
         nama_eviden: '',
@@ -185,7 +208,7 @@
     return `
       <tr data-rhk-id="${attr(r.id)}">
         <td rowspan="2" class="cell-id" style="vertical-align:middle;text-align:center;">
-          <strong>${attr(r.id)}</strong>
+          <strong>RHK-${attr(r.nomor_rhk || '—')}</strong>
           <div class="small mt-1">${tw}</div>
         </td>
         <td rowspan="2" class="cell-wrap" style="vertical-align:middle;">

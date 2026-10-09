@@ -6,7 +6,8 @@
       "createdAt": "2026-10-09T03:35:52.183Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false
+      "revoked": false,
+      "note": "Abd. Bari"
     },
     {
       "code": "FULL-MJQE-6AL6-HWQM",
@@ -793,5 +794,5 @@
       "note": "Hariyanto"
     }
   ],
-  "updatedAt": "2026-10-09T03:35:54.309Z"
+  "updatedAt": "2026-10-09T03:36:07.553Z"
 }

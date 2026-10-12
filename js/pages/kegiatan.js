@@ -96,7 +96,7 @@
       tempat: '',
       sasaran: '',
       peserta: '',
-      narasumber: '',
+      narasumber: (Page.Identitas.get().pegawai || {}).nama || '',
       uraian: '',
       tujuan: '',
       hasil: '',
@@ -391,6 +391,51 @@
         }
       });
     }
+
+    // ===== Auto-fill Sasaran & Narasumber dari Identitas Pengawas =====
+    const pegawai = Page.Identitas.get().pegawai || {};
+    const inputSasaran = document.querySelector('input[name="sasaran"]');
+    const inputNarasumber = document.querySelector('input[name="narasumber"]');
+
+    // Nama KKM diambil dari Wilayah Binaan pada Identitas Pengawas
+    // (mis. "KKMA 04 Jember (Kecamatan Sukowono)" -> "KKMA 04 Jember")
+    function namaKKM() {
+      const wb = (pegawai.wilayah_binaan || '').trim();
+      if (!wb) return (pegawai.unit_kerja || '').trim();
+      return wb.split('(')[0].trim();
+    }
+
+    function sasaranUntuk(madValue) {
+      if (madValue === 'semua') return namaKKM();
+      if (madValue) {
+        const m = madrasah.find(x => x.id === madValue);
+        if (m) return 'Kepala Madrasah dan Guru';
+      }
+      return '';
+    }
+
+    // Isi hanya jika masih kosong atau masih berisi hasil auto-fill sebelumnya,
+    // supaya tulisan yang sudah diedit manual tidak tertimpa.
+    function autoFill(el, val) {
+      if (!el || !val) return;
+      const isAuto = el.dataset.auto === '1';
+      if (!el.value.trim() || isAuto) {
+        el.value = val;
+        el.dataset.auto = '1';
+      }
+    }
+    // Tandai sebagai editan manual begitu pengguna mengetik sendiri
+    [inputSasaran, inputNarasumber].forEach(el => {
+      if (el) el.addEventListener('input', () => { el.dataset.auto = '0'; });
+    });
+
+    if (selMadrasah && inputSasaran) {
+      autoFill(inputSasaran, sasaranUntuk(selMadrasah.value));
+      selMadrasah.addEventListener('change', () => {
+        autoFill(inputSasaran, sasaranUntuk(selMadrasah.value));
+      });
+    }
+    if (inputNarasumber) autoFill(inputNarasumber, pegawai.nama || '');
 
     const btnGenAll = document.getElementById('btnGenAll');
     if (btnGenAll) btnGenAll.addEventListener('click', () => genAll(0));

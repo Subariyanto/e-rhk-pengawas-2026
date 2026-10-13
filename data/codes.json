@@ -6,7 +6,8 @@
       "createdAt": "2026-10-13T23:46:36.910Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false
+      "revoked": false,
+      "note": "emilia"
     },
     {
       "code": "FULL-Z8CN-BLMW-W6QD",
@@ -52,5 +53,5 @@
       "revoked": false
     }
   ],
-  "updatedAt": "2026-10-13T23:46:38.500Z"
+  "updatedAt": "2026-10-13T23:46:55.143Z"
 }

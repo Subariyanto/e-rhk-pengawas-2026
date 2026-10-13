@@ -1,6 +1,14 @@
 {
   "codes": [
     {
+      "code": "FULL-Z8CN-BLMW-W6QD",
+      "tier": "full",
+      "createdAt": "2026-10-13T23:45:55.465Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
       "code": "FULL-JKJ6-FTYK-886X",
       "tier": "full",
       "createdAt": "2026-10-13T23:44:01.959Z",
@@ -36,5 +44,5 @@
       "revoked": false
     }
   ],
-  "updatedAt": "2026-10-13T23:45:42.473Z"
+  "updatedAt": "2026-10-13T23:45:57.332Z"
 }

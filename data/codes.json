@@ -4,10 +4,12 @@
       "code": "FULL-3936-B43Z-PT3C",
       "tier": "full",
       "createdAt": "2026-10-24T12:25:51.826Z",
-      "usedBy": null,
-      "usedAt": null,
+      "usedBy": "197511252005012004",
+      "usedAt": "2026-10-24T12:29:13.189Z",
       "revoked": false,
-      "note": "Sahrawani"
+      "note": "Sahrawani",
+      "ownerName": "Pengawas 2004",
+      "ownerNip": "197511252005012004"
     },
     {
       "code": "FULL-X3L4-HM9B-MX77",
@@ -62,5 +64,5 @@
       "revoked": false
     }
   ],
-  "updatedAt": "2026-10-24T12:26:23.424Z"
+  "updatedAt": "2026-10-24T12:29:14.817Z"
 }

@@ -26,9 +26,23 @@
   let _status = { state: 'idle', lastAt: null, lastError: null, pulled: 0, applied: 0, pushed: 0 };
 
   // ---------- config & akun ----------
+  // PINDAH BERSIH KE VPS (keputusan Yanto 26 Okt 10:27):
+  // Simpan perubahan HANYA ke VPS lewat fn_data_set/fn_data_get.
+  // Server lama dipakai SEKALI saja: menarik data warisan saat migrasi.
+  // localStorage tetap sumber utama & lapisan hidup (offline-first).
   function cfg() {
     const S = window.SupabaseSync || {};
-    return { url: S.PUSAT_URL || S.SUPABASE_URL || '', key: S.PUSAT_ANON_KEY || S.SUPABASE_ANON_KEY || '' };
+    return { url: S.VPS_URL || '', key: S.VPS_ANON_KEY || '' };
+  }
+  function legacyCfg() {
+    const S = window.SupabaseSync || {};
+    return { url: S.PUSAT_URL || '', key: S.PUSAT_ANON_KEY || '' };
+  }
+  function vpsToken() {
+    try {
+      const S = window.SupabaseSync || {};
+      return (S.vpsGetToken && S.vpsGetToken()) || '';
+    } catch (e) { return ''; }
   }
   function currentUser() {
     try { return (window.Auth && Auth.currentUser) ? Auth.currentUser() : null; } catch (e) { return null; }
@@ -47,7 +61,8 @@
     if (!c.url || !c.key) return false;
     const u = currentUser();
     if (!u || u.role === 'admin') return false;
-    return !!(usernameOf(u) && passwordHashOf(u));
+    // VPS butuh token hasil login, bukan hash.
+    return !!(usernameOf(u) && vpsToken());
   }
   function userPrefix(u) { return Store.PREFIX + 'u_' + (u ? u.id : '_anon_') + '_'; }
   function localKeyFor(u, scope, periode) {
@@ -67,10 +82,58 @@
   }
 
   // ---------- RPC ----------
+  // RPC ke VPS: apikey = anon key, Authorization = token user.
+  // Wajib Content-Profile: edusmart (schema non-public).
   async function rpc(fn, args) {
     const c = cfg();
+    const tok = vpsToken();
+    if (!c.url || !tok) { _status.lastError = 'no-token'; return null; }
     const ctrl = new AbortController();
     const to = setTimeout(() => ctrl.abort(), 15000);
+    try {
+      const r = await fetch(c.url.replace(/\/$/, '') + '/rest/v1/rpc/' + fn, {
+        method: 'POST',
+        headers: {
+          apikey: c.key,
+          Authorization: 'Bearer ' + tok,
+          'Content-Type': 'application/json',
+          'Content-Profile': 'edusmart',
+        },
+        body: JSON.stringify(args || {}),
+        signal: ctrl.signal,
+      });
+      if (!r.ok) {
+        const t = await r.text().catch(() => '');
+        console.warn('[CloudSync] rpc', fn, r.status, t.slice(0, 200));
+        // 401 = token kedaluwarsa/ditolak -> minta login ulang, JANGAN diam.
+        if (r.status === 401) {
+          _status.lastError = 'token-expired';
+          _status.state = 'need-relogin';
+        } else {
+          _status.lastError = 'http-' + r.status;
+        }
+        return null;
+      }
+      const out = await r.json();
+      if (out && out.ok === false && /token tidak valid/i.test(out.error || '')) {
+        _status.lastError = 'token-expired';
+        _status.state = 'need-relogin';
+        return null;
+      }
+      return out;
+    } catch (e) {
+      console.warn('[CloudSync] rpc', fn, 'error:', e.message);
+      _status.lastError = e.message;
+      return null;
+    } finally { clearTimeout(to); }
+  }
+
+  // RPC ke server LAMA — hanya dipakai saat migrasi data warisan.
+  async function legacyRpc(fn, args) {
+    const c = legacyCfg();
+    if (!c.url || !c.key) return null;
+    const ctrl = new AbortController();
+    const to = setTimeout(() => ctrl.abort(), 20000);
     try {
       const r = await fetch(c.url.replace(/\/$/, '') + '/rest/v1/rpc/' + fn, {
         method: 'POST',
@@ -78,16 +141,10 @@
         body: JSON.stringify(args || {}),
         signal: ctrl.signal,
       });
-      if (!r.ok) {
-        const t = await r.text().catch(() => '');
-        console.warn('[CloudSync] rpc', fn, r.status, t.slice(0, 200));
-        _status.lastError = 'http-' + r.status;
-        return null;
-      }
+      if (!r.ok) return null;
       return await r.json();
     } catch (e) {
-      console.warn('[CloudSync] rpc', fn, 'error:', e.message);
-      _status.lastError = e.message;
+      console.warn('[CloudSync] legacyRpc', fn, 'error:', e.message);
       return null;
     } finally { clearTimeout(to); }
   }
@@ -127,13 +184,16 @@
       const parts = k.split('|');
       const scope = parts[0];
       const periode = parseInt(parts[1], 10) || 0;
-      const res = await rpc('user_data_set', {
-        p_app_slug: APP_SLUG, p_username: uk, p_password_hash: passwordHashOf(u),
+      const res = await rpc('fn_data_set', {
         p_scope: scope, p_periode: periode, p_payload: v,
+        p_device: (navigator.userAgent || '').slice(0, 60),
       });
-      if (res && res.success === true) {
+      if (res && res.ok === true) {
         ok++;
         um.scopes[k] = { at: res.updated_at || new Date().toISOString() };
+      } else {
+        // gagal -> kembalikan ke antrean, jangan hilang
+        _queue.set(k, v);
       }
     }
     writeMeta(meta);
@@ -164,12 +224,10 @@
     if (!canSync()) return { ok: false, reason: 'not-applicable' };
     const u = currentUser();
     const uk = usernameOf(u);
-    const res = await rpc('user_data_get', {
-      p_app_slug: APP_SLUG, p_username: uk, p_password_hash: passwordHashOf(u),
-    });
-    if (!res || res.success !== true) {
-      _status.state = 'error';
-      return { ok: false, reason: (res && res.reason) || _status.lastError || 'network' };
+    const res = await rpc('fn_data_get', {});
+    if (!res || res.ok !== true) {
+      _status.state = (_status.state === 'need-relogin') ? 'need-relogin' : 'error';
+      return { ok: false, reason: _status.lastError || 'network' };
     }
     const rows = Array.isArray(res.rows) ? res.rows : [];
     const meta = readMeta();
@@ -225,6 +283,158 @@
   }
 
   // ---------- watcher & boot ----------
+
+  // =============================================================
+  // MIGRASI DATA WARISAN: server lama -> VPS (sekali per akun)
+  // =============================================================
+  // Dijalankan otomatis setelah login sukses via VPS.
+  // Urutan sengaja: SALIN DULU ke file, baru sentuh apa pun.
+  //
+  // Aturan penggabungan: data LOKAL menang. Server lama hanya mengisi
+  // bagian yang TIDAK ada di perangkat ini (mis. user pernah pakai
+  // laptop lain). Jadi tidak mungkin menimpa kerja terbaru user.
+  //
+  // Gagal di tengah -> TIDAK ditandai selesai, dicoba lagi saat login
+  // berikutnya. Tidak ada kondisi setengah jalan yang dianggap beres.
+  const MIG_KEY = '***';
+
+  function migDone(uk) {
+    try {
+      const raw = localStorage.getItem(MIG_KEY);
+      const o = raw ? JSON.parse(raw) : {};
+      return !!(o && o[uk]);
+    } catch (e) { return false; }
+  }
+  function setMigDone(uk, info) {
+    try {
+      const raw = localStorage.getItem(MIG_KEY);
+      const o = raw ? JSON.parse(raw) : {};
+      o[uk] = Object.assign({ at: new Date().toISOString() }, info || {});
+      localStorage.setItem(MIG_KEY, JSON.stringify(o));
+    } catch (e) {}
+  }
+
+  // Unduh salinan data lokal sebagai file — jaring aman nyata di tangan user.
+  function unduhSalinanLokal(u, tag) {
+    try {
+      const bundle = { aplikasi: 'e-RHK', akun: usernameOf(u), dibuat: new Date().toISOString(), data: {} };
+      for (const it of scanLocal(u)) {
+        bundle.data[it.scope + (it.periode ? '_' + it.periode : '')] = it.value;
+      }
+      if (!Object.keys(bundle.data).length) return false;
+      const blob = new Blob([JSON.stringify(bundle, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'erhk-backup-' + (usernameOf(u) || 'akun') + '-' + (tag || 'migrasi') + '.json';
+      document.body.appendChild(a); a.click();
+      setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+      return true;
+    } catch (e) { console.warn('[CloudSync] unduh salinan gagal:', e.message); return false; }
+  }
+
+  async function migrateLegacyToVps(opts) {
+    opts = opts || {};
+    const u = currentUser();
+    const uk = usernameOf(u);
+    if (!u || !uk || u.role === 'admin') return { ok: false, reason: 'not-applicable' };
+    if (!vpsToken()) return { ok: false, reason: 'no-token' };
+    if (!opts.force && migDone(uk)) return { ok: true, reason: 'already', skipped: true };
+
+    _status.state = 'migrating';
+    const lap = { diambil_dari_lama: 0, dikirim_ke_vps: 0, dilewati: 0 };
+
+    // 0) Salinan lokal dulu — sebelum apa pun berubah.
+    lap.salinan_terunduh = unduhSalinanLokal(u, 'sebelum-migrasi');
+
+    // 1) Apa yang sudah ada di VPS?
+    const vpsRes = await rpc('fn_data_get', {});
+    if (!vpsRes || vpsRes.ok !== true) {
+      _status.state = 'error';
+      return { ok: false, reason: 'vps-tak-terjangkau', lap: lap };
+    }
+    const adaDiVps = new Set((vpsRes.rows || []).map(function (r) {
+      return r.scope + '|' + (parseInt(r.periode, 10) || 0);
+    }));
+
+    // 2) Kumpulkan data lokal (prioritas tertinggi)
+    const gabungan = new Map();
+    for (const it of scanLocal(u)) {
+      gabungan.set(it.scope + '|' + it.periode, it.value);
+    }
+
+    // 3) Tarik data warisan dari server lama — hanya isi yang belum ada.
+    //    Pakai serverHash yang tersimpan saat login (hash sha256 lama).
+    const hash = passwordHashOf(u);
+    if (hash) {
+      const old = await legacyRpc('user_data_get', {
+        p_app_slug: APP_SLUG, p_username: uk, p_password_hash: hash,
+      });
+      if (old && old.success === true && Array.isArray(old.rows)) {
+        lap.diambil_dari_lama = old.rows.length;
+        for (const row of old.rows) {
+          const scope = String(row.scope || '');
+          if (!scope) continue;
+          const k = scope + '|' + (parseInt(row.periode, 10) || 0);
+          if (gabungan.has(k)) { lap.dilewati++; continue; }   // lokal menang
+          gabungan.set(k, row.payload);
+        }
+      } else {
+        lap.lama_tak_terjangkau = true;   // bukan penggagal: mungkin user baru
+      }
+    }
+
+    // 4) Kirim ke VPS semua yang belum ada di sana
+    let gagal = 0;
+    for (const [k, v] of gabungan.entries()) {
+      if (adaDiVps.has(k)) continue;
+      const parts = k.split('|');
+      const res = await rpc('fn_data_set', {
+        p_scope: parts[0], p_periode: parseInt(parts[1], 10) || 0, p_payload: v,
+        p_device: 'migrasi',
+      });
+      if (res && res.ok === true) lap.dikirim_ke_vps++; else gagal++;
+    }
+
+    if (gagal > 0) {
+      _status.state = 'error';
+      return { ok: false, reason: 'sebagian-gagal', gagal: gagal, lap: lap };
+    }
+
+    // 5) Backup snapshot pertama di VPS (jalur kedua, jaring aman)
+    try {
+      const snapshot = {};
+      for (const [k, v] of gabungan.entries()) snapshot[k] = v;
+      if (Object.keys(snapshot).length) {
+        await rpc('fn_backup_push', { p_payload: snapshot, p_device: 'migrasi-awal' });
+      }
+    } catch (e) {}
+
+    // 6) Tandai selesai — di perangkat DAN di server
+    await rpc('fn_mark_migrated', { p_note: 'bagian=' + lap.dikirim_ke_vps });
+    setMigDone(uk, lap);
+
+    _status.state = 'ok';
+    _status.lastAt = new Date().toISOString();
+    return { ok: true, lap: lap };
+  }
+
+  // Backup manual: snapshot ke VPS + salinan file ke perangkat (dua jalur).
+  async function backupSekarang() {
+    const u = currentUser();
+    if (!u) return { ok: false, reason: 'belum-login' };
+    const snapshot = {};
+    for (const it of scanLocal(u)) {
+      snapshot[it.scope + '|' + it.periode] = it.value;
+    }
+    const keFile = unduhSalinanLokal(u, 'backup');
+    let keVps = false;
+    if (vpsToken() && Object.keys(snapshot).length) {
+      const r = await rpc('fn_backup_push', { p_payload: snapshot, p_device: 'manual' });
+      keVps = !!(r && r.ok === true);
+    }
+    return { ok: (keFile || keVps), ke_file: keFile, ke_vps: keVps };
+  }
+
   function refresh() {
     try { if (window.Router && Router.dispatch) Router.dispatch(); } catch (e) {}
   }
@@ -251,9 +461,23 @@
     start: start,
     hydrate: hydrate,
     flush: flush,
-    afterLogin: function () { _lastUserKey = ''; watchUser(); },
+    afterLogin: function () {
+      _lastUserKey = '';
+      // Migrasi dulu (sekali per akun), baru sinkron normal.
+      migrateLegacyToVps().then(function (r) {
+        if (r && r.ok && r.lap && r.lap.dikirim_ke_vps) {
+          console.info('[CloudSync] migrasi selesai:', r.lap);
+        }
+        watchUser();
+      }).catch(function () { watchUser(); });
+    },
     canSync: canSync,
     usernameOf: usernameOf,
     status: function () { return Object.assign({}, _status, { queued: _queue.size }); },
+    // === migrasi & backup (dipanggil UI / Console) ===
+    migrateLegacyToVps: migrateLegacyToVps,
+    sudahMigrasi: function () { return migDone(usernameOf(currentUser())); },
+    backupSekarang: backupSekarang,
+    unduhSalinanLokal: function () { return unduhSalinanLokal(currentUser(), 'manual'); },
   };
 })();

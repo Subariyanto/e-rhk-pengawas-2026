@@ -221,7 +221,11 @@
     if (!username) return { ok: false, reason: 'invalid_credentials' };
     const hash = await SupabaseSync.accountHash(username, password);
     if (!hash) return { ok: false, reason: 'hash-fail' };
-    const r = await SupabaseSync.loginAccount(username, hash, SupabaseSync.APP_SLUG);
+    // Jalur cerdas: VPS dulu (password asli, bcrypt di server), fallback ke
+    // Pusat Lisensi lama (hash) bila VPS tak terjangkau / akun belum migrasi.
+    const r = (typeof SupabaseSync.loginAccountSmart === 'function')
+      ? await SupabaseSync.loginAccountSmart(username, password, SupabaseSync.APP_SLUG)
+      : await SupabaseSync.loginAccount(username, hash, SupabaseSync.APP_SLUG);
     if (!r || r.valid === null) return { ok: false, reason: 'network' };
     if (r.valid !== true) return { ok: false, reason: r.reason || 'invalid_credentials' };
     const isNip = /^\d{6,}$/.test(username);
@@ -250,10 +254,15 @@
     if (uname.length < 4) return { ok: false, reason: 'username_invalid' };
     const hash = await SupabaseSync.accountHash(uname, opts.password);
     if (!hash) return { ok: false, reason: 'hash-fail' };
-    const r = await SupabaseSync.registerAccount(
-      opts.code, SupabaseSync.APP_SLUG, uname, hash, opts.fullname || '', opts.madrasah || '',
-      (navigator.userAgent || '').slice(0, 200)
-    );
+    // Jalur cerdas: VPS dulu, fallback Pusat Lisensi lama.
+    const r = (typeof SupabaseSync.registerAccountSmart === 'function')
+      ? await SupabaseSync.registerAccountSmart(
+          opts.code, SupabaseSync.APP_SLUG, uname, opts.password,
+          opts.fullname || '', opts.madrasah || '',
+          (navigator.userAgent || '').slice(0, 200))
+      : await SupabaseSync.registerAccount(
+          opts.code, SupabaseSync.APP_SLUG, uname, hash, opts.fullname || '', opts.madrasah || '',
+          (navigator.userAgent || '').slice(0, 200));
     if (r === null || r.success === null) return { ok: false, reason: 'network' };
     if (r.success === true) return { ok: true, reason: r.reason || 'claimed', hash: hash };
     return { ok: false, reason: r.reason || 'failed' };

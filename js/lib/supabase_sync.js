@@ -54,6 +54,155 @@
   const PUSAT_URL = 'https://llaukzsztguwrtwdubpm.supabase.co';
   const PUSAT_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxsYXVrenN6dGd1d3J0d2R1YnBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcxOTI1NDgsImV4cCI6MjEwMjc2ODU0OH0.DqKtA0aus9nOLViMEWjAPvYIAdLS_EKU3H8dYKe_Zhk';
 
+  // =============================================================
+  // === SERVER BARU: VPS EduSmartDigital (api.pokjawasjember.com)
+  // =============================================================
+  // Strategi migrasi: COBA VPS DULU, kalau gagal JATUH KE PUSAT LAMA.
+  // Aplikasi lama tetap bisa dipakai client walau VPS bermasalah.
+  //
+  // Saklar runtime (tanpa deploy ulang) — jalankan di Console browser:
+  //   localStorage.setItem('erhk_backend','vps')    -> paksa VPS saja
+  //   localStorage.setItem('erhk_backend','legacy') -> paksa server lama
+  //   localStorage.removeItem('erhk_backend')       -> otomatis (default)
+  const VPS_URL = 'https://api.pokjawasjember.com';
+  const VPS_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzkyOTkxMzgyLCJleHAiOjIxMDgzNTEzODJ9.PLdEjj-1BO106pt04M9Xg5Tlx2PuJIiskJRA1P10FlY';
+  const VPS_APP_ID = 'e-rhk';            // app_id di skema VPS (bukan app_slug lama)
+  const VPS_TOKEN_KEY = 'erhk_vps_token';
+  const VPS_TIMEOUT_MS = 12000;
+
+  function backendMode() {
+    try { return localStorage.getItem('erhk_backend') || 'auto'; } catch (e) { return 'auto'; }
+  }
+
+  // === LATCH ANTI-FALLBACK (pengaman data) ===================
+  // Begitu sebuah akun PERNAH berhasil login via VPS, akun itu dianggap
+  // sudah pindah. Sejak saat itu DILARANG fallback diam-diam ke server
+  // lama, karena server lama tidak punya data terbaru milik user.
+  //
+  // Kalau VPS sedang mati, user HARUS lihat error jujur "server sedang
+  // bermasalah" — bukan diam-diam dilempar ke data lama yang bikin dia
+  // merasa datanya hilang lalu panik.
+  const VPS_MIGRATED_KEY = 'erhk_vps_users';
+
+  function vpsMigratedUsers() {
+    try {
+      const raw = localStorage.getItem(VPS_MIGRATED_KEY);
+      const arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    } catch (e) { return []; }
+  }
+  function isVpsMigrated(username) {
+    const u = String(username || '').trim().toLowerCase();
+    return !!u && vpsMigratedUsers().indexOf(u) !== -1;
+  }
+  function markVpsMigrated(username) {
+    const u = String(username || '').trim().toLowerCase();
+    if (!u) return;
+    try {
+      const arr = vpsMigratedUsers();
+      if (arr.indexOf(u) === -1) {
+        arr.push(u);
+        localStorage.setItem(VPS_MIGRATED_KEY, JSON.stringify(arr));
+      }
+    } catch (e) {}
+  }
+  // Pelepas darurat (hanya kalau Yanto memang mau mundur ke server lama):
+  //   SupabaseSync.resetVpsLatch()
+  function resetVpsLatch() {
+    try { localStorage.removeItem(VPS_MIGRATED_KEY); } catch (e) {}
+  }
+
+  // Info diagnosa buat Console browser: SupabaseSync.backendInfo()
+  function backendInfo() {
+    return {
+      mode: backendMode(),
+      vps_url: VPS_URL,
+      app_id: VPS_APP_ID,
+      akun_sudah_pindah_vps: vpsMigratedUsers(),
+      ada_token_vps: !!vpsGetToken(),
+    };
+  }
+
+  function vpsSaveToken(tok) {
+    try { if (tok) localStorage.setItem(VPS_TOKEN_KEY, tok); } catch (e) {}
+  }
+  function vpsGetToken() {
+    try { return localStorage.getItem(VPS_TOKEN_KEY) || ''; } catch (e) { return ''; }
+  }
+  function vpsClearToken() {
+    try { localStorage.removeItem(VPS_TOKEN_KEY); } catch (e) {}
+  }
+
+  // POST ke VPS. Return { httpOk, status, data } | { netError:true }
+  async function vpsPost(path, body, authToken) {
+    try {
+      const ctrl = new AbortController();
+      const to = setTimeout(() => ctrl.abort(), VPS_TIMEOUT_MS);
+      const h = { 'Content-Type': 'application/json', apikey: VPS_ANON_KEY };
+      // apikey WAJIB anon key; token user hanya di Authorization.
+      h.Authorization = 'Bearer ' + (authToken || VPS_ANON_KEY);
+      const r = await fetch(VPS_URL + path, {
+        method: 'POST', headers: h,
+        body: JSON.stringify(body || {}), signal: ctrl.signal,
+      });
+      clearTimeout(to);
+      let data = null;
+      try { data = await r.json(); } catch (e) {}
+      return { httpOk: r.ok, status: r.status, data: data };
+    } catch (e) {
+      console.warn('[VPS] ' + path + ' network:', e.message);
+      return { netError: true };
+    }
+  }
+
+  // Login ke VPS pakai PASSWORD ASLI (bukan hash).
+  // Server yang menghitung & memverifikasi, lalu hash naik ke bcrypt otomatis.
+  // Return { valid:true, ...profil } | { valid:false, reason } | { valid:null } offline
+  async function vpsLogin(username, password) {
+    const res = await vpsPost('/functions/v1/edusmart-auth/login', {
+      app_id: VPS_APP_ID,
+      username: String(username || '').trim().toLowerCase(),
+      password: String(password || ''),
+    });
+    if (res.netError) return { valid: null, reason: 'network_error' };
+    const d = res.data || {};
+    if (!d.ok) return { valid: false, reason: d.error || 'invalid_credentials' };
+    vpsSaveToken(d.token);
+    return {
+      valid: true, reason: 'ok', source: 'vps',
+      username: d.username || username,
+      fullname: d.fullname || '',
+      madrasah: d.madrasah || '',
+      role: d.role || 'user',
+      tier: d.tier || 'pro',
+      license_code: d.license_code || null,
+    };
+  }
+
+  // Aktivasi/registrasi akun di VPS (1 kode = 1 akun).
+  async function vpsActivate(code, username, password, fullname, madrasah) {
+    const res = await vpsPost('/functions/v1/edusmart-auth/activate', {
+      app_id: VPS_APP_ID,
+      code: String(code || '').trim().toUpperCase(),
+      username: String(username || '').trim().toLowerCase(),
+      password: String(password || ''),
+      fullname: fullname || '',
+      madrasah: madrasah || '',
+    });
+    if (res.netError) return { success: null, reason: 'network_error' };
+    const d = res.data || {};
+    if (!d.ok) return { success: false, reason: d.error || 'failed' };
+    vpsSaveToken(d.token);
+    return { success: true, reason: d.mode === 'register' ? 'claimed' : 'ok', source: 'vps' };
+  }
+
+  // Cek VPS hidup (dipakai indikator UI / diagnosa).
+  async function vpsOnline() {
+    const res = await vpsPost('/functions/v1/edusmart-auth/login',
+      { app_id: VPS_APP_ID, username: '__ping__', password: '__ping__' });
+    return !res.netError;
+  }
+
   function isConfigured() {
     return !!(SUPABASE_URL && SUPABASE_ANON_KEY);
   }
@@ -300,6 +449,70 @@
     return r;
   }
 
+  // =============================================================
+  // LOGIN CERDAS: VPS dulu, fallback ke server lama
+  // =============================================================
+  // Butuh PASSWORD ASLI karena VPS memverifikasi di server (bcrypt).
+  // Jalur lama tetap pakai hash supaya tidak ada perubahan perilaku.
+  async function loginAccountSmart(username, password, appSlug, deviceInfo) {
+    const mode = backendMode();
+    const uname = String(username || '').trim().toLowerCase();
+
+    // 1) Coba VPS (kecuali dipaksa legacy)
+    if (mode !== 'legacy') {
+      const v = await vpsLogin(uname, password);
+      if (v.valid === true) {
+        markVpsMigrated(uname);      // kunci: akun ini resmi di VPS
+        return v;
+      }
+      if (mode === 'vps') return v;  // dipaksa VPS -> apa pun hasilnya, hormati
+
+      // === PENGAMAN DATA ===
+      // Akun ini sudah pernah sukses di VPS. Jangan pernah lempar diam-diam
+      // ke server lama: datanya lebih tua, user akan merasa datanya hilang.
+      if (isVpsMigrated(uname)) {
+        if (v.valid === null) {
+          return { valid: null, reason: 'vps_unreachable', source: 'vps',
+                   message: 'Server sedang tidak dapat dihubungi. Data Anda aman di server, '
+                          + 'silakan coba beberapa saat lagi.' };
+        }
+        // Password salah di VPS = memang salah. Jangan dicoba ke server lama.
+        return { valid: false, reason: v.reason || 'invalid_credentials', source: 'vps' };
+      }
+      // Akun BELUM pernah sukses di VPS -> aman untuk fallback ke server lama.
+    }
+
+    // 2) Fallback: server lama (pakai hash seperti semula)
+    const hash = await accountHash(uname, password);
+    if (!hash) return { valid: null, reason: 'hash-fail' };
+    const r = await loginAccount(uname, hash, appSlug, deviceInfo);
+    if (r && r.valid === true) r.source = 'legacy';
+    return r;
+  }
+
+  // Aktivasi cerdas: VPS dulu, fallback server lama.
+  async function registerAccountSmart(code, appSlug, username, password, fullname, madrasah, deviceInfo) {
+    const mode = backendMode();
+    const uname = String(username || '').trim().toLowerCase();
+
+    if (mode !== 'legacy') {
+      const v = await vpsActivate(code, uname, password, fullname, madrasah);
+      if (v.success === true) {
+        markVpsMigrated(uname);      // akun baru lahir di VPS
+        return v;
+      }
+      if (mode === 'vps') return v;
+      // Akun yang sudah pindah tidak boleh didaftarkan ulang ke server lama.
+      if (isVpsMigrated(uname)) return v;
+    }
+
+    const hash = await accountHash(uname, password);
+    if (!hash) return { success: null, reason: 'hash-fail' };
+    const r = await registerAccount(code, appSlug, uname, hash, fullname, madrasah, deviceInfo);
+    if (r && r.success === true) r.source = 'legacy';
+    return r;
+  }
+
   // RPC admin akun (butuh admin key Pusat Lisensi). Dipakai panel Pusat Lisensi.
   function adminListAccounts(adminKey, appSlug) {
     return callPusatRpc('admin_list_accounts', { p_admin_key: adminKey, p_app_slug: appSlug || PUSAT_APP_SLUG });
@@ -395,6 +608,22 @@
     registerAccount,
     loginAccount,
     callPusatRpc,
+    // === VPS EduSmartDigital (server baru) ===
+    VPS_URL,
+    VPS_ANON_KEY,
+    VPS_APP_ID,
+    backendMode,
+    backendInfo,
+    isVpsMigrated,
+    resetVpsLatch,
+    vpsLogin,
+    vpsActivate,
+    vpsOnline,
+    vpsGetToken,
+    vpsClearToken,
+    // Jalur cerdas: VPS dulu, fallback server lama
+    loginAccountSmart,
+    registerAccountSmart,
     // Admin akun (panel Pusat Lisensi)
     adminListAccounts,
     adminRevokeAccount,

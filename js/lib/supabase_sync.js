@@ -203,6 +203,37 @@
     return !res.netError;
   }
 
+  // Perpanjang token tanpa minta password lagi.
+  // Token TTL 7 hari; tanpa ini penyimpanan ke VPS berhenti diam-diam
+  // begitu token kedaluwarsa.
+  // Return true kalau token berhasil diperbarui.
+  async function vpsRefreshToken() {
+    const tok = vpsGetToken();
+    if (!tok) return false;
+    const res = await vpsPost('/functions/v1/edusmart-auth/refresh', {}, tok);
+    if (res.netError) return false;
+    const d = res.data || {};
+    if (d.ok && d.token) { vpsSaveToken(d.token); return true; }
+    // Token sudah kedaluwarsa/dicabut -> buang, user perlu login ulang.
+    if (res.status === 401) vpsClearToken();
+    return false;
+  }
+
+  // Sisa umur token dalam jam (dibaca dari klaim exp). null kalau tak ada token.
+  function vpsTokenSisaJam() {
+    const t = vpsGetToken();
+    if (!t) return null;
+    try {
+      const parts = t.split('.');
+      if (parts.length < 2) return null;
+      let p = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+      while (p.length % 4) p += '=';
+      const c = JSON.parse(atob(p));
+      if (!c.exp) return null;
+      return (c.exp * 1000 - Date.now()) / 3600000;
+    } catch (e) { return null; }
+  }
+
   function isConfigured() {
     return !!(SUPABASE_URL && SUPABASE_ANON_KEY);
   }
@@ -621,6 +652,8 @@
     vpsOnline,
     vpsGetToken,
     vpsClearToken,
+    vpsRefreshToken,
+    vpsTokenSisaJam,
     // Jalur cerdas: VPS dulu, fallback server lama
     loginAccountSmart,
     registerAccountSmart,

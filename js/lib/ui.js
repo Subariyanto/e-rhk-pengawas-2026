@@ -69,6 +69,7 @@
             <button class="btn btn-burger btn-sm btn-outline-success" id="btnBurger"><i class="bi bi-list"></i></button>
             <div class="page-title flex-grow-1">${U.escapeHtml(title)}</div>
             <a href="#/periode" class="badge bg-success text-decoration-none me-2" title="Klik untuk ganti periode"><i class="bi bi-calendar3"></i> SKP ${U.escapeHtml(Store.activePeriode())}</a>
+            <span id="syncBadge" class="badge bg-secondary text-decoration-none me-2" role="button" title="Status penyimpanan ke server"><i class="bi bi-cloud"></i> <span id="syncBadgeText">…</span></span>
             <div class="text-muted small d-none d-md-block">${U.escapeHtml((u?.email || ''))}</div>
           </div>
           <div class="app-content" id="appContent">${contentHTML || ''}</div>
@@ -85,6 +86,10 @@
     const overlay = document.getElementById('appOverlay');
     burger.addEventListener('click', () => { sidebar.classList.toggle('open'); overlay.classList.toggle('show'); });
     overlay.addEventListener('click', () => { sidebar.classList.remove('open'); overlay.classList.remove('show'); });
+
+    // Indikator status penyimpanan ke server. Dipasang ulang setiap shell
+    // dirender; isinya diurus CloudSync agar tidak ada logika sync di UI.
+    try { window.CloudSync && CloudSync.pasangBadge && CloudSync.pasangBadge(); } catch (e) {}
   }
 
   function bareShell(html) {

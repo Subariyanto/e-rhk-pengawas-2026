@@ -17,6 +17,8 @@
   const META_SCOPE = 'cloudmeta_v1';       // disimpan per-perangkat (Store global)
   const PERIODIC = ['master_rhk', 'kegiatan', 'eviden'];
   const WATCH_MS = 10000;
+  const TOKEN_CHECK_MS = 30 * 60 * 1000;   // cek token tiap 30 menit
+  const TOKEN_REFRESH_IF_LESS_H = 48;      // perpanjang bila sisa < 48 jam
 
   let _queue = new Map();      // "scope|periode" -> value (JS object)
   let _timer = null;
@@ -435,8 +437,150 @@
     return { ok: (keFile || keVps), ke_file: keFile, ke_vps: keVps };
   }
 
+  // =============================================================
+  // INDIKATOR UI: badge status penyimpanan di topbar
+  // =============================================================
+  // Tujuan: user tahu datanya tersimpan di server TANPA perlu buka
+  // Console. 38 pengawas tidak akan pernah membuka Console.
+  //
+  // Keadaan yang ditampilkan:
+  //   hijau  "Tersimpan"      -> semua perubahan sudah di server
+  //   kuning "Menyimpan…"     -> masih ada antrean
+  //   merah  "Perlu login"    -> token kedaluwarsa, data belum aman
+  //   abu    "Lokal saja"     -> belum login VPS / admin
+  function badgeState() {
+    const u = currentUser();
+    if (!u || u.role === 'admin') return { cls: 'bg-secondary', icon: 'cloud-slash', text: 'Lokal', title: 'Mode lokal — data hanya di perangkat ini.' };
+    if (_status.state === 'need-relogin') {
+      return { cls: 'bg-danger', icon: 'exclamation-triangle', text: 'Perlu login',
+               title: 'Sesi server berakhir. Keluar lalu masuk lagi agar data tersimpan ke server.' };
+    }
+    if (!canSync()) {
+      return { cls: 'bg-secondary', icon: 'cloud-slash', text: 'Lokal saja',
+               title: 'Belum terhubung ke server. Data tersimpan di perangkat ini.' };
+    }
+    if (_status.state === 'migrating') {
+      return { cls: 'bg-info text-dark', icon: 'arrow-repeat', text: 'Memindahkan…',
+               title: 'Memindahkan data ke server baru.' };
+    }
+    if (_queue.size > 0 || _busy) {
+      return { cls: 'bg-warning text-dark', icon: 'arrow-repeat', text: 'Menyimpan…',
+               title: _queue.size + ' perubahan sedang dikirim ke server.' };
+    }
+    if (_status.state === 'error') {
+      return { cls: 'bg-warning text-dark', icon: 'wifi-off', text: 'Tertunda',
+               title: 'Server belum bisa dihubungi. Data aman di perangkat, akan dikirim otomatis.' };
+    }
+    if (_status.state === 'ok') {
+      const sisa = (window.SupabaseSync && SupabaseSync.vpsTokenSisaJam) ? SupabaseSync.vpsTokenSisaJam() : null;
+      const ket = (sisa !== null && sisa < 48) ? ' (sesi akan diperpanjang)' : '';
+      return { cls: 'bg-success', icon: 'cloud-check', text: 'Tersimpan',
+               title: 'Semua perubahan sudah tersimpan di server.' + ket };
+    }
+    return { cls: 'bg-secondary', icon: 'cloud', text: 'Siap', title: 'Menunggu perubahan.' };
+  }
+
+  function gambarBadge() {
+    const el = document.getElementById('syncBadge');
+    if (!el) return;
+    const s = badgeState();
+    el.className = 'badge ' + s.cls + ' me-2';
+    el.title = s.title;
+    const ic = el.querySelector('i');
+    if (ic) ic.className = 'bi bi-' + s.icon;
+    const tx = document.getElementById('syncBadgeText');
+    if (tx) tx.textContent = s.text;
+  }
+
+  // Panel ringkas saat badge diklik — pengganti Console untuk user biasa.
+  function bukaPanelSync() {
+    const u = currentUser();
+    const uk = usernameOf(u);
+    const sisa = (window.SupabaseSync && SupabaseSync.vpsTokenSisaJam) ? SupabaseSync.vpsTokenSisaJam() : null;
+    const s = badgeState();
+    const baris = function (k, v) {
+      return '<div class="d-flex justify-content-between border-bottom py-2"><span class="text-muted">' +
+        k + '</span><span class="fw-semibold text-end">' + v + '</span></div>';
+    };
+    const html =
+      '<div class="small">' +
+      baris('Status', '<span class="badge ' + s.cls + '">' + s.text + '</span>') +
+      baris('Akun', uk || '-') +
+      baris('Menunggu dikirim', _queue.size + ' perubahan') +
+      baris('Terakhir tersimpan', _status.lastAt ? new Date(_status.lastAt).toLocaleString('id-ID') : 'belum ada') +
+      baris('Data dipindahkan', migDone(uk) ? 'sudah' : 'belum') +
+      baris('Sesi server', sisa === null ? 'belum login server' :
+            (sisa <= 0 ? 'berakhir' : Math.round(sisa) + ' jam lagi')) +
+      '<p class="text-muted mt-3 mb-2">Data selalu tersimpan di perangkat ini lebih dulu, ' +
+      'lalu dikirim ke server sebagai cadangan. Aplikasi tetap bisa dipakai walau server sedang bermasalah.</p>' +
+      '<div class="d-grid gap-2">' +
+      '<button class="btn btn-success btn-sm" id="btnBackupSekarang"><i class="bi bi-cloud-arrow-up"></i> Cadangkan sekarang</button>' +
+      '<button class="btn btn-outline-secondary btn-sm" id="btnUnduhSalinan"><i class="bi bi-download"></i> Unduh salinan data (file)</button>' +
+      '</div></div>';
+
+    UI.showModal('Penyimpanan & Cadangan', html, {
+      onMount: function (body, close) {
+        const b1 = body.querySelector('#btnBackupSekarang');
+        const b2 = body.querySelector('#btnUnduhSalinan');
+        if (b1) b1.onclick = async function () {
+          b1.disabled = true;
+          b1.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Mencadangkan…';
+          try { await flush(); } catch (e) {}
+          const r = await backupSekarang();
+          gambarBadge();
+          close();
+          if (r && r.ok) {
+            UI.toast(r.ke_vps ? 'Cadangan tersimpan di server dan file terunduh.'
+                              : 'File cadangan terunduh. Server belum bisa dihubungi.',
+                     r.ke_vps ? 'success' : 'warning');
+          } else {
+            UI.toast('Pencadangan belum berhasil. Coba lagi nanti.', 'danger');
+          }
+        };
+        if (b2) b2.onclick = function () {
+          const ok = unduhSalinanLokal(currentUser(), 'manual');
+          UI.toast(ok ? 'Salinan data terunduh.' : 'Belum ada data untuk diunduh.',
+                   ok ? 'success' : 'warning');
+        };
+      },
+    });
+  }
+
+  function pasangBadge() {
+    const el = document.getElementById('syncBadge');
+    if (!el) return;
+    el.onclick = bukaPanelSync;
+    gambarBadge();
+  }
+
   function refresh() {
     try { if (window.Router && Router.dispatch) Router.dispatch(); } catch (e) {}
+  }
+
+  // =============================================================
+  // JAGA TOKEN: perpanjang sebelum kedaluwarsa
+  // =============================================================
+  // Token berlaku 7 hari. Tanpa perpanjangan, penyimpanan ke VPS
+  // berhenti diam-diam dan user tidak sadar datanya tidak tersimpan.
+  // Diperpanjang bila sisa umur < 48 jam.
+  async function jagaToken() {
+    try {
+      const S = window.SupabaseSync || {};
+      if (!S.vpsTokenSisaJam || !S.vpsRefreshToken) return false;
+      const sisa = S.vpsTokenSisaJam();
+      if (sisa === null) return false;          // belum login via VPS
+      if (sisa > TOKEN_REFRESH_IF_LESS_H) return false;  // masih lama
+      const ok = await S.vpsRefreshToken();
+      if (ok) {
+        if (_status.state === 'need-relogin') _status.state = 'ok';
+        _status.lastError = null;
+        console.info('[CloudSync] token diperpanjang');
+      } else {
+        _status.state = 'need-relogin';
+        _status.lastError = 'token-expired';
+      }
+      return ok;
+    } catch (e) { return false; }
   }
   function watchUser() {
     const ok = canSync();
@@ -452,9 +596,14 @@
   }
   function start() {
     if (window.Store && Store.onSet) Store.onSet(onSet);
-    window.addEventListener('online', () => { _lastUserKey = ''; watchUser(); });
-    watchUser();
+    window.addEventListener('online', () => { _lastUserKey = ''; jagaToken().then(watchUser); });
+    jagaToken().then(watchUser);
     setInterval(watchUser, WATCH_MS);
+    // Jaga token tiap 30 menit. Token TTL 7 hari; kalau sisa < 48 jam
+    // diperpanjang diam-diam supaya penyimpanan tidak berhenti mendadak.
+    setInterval(jagaToken, TOKEN_CHECK_MS);
+    // Segarkan badge berkala supaya status tidak basi.
+    setInterval(gambarBadge, 3000);
   }
 
   window.CloudSync = {
@@ -474,10 +623,22 @@
     canSync: canSync,
     usernameOf: usernameOf,
     status: function () { return Object.assign({}, _status, { queued: _queue.size }); },
+    // === token ===
+    jagaToken: jagaToken,
+    tokenSisaJam: function () {
+      try {
+        const S = window.SupabaseSync || {};
+        return S.vpsTokenSisaJam ? S.vpsTokenSisaJam() : null;
+      } catch (e) { return null; }
+    },
     // === migrasi & backup (dipanggil UI / Console) ===
     migrateLegacyToVps: migrateLegacyToVps,
     sudahMigrasi: function () { return migDone(usernameOf(currentUser())); },
     backupSekarang: backupSekarang,
     unduhSalinanLokal: function () { return unduhSalinanLokal(currentUser(), 'manual'); },
+    // === indikator UI ===
+    pasangBadge: pasangBadge,
+    gambarBadge: gambarBadge,
+    bukaPanelSync: bukaPanelSync,
   };
 })();

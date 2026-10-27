@@ -1,6 +1,14 @@
 {
   "codes": [
     {
+      "code": "FULL-2UD6-H3BL-FF8A",
+      "tier": "full",
+      "createdAt": "2026-10-27T11:59:57.330Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
       "code": "FULL-AL7W-2WU9-WYUG",
       "tier": "full",
       "createdAt": "2026-10-27T11:57:44.279Z",
@@ -72,5 +80,5 @@
       "revoked": false
     }
   ],
-  "updatedAt": "2026-10-27T11:59:25.328Z"
+  "updatedAt": "2026-10-27T11:59:59.349Z"
 }

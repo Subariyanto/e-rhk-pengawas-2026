@@ -576,9 +576,33 @@
   // dan TIDAK bisa dipakai login dari perangkat lain (HP) karena server tak kenal kodenya.
   // Butuh admin key Pusat Lisensi (disimpan lokal di perangkat admin).
 
+  // === VPS: sumber kebenaran kode aktivasi (aktivasi sudah ke VPS) ===
+  // Admin Key sama dengan Pusat Lisensi; diverifikasi di DB VPS.
+  // Return { success, count, reason, skipped_used }.
+  async function vpsAdminCodes(adminKey, action, codes, tier) {
+    if (!adminKey) return { success: false, reason: 'no_admin_key' };
+    const res = await vpsPost('/functions/v1/edusmart-auth/admin-codes', {
+      admin_key: adminKey, action: action, app_id: VPS_APP_ID,
+      codes: (codes || []).map(c => String(c || '').trim().toUpperCase()),
+      tier: tier || 'pro',
+    });
+    if (res.netError) return { success: null, reason: 'network_error' };
+    const d = res.data || {};
+    if (!d.ok) return { success: false, reason: d.error || ('http_' + res.status) };
+    return { success: true, count: d.count, skipped_used: d.skipped_used || [], reason: 'ok' };
+  }
+
+  // Salinan ke server lama, best-effort. Dipertahankan supaya jalur
+  // fallback lama tetap kenal kodenya. Gagal di sini tidak membatalkan apa pun.
+  function legacyBestEffort(p) { p.catch(() => {}); }
+
   // Daftarkan satu kode eksplisit (format persis dari panel, mis. FULL-XXXX-XXXX-XXXX).
   async function adminRegisterCode(adminKey, code, appSlug, tier, recipient, appName) {
     if (!adminKey) return { success: false, reason: 'no_admin_key' };
+    legacyBestEffort(legacyRegisterCode(adminKey, code, appSlug, tier, recipient, appName));
+    return vpsAdminCodes(adminKey, 'register', [code], tier);
+  }
+  async function legacyRegisterCode(adminKey, code, appSlug, tier, recipient, appName) {
     const r = await callPusatRpc('admin_register_code', {
       p_admin_key: adminKey,
       p_code: String(code || '').trim().toUpperCase(),
@@ -594,6 +618,10 @@
   // Daftarkan banyak kode sekaligus (batch).
   async function adminRegisterCodes(adminKey, codes, appSlug, tier, appName) {
     if (!adminKey) return { success: false, reason: 'no_admin_key' };
+    legacyBestEffort(legacyRegisterCodes(adminKey, codes, appSlug, tier, appName));
+    return vpsAdminCodes(adminKey, 'register', Array.isArray(codes) ? codes : [], tier);
+  }
+  async function legacyRegisterCodes(adminKey, codes, appSlug, tier, appName) {
     const r = await callPusatRpc('admin_register_codes', {
       p_admin_key: adminKey,
       p_codes: Array.isArray(codes) ? codes.map(c => String(c || '').trim().toUpperCase()) : [],
@@ -607,18 +635,26 @@
 
   async function adminRevokeCodeByCode(adminKey, code, appSlug) {
     if (!adminKey) return { success: false, reason: 'no_admin_key' };
-    return callPusatRpc('admin_revoke_code_by_code', {
+    legacyBestEffort(callPusatRpc('admin_revoke_code_by_code', {
       p_admin_key: adminKey, p_code: String(code || '').trim().toUpperCase(),
       p_app_slug: appSlug || PUSAT_APP_SLUG,
-    });
+    }));
+    const r = await vpsAdminCodes(adminKey, 'revoke', [code]);
+    if (r.success && !r.count) return { success: false, reason: 'not_found' };
+    return r;
   }
 
   async function adminDeleteCodeByCode(adminKey, code, appSlug) {
     if (!adminKey) return { success: false, reason: 'no_admin_key' };
-    return callPusatRpc('admin_delete_code_by_code', {
+    const r = await vpsAdminCodes(adminKey, 'delete', [code]);
+    // Kode yang masih dipakai akun tidak dihapus di VPS -> jangan hapus juga di server lama.
+    if (r.success && r.skipped_used && r.skipped_used.length) return { success: false, reason: 'has_account' };
+    legacyBestEffort(callPusatRpc('admin_delete_code_by_code', {
       p_admin_key: adminKey, p_code: String(code || '').trim().toUpperCase(),
       p_app_slug: appSlug || PUSAT_APP_SLUG,
-    });
+    }));
+    if (r.success && !r.count) return { success: false, reason: 'not_found' };
+    return r;
   }
 
   window.SupabaseSync = {

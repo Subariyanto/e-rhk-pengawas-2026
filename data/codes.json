@@ -6,7 +6,8 @@
       "createdAt": "2026-11-02T12:33:21.448Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false
+      "revoked": false,
+      "note": "ANDRIANTO"
     },
     {
       "code": "FULL-SD9H-DN7M-LDN3",
@@ -118,5 +119,5 @@
       "ownerEmail": "subariyantoss2@gmail.com"
     }
   ],
-  "updatedAt": "2026-11-02T12:33:23.123Z"
+  "updatedAt": "2026-11-02T12:33:43.019Z"
 }

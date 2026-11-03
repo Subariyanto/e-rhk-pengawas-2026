@@ -1,6 +1,14 @@
 {
   "codes": [
     {
+      "code": "FULL-UK2L-A5VC-ZD7J",
+      "tier": "full",
+      "createdAt": "2026-11-03T22:15:04.563Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
       "code": "FULL-B8LW-Y7PF-JCGE",
       "tier": "full",
       "createdAt": "2026-11-02T12:33:21.448Z",
@@ -119,5 +127,5 @@
       "ownerEmail": "subariyantoss2@gmail.com"
     }
   ],
-  "updatedAt": "2026-11-02T12:33:43.019Z"
+  "updatedAt": "2026-11-03T22:15:06.140Z"
 }

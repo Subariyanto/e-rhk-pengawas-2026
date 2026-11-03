@@ -6,7 +6,8 @@
       "createdAt": "2026-11-03T22:19:39.419Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false
+      "revoked": false,
+      "note": "P. Yus"
     },
     {
       "code": "FULL-B8LW-Y7PF-JCGE",
@@ -127,5 +128,5 @@
       "ownerEmail": "subariyantoss2@gmail.com"
     }
   ],
-  "updatedAt": "2026-11-03T22:19:40.835Z"
+  "updatedAt": "2026-11-03T22:19:50.971Z"
 }

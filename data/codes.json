@@ -1,22 +1,12 @@
 {
   "codes": [
     {
-      "code": "FULL-GJLY-RU84-XES9",
+      "code": "FULL-BV8F-VCQC-U2AL",
       "tier": "full",
-      "createdAt": "2026-11-03T22:18:25.136Z",
+      "createdAt": "2026-11-03T22:19:39.419Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false,
-      "note": "Wilker"
-    },
-    {
-      "code": "FULL-UK2L-A5VC-ZD7J",
-      "tier": "full",
-      "createdAt": "2026-11-03T22:15:04.563Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false,
-      "note": "Pak Yus"
+      "revoked": false
     },
     {
       "code": "FULL-B8LW-Y7PF-JCGE",
@@ -137,5 +127,5 @@
       "ownerEmail": "subariyantoss2@gmail.com"
     }
   ],
-  "updatedAt": "2026-11-03T22:19:17.545Z"
+  "updatedAt": "2026-11-03T22:19:40.835Z"
 }

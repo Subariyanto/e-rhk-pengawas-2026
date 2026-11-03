@@ -6,7 +6,8 @@
       "createdAt": "2026-11-03T22:15:04.563Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false
+      "revoked": false,
+      "note": "Pak Yus"
     },
     {
       "code": "FULL-B8LW-Y7PF-JCGE",
@@ -127,5 +128,5 @@
       "ownerEmail": "subariyantoss2@gmail.com"
     }
   ],
-  "updatedAt": "2026-11-03T22:15:06.140Z"
+  "updatedAt": "2026-11-03T22:15:15.527Z"
 }

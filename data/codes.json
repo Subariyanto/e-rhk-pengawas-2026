@@ -6,7 +6,8 @@
       "createdAt": "2026-11-06T13:35:15.729Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false
+      "revoked": false,
+      "note": "Lumajang"
     },
     {
       "code": "FULL-BV8F-VCQC-U2AL",
@@ -136,5 +137,5 @@
       "ownerEmail": "subariyantoss2@gmail.com"
     }
   ],
-  "updatedAt": "2026-11-06T13:35:17.275Z"
+  "updatedAt": "2026-11-06T13:35:30.364Z"
 }

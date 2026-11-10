@@ -1,15 +1,6 @@
 {
   "codes": [
     {
-      "code": "FULL-QRJJ-3CY4-C9N2",
-      "tier": "full",
-      "createdAt": "2026-11-10T21:55:06.494Z",
-      "usedBy": null,
-      "usedAt": null,
-      "revoked": false,
-      "note": "Azmawarti"
-    },
-    {
       "code": "FULL-J9QG-HFSE-D5C7",
       "tier": "full",
       "createdAt": "2026-11-06T13:35:15.729Z",
@@ -146,5 +137,5 @@
       "ownerEmail": "subariyantoss2@gmail.com"
     }
   ],
-  "updatedAt": "2026-11-10T21:57:03.096Z"
+  "updatedAt": "2026-11-10T21:58:25.235Z"
 }

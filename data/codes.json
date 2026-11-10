@@ -6,7 +6,8 @@
       "createdAt": "2026-11-10T21:58:25.666Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false
+      "revoked": false,
+      "note": "Azmawarti"
     },
     {
       "code": "FULL-J9QG-HFSE-D5C7",
@@ -145,5 +146,5 @@
       "ownerEmail": "subariyantoss2@gmail.com"
     }
   ],
-  "updatedAt": "2026-11-10T21:58:28.076Z"
+  "updatedAt": "2026-11-10T21:58:39.998Z"
 }

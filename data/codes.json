@@ -1,6 +1,14 @@
 {
   "codes": [
     {
+      "code": "FULL-DK89-9RKD-X3DH",
+      "tier": "full",
+      "createdAt": "2026-11-11T13:00:17.418Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
       "code": "FULL-D4WK-4BCW-FYW5",
       "tier": "full",
       "createdAt": "2026-11-11T12:54:00.024Z",
@@ -155,5 +163,5 @@
       "ownerEmail": "subariyantoss2@gmail.com"
     }
   ],
-  "updatedAt": "2026-11-11T12:54:16.859Z"
+  "updatedAt": "2026-11-11T13:00:18.973Z"
 }

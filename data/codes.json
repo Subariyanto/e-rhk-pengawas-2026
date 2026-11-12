@@ -6,7 +6,8 @@
       "createdAt": "2026-11-12T23:56:49.744Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false
+      "revoked": false,
+      "note": "Ervina"
     },
     {
       "code": "FULL-DK89-9RKD-X3DH",
@@ -172,5 +173,5 @@
       "ownerEmail": "subariyantoss2@gmail.com"
     }
   ],
-  "updatedAt": "2026-11-12T23:56:51.356Z"
+  "updatedAt": "2026-11-12T23:57:03.997Z"
 }

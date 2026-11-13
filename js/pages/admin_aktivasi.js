@@ -72,7 +72,7 @@
       <ul class="nav nav-tabs mb-3" id="aktTab" role="tablist">
         <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabRandom" type="button">Kode Tier (Random)</button></li>
         <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabSync" type="button">🔄 Sinkronisasi</button></li>
-        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabRegistry" type="button">Daftar Pengawas</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabAkun" type="button"><i class="bi bi-people"></i> Kelola Akun</button></li>
       </ul>
 
       <div class="tab-content">
@@ -173,23 +173,43 @@
           </div></div>
         </div>
 
-        <div class="tab-pane fade" id="tabRegistry">
+        <div class="tab-pane fade" id="tabAkun">
           <div class="card mb-3"><div class="card-body">
-            <h5 class="card-title mb-2"><i class="bi bi-people"></i> Daftar Pengawas</h5>
-            <p class="small text-muted mb-2">Database NIP → Nama pengawas. Dipakai halaman <strong>Daftar / Register</strong>: saat user mengetik NIP, nama otomatis muncul. Tidak ada kaitan dengan kode aktivasi.</p>
-            <input id="xlsIn" type="file" class="form-control" accept=".xlsx,.xls,.xlsm" />
-            <div class="form-text">Upload file Excel berisi kolom <strong>Nama Pengawas</strong> &amp; <strong>NIP Pengawas</strong> (opsional Wilayah/KKMA &amp; Telp). Sheet pertama yang berkolom NIP otomatis dibaca.</div>
-            <div id="importResult" class="mt-3"></div>
+            <h5 class="card-title mb-2"><i class="bi bi-people"></i> Kelola Akun</h5>
+            <p class="small text-muted mb-2">Akun pengawas di <strong>Pusat Lisensi</strong> (model <strong>1 kode = 1 akun</strong>). Akun di sini bisa <strong>login dari perangkat mana pun</strong>. Butuh <strong>Admin Key</strong> — isi sekali di tab <em>Kode Tier (Random)</em>.</p>
+            <div class="d-flex flex-wrap gap-2 align-items-end">
+              <div class="flex-grow-1" style="min-width:240px;">
+                <label class="form-label small mb-1">Admin Key Pusat Lisensi</label>
+                <input id="akKeyInline" class="form-control form-control-sm" type="password" placeholder="PJWS-ADM-..." autocomplete="off" />
+              </div>
+              <button class="btn btn-sm btn-primary" id="btnAkunLoad"><i class="bi bi-arrow-clockwise"></i> Muat Data</button>
+              <button class="btn btn-sm btn-outline-secondary" id="btnAkunOpenFull"><i class="bi bi-box-arrow-up-right"></i> Panel Lengkap</button>
+            </div>
+            <div class="form-text">Panel lengkap (statistik akun + daftar kode server) ada di menu <strong>Akun Server</strong>. Key disimpan lokal di perangkat admin Anda.</div>
           </div></div>
+
+          <div id="akunStats" class="mb-2"></div>
           <div class="card"><div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
-              <h6 class="mb-0"><i class="bi bi-list-ul"></i> Pengawas Tersimpan <span id="registryCount" class="badge bg-secondary">0</span></h6>
+              <h6 class="mb-0"><i class="bi bi-person-lines-fill"></i> Akun Terdaftar <span id="akunCount" class="badge bg-secondary">0</span></h6>
+              <input class="form-control form-control-sm" id="akunFilter" placeholder="Cari username / nama…" style="max-width:18rem;" />
+            </div>
+            <div id="akunList"><div class="text-muted small">Klik <strong>Muat Data</strong> untuk melihat daftar akun.</div></div>
+          </div></div>
+
+          <div class="card mt-3"><div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+              <h6 class="mb-0"><i class="bi bi-journal-text"></i> Daftar Nama Pengawas (NIP → Nama) <span id="registryCount" class="badge bg-secondary">0</span></h6>
               <div class="d-flex flex-wrap gap-2">
                 <button class="btn btn-sm btn-outline-success" id="btnRegistryAdd"><i class="bi bi-plus-circle"></i> Tambah Manual</button>
                 <button class="btn btn-sm btn-outline-danger" id="btnRegistryClear"><i class="bi bi-trash"></i> Hapus Semua</button>
               </div>
             </div>
-            <div id="registryList"></div>
+            <p class="small text-muted mb-2">Database NIP → Nama pengawas, dipakai halaman <strong>Daftar / Register</strong> supaya nama otomatis muncul saat NIP diketik.</p>
+            <input id="xlsIn" type="file" class="form-control form-control-sm" accept=".xlsx,.xls,.xlsm" />
+            <div class="form-text">Upload Excel berisi kolom <strong>Nama Pengawas</strong> &amp; <strong>NIP Pengawas</strong> (opsional Wilayah/KKMA &amp; Telp).</div>
+            <div id="importResult" class="mt-2"></div>
+            <div id="registryList" class="mt-2"></div>
           </div></div>
         </div>
       </div>
@@ -934,5 +954,141 @@
 
     renderRandomList();
     renderRegistry();
+    initTabAkun();
+
+    // ===== Tab Kelola Akun Server (Pusat Lisensi) =====
+    function initTabAkun() {
+      const keyIn = document.getElementById('akKeyInline');
+      const listWrap = document.getElementById('akunList');
+      const statsWrap = document.getElementById('akunStats');
+      const cntEl = document.getElementById('akunCount');
+      const filterEl = document.getElementById('akunFilter');
+      if (!keyIn || !listWrap) return;
+
+      keyIn.value = getAdminKey();
+      let accounts = [];
+
+      function reasonMsgAk(r) {
+        const m = {
+          no_admin_key: 'Admin Key belum diisi.',
+          invalid_admin_key: 'Admin Key salah.',
+          network_error: 'Server tidak terjangkau.',
+          not_found: 'Akun tidak ditemukan.',
+        };
+        return m[(r && r.reason)] || ((r && r.reason) || 'gagal');
+      }
+
+      function fmtWaktu(iso) {
+        if (!iso) return '-';
+        try { return new Date(iso).toLocaleString('id-ID'); } catch (e) { return iso; }
+      }
+
+      function renderAkun() {
+        const q = String(filterEl && filterEl.value || '').toUpperCase();
+        let rows = accounts.slice();
+        if (q) rows = rows.filter(a => String(a.username || '').toUpperCase().includes(q) || String(a.fullname || '').toUpperCase().includes(q));
+        if (cntEl) cntEl.textContent = String(accounts.length);
+        if (!rows.length) {
+          listWrap.innerHTML = '<div class="text-muted small p-3 text-center">' + (accounts.length ? 'Tidak ada akun yang cocok dengan pencarian.' : 'Belum ada akun server terdaftar.') + '</div>';
+          return;
+        }
+        listWrap.innerHTML = `
+          <div class="table-responsive" style="max-height:520px;">
+            <table class="table table-sm table-hover align-middle mb-0">
+              <thead class="table-light position-sticky top-0"><tr>
+                <th>Username</th><th>Nama</th><th>Role</th><th>Status</th><th>Tier</th><th>Login terakhir</th><th class="text-end" style="width:11rem;">Aksi</th>
+              </tr></thead>
+              <tbody>
+                ${rows.map(a => `<tr>
+                  <td style="font-family:'Courier New',monospace;font-size:.82em;">${U.escapeHtml(a.username)}</td>
+                  <td>${U.escapeHtml(a.fullname || '-')}${a.madrasah ? `<div class="small text-muted">${U.escapeHtml(a.madrasah)}</div>` : ''}</td>
+                  <td><span class="badge ${a.role === 'admin' ? 'bg-success' : 'bg-secondary'}">${U.escapeHtml(a.role || 'user')}</span></td>
+                  <td><span class="badge ${a.status === 'active' ? 'bg-success' : 'bg-danger'}">${a.status === 'active' ? 'aktif' : 'dicabut'}</span></td>
+                  <td>${U.escapeHtml(a.tier || '-')}</td>
+                  <td class="small text-muted">${fmtWaktu(a.last_login_at)}</td>
+                  <td class="text-end text-nowrap">
+                    ${a.status === 'active'
+                      ? `<button class="btn btn-sm btn-outline-warning" data-ak-revoke="${U.escapeHtml(a.id)}" title="Cabut akun">🚫</button>`
+                      : `<button class="btn btn-sm btn-outline-success" data-ak-reactivate="${U.escapeHtml(a.id)}" title="Aktifkan kembali">✅</button>`}
+                    <button class="btn btn-sm btn-outline-secondary" data-ak-reset="${U.escapeHtml(a.id)}" data-username="${U.escapeHtml(a.username)}" title="Reset password">🔑</button>
+                    <button class="btn btn-sm btn-outline-danger" data-ak-del="${U.escapeHtml(a.id)}" title="Hapus akun (kode bebas dipakai lagi)">🗑️</button>
+                  </td>
+                </tr>`).join('')}
+              </tbody>
+            </table>
+          </div>
+          <div class="small text-muted mt-2">Dicabut = tidak bisa login (data lokal tetap). Hapus = kode aktivasi bebas dipakai akun baru.</div>
+        `;
+
+        listWrap.querySelectorAll('button[data-ak-revoke]').forEach(b => b.addEventListener('click', async () => {
+          if (!await UI.confirmDialog('Cabut akun ini? Pengguna tidak bisa login lagi (data lokalnya tetap ada).')) return;
+          const r = await SupabaseSync.adminRevokeAccount(getAdminKey(), b.dataset.akRevoke);
+          UI.toast(r && r.success ? 'Akun dicabut.' : 'Gagal mencabut: ' + reasonMsgAk(r), r && r.success ? 'success' : 'danger');
+          loadAkun();
+        }));
+        listWrap.querySelectorAll('button[data-ak-reactivate]').forEach(b => b.addEventListener('click', async () => {
+          const r = await SupabaseSync.adminReactivateAccount(getAdminKey(), b.dataset.akReactivate);
+          UI.toast(r && r.success ? 'Akun diaktifkan kembali.' : 'Gagal: ' + reasonMsgAk(r), r && r.success ? 'success' : 'danger');
+          loadAkun();
+        }));
+        listWrap.querySelectorAll('button[data-ak-reset]').forEach(b => b.addEventListener('click', async () => {
+          const u = b.dataset.username;
+          const np = prompt('Password baru untuk akun "' + u + '" (min 6):');
+          if (!np) return;
+          if (String(np).length < 6) return UI.toast('Password minimal 6 karakter.', 'danger');
+          const hash = await SupabaseSync.accountHash(u, np);
+          if (!hash) return UI.toast('Gagal menghitung hash password.', 'danger');
+          const r = await SupabaseSync.adminResetAccountPassword(getAdminKey(), b.dataset.akReset, hash);
+          UI.toast(r && r.success ? 'Password direset. Beri tahu pengguna password barunya.' : 'Gagal reset: ' + reasonMsgAk(r), r && r.success ? 'success' : 'danger');
+        }));
+        listWrap.querySelectorAll('button[data-ak-del]').forEach(b => b.addEventListener('click', async () => {
+          if (!await UI.confirmDialog('HAPUS akun ini dari server? Kode aktivasi menjadi bebas dipakai akun baru. Tidak bisa dibatalkan.')) return;
+          const r = await SupabaseSync.adminDeleteAccount(getAdminKey(), b.dataset.akDel);
+          UI.toast(r && r.success ? 'Akun dihapus.' : 'Gagal menghapus: ' + reasonMsgAk(r), r && r.success ? 'success' : 'danger');
+          loadAkun();
+        }));
+      }
+
+      async function loadAkun() {
+        const key = getAdminKey();
+        if (!key) {
+          listWrap.innerHTML = '<div class="alert alert-warning mb-0 small"><i class="bi bi-exclamation-triangle"></i> Admin Key belum diisi. Isi di kolom atas (atau tab <em>Kode Tier (Random)</em>), lalu klik <strong>Muat Data</strong>.</div>';
+          return;
+        }
+        listWrap.innerHTML = '<div class="text-muted small"><span class="spinner-border spinner-border-sm"></span> Memuat akun…</div>';
+        if (statsWrap) statsWrap.innerHTML = '';
+        const [res, stats] = await Promise.all([
+          SupabaseSync.adminListAccounts(key, SupabaseSync.APP_SLUG),
+          SupabaseSync.adminGetAccountStats ? SupabaseSync.adminGetAccountStats(key, SupabaseSync.APP_SLUG) : Promise.resolve(null),
+        ]);
+        if (!res || res.success !== true) {
+          listWrap.innerHTML = `<div class="alert alert-danger mb-0 small"><i class="bi bi-x-circle"></i> Gagal memuat akun. ${U.escapeHtml(reasonMsgAk(res))}</div>`;
+          return;
+        }
+        accounts = res.accounts || [];
+        if (stats && stats.success && statsWrap) {
+          statsWrap.innerHTML = `
+            <div class="row g-2">
+              <div class="col-6 col-md-3"><div class="border rounded p-2 text-center"><div class="h5 mb-0">${stats.total_accounts || 0}</div><div class="small text-muted">Total akun</div></div></div>
+              <div class="col-6 col-md-3"><div class="border rounded p-2 text-center"><div class="h5 mb-0 text-success">${stats.active_accounts || 0}</div><div class="small text-muted">Aktif</div></div></div>
+              <div class="col-6 col-md-3"><div class="border rounded p-2 text-center"><div class="h5 mb-0 text-danger">${stats.revoked_accounts || 0}</div><div class="small text-muted">Dicabut</div></div></div>
+              <div class="col-6 col-md-3"><div class="border rounded p-2 text-center"><div class="h5 mb-0 text-primary">${stats.codes_with_account || 0}</div><div class="small text-muted">Kode terpakai</div></div></div>
+            </div>`;
+        }
+        renderAkun();
+      }
+
+      const btnLoad = document.getElementById('btnAkunLoad');
+      if (btnLoad) btnLoad.addEventListener('click', () => {
+        const v = String(keyIn.value || '').trim();
+        if (!v) return UI.toast('Admin Key kosong.', 'danger');
+        try { localStorage.setItem(ADMIN_KEY_STORE, v); } catch (e) {}
+        renderAkStatus();
+        loadAkun();
+      });
+      if (filterEl) filterEl.addEventListener('input', renderAkun);
+      const btnFull = document.getElementById('btnAkunOpenFull');
+      if (btnFull) btnFull.addEventListener('click', () => { location.hash = '#/admin/akun-server'; });
+    }
   };
 })();

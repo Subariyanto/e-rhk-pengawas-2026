@@ -6,7 +6,8 @@
       "createdAt": "2026-11-18T13:03:49.587Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false
+      "revoked": false,
+      "note": "Lumjang"
     },
     {
       "code": "FULL-KFEH-P4LC-UKDB",
@@ -190,5 +191,5 @@
       "ownerEmail": "subariyantoss2@gmail.com"
     }
   ],
-  "updatedAt": "2026-11-18T13:03:51.384Z"
+  "updatedAt": "2026-11-18T13:03:57.117Z"
 }

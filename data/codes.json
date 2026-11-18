@@ -6,7 +6,8 @@
       "createdAt": "2026-11-18T13:04:48.052Z",
       "usedBy": null,
       "usedAt": null,
-      "revoked": false
+      "revoked": false,
+      "note": "Lumajang"
     },
     {
       "code": "FULL-P6QK-U2Q6-TCAS",
@@ -199,5 +200,5 @@
       "ownerEmail": "subariyantoss2@gmail.com"
     }
   ],
-  "updatedAt": "2026-11-18T13:04:49.707Z"
+  "updatedAt": "2026-11-18T13:04:56.730Z"
 }

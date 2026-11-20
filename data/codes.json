@@ -1,6 +1,14 @@
 {
   "codes": [
     {
+      "code": "FULL-Q3H5-2REC-MNKG",
+      "tier": "full",
+      "createdAt": "2026-11-20T21:31:47.187Z",
+      "usedBy": null,
+      "usedAt": null,
+      "revoked": false
+    },
+    {
       "code": "FULL-T2DA-GSSU-QM7D",
       "tier": "full",
       "createdAt": "2026-11-19T04:45:10.529Z",
@@ -218,5 +226,5 @@
       "ownerEmail": "subariyantoss2@gmail.com"
     }
   ],
-  "updatedAt": "2026-11-19T04:45:26.192Z"
+  "updatedAt": "2026-11-20T21:31:49.008Z"
 }

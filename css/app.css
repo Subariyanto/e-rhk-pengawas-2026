@@ -345,6 +345,29 @@ a:hover { color: var(--primary-dark); }
   padding: 4px 8px;
   border-radius: 6px;
 }
+/* Badge keterkaitan indikator e-PKPM pada Master RHK */
+.pkpm-badge {
+  display: inline-block;
+  background: #e7f4ec;
+  color: #14764a;
+  font-weight: 600;
+  font-size: 12px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid #bfe3cf;
+  cursor: help;
+  white-space: nowrap;
+}
+.pkpm-badge i { margin-right: 2px; }
+.pkpm-list {
+  font-size: 13px;
+  color: #14764a;
+  background: #f2faf5;
+  border: 1px solid #d6ecdf;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 10px;
+}
 .badge.bg-success { background-color: var(--primary) !important; }
 .badge.bg-warning { background-color: var(--accent) !important; color: #1F2937 !important; }
 .badge.bg-secondary { background-color: var(--muted) !important; }

@@ -15,6 +15,7 @@
       { href: '#/eviden', icon: 'file-earmark-text', label: 'Generator Eviden' },
       { href: '#/arsip', icon: 'archive', label: 'Arsip Eviden' },
       { href: '#/rekap', icon: 'bar-chart', label: 'Rekapitulasi' },
+      { href: '#/paket-pkpm', icon: 'clipboard-check', label: 'Paket Bukti e-PKPM' },
       { href: '#/laporan-triwulan', icon: 'journal-richtext', label: 'Laporan Triwulan' },
       { href: '#/backup', icon: 'cloud-arrow-up', label: 'Backup & Restore', section: 'Pengaturan' },
       { href: '#/panduan', icon: 'book', label: 'Panduan Penggunaan' },

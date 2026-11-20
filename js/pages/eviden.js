@@ -1,5 +1,21 @@
 // Eviden Generator — Index (pilih RHK) dan halaman per RHK + Preview
 (function () {
+  // Ringkasan keterkaitan RHK dengan indikator e-PKPM (dipakai di halaman
+  // Generator Eviden dan Preview Eviden). Aman jika pemetaan belum dimuat.
+  function pkpmListHtml(rhk) {
+    if (typeof window.pkpmIndikatorUntuk !== 'function') return '';
+    const items = window.pkpmIndikatorUntuk(rhk);
+    if (!items.length) return '';
+    const rows = items.map(function (x) {
+      const komp = (window.PKPM_KOMPONEN || {})[x.komponen] || x.komponen || '';
+      return '<li><strong>' + U.escapeHtml(x.kode) + '</strong> — ' + U.escapeHtml(x.nama || '') +
+        (komp ? ' <span class="text-muted">(' + U.escapeHtml(komp) + ')</span>' : '') + '</li>';
+    }).join('');
+    return '<div class="pkpm-list no-print"><i class="bi bi-clipboard-check"></i> ' +
+      'Bukti dukung RHK ini menunjang indikator <strong>e-PKPM</strong>:' +
+      '<ul class="mb-0 mt-1 ps-3">' + rows + '</ul></div>';
+  }
+
   Page.EvidenIndex = function () {
     const masterRhk = Page.MasterRHK.get();
     const eviden = Store.get('eviden', []) || [];
@@ -65,6 +81,7 @@
         <div class="card-body">
           <h5 class="mb-1">${U.escapeHtml(rhk.nama_eviden)}</h5>
           <div class="text-muted small mb-2">${rhk.id} · ${rhk.triwulan === 'TAMBAHAN' ? 'Kinerja Tambahan' : 'Triwulan ' + rhk.triwulan}</div>
+          ${pkpmListHtml(rhk)}
           <div>${U.nl2br(rhk.rencana_hasil_kerja)}</div>
         </div>
       </div>
@@ -233,6 +250,7 @@
         <strong>${U.escapeHtml(rhk.nama_eviden)}</strong> · ${ev.status} · ${parts.length} dokumen ·
         Kegiatan: ${keg ? U.escapeHtml(keg.nama_kegiatan) : '<em class="text-muted">tanpa kegiatan</em>'}
       </div>
+      ${pkpmListHtml(rhk)}
 
       <ul class="nav nav-pills mb-3 no-print" id="navDoc">
         ${parts.map((p, i) => `<li class="nav-item"><button class="nav-link ${i === 0 ? 'active' : ''}" data-tab="${i}">${U.escapeHtml(p.label)}</button></li>`).join('')}

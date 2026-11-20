@@ -202,6 +202,19 @@
     });
   };
 
+  // Tampilkan indikator e-PKPM yang dibuktikan oleh RHK ini.
+  function renderPkpmBadges(r) {
+    if (typeof window.pkpmIndikatorUntuk !== 'function') return '';
+    const items = window.pkpmIndikatorUntuk(r);
+    if (!items.length) return '';
+    const label = items.map(x => x.kode).join(', ');
+    const detail = items.map(x => {
+      const komp = (window.PKPM_KOMPONEN || {})[x.komponen] || x.komponen || '';
+      return x.kode + ' — ' + (x.nama || '') + (komp ? ' (' + komp + ')' : '');
+    }).join('\n');
+    return `<span class="pkpm-badge" title="Bukti dukung untuk indikator e-PKPM:\n${attr(detail)}"><i class="bi bi-clipboard-check"></i> ${attr(label)}</span>`;
+  }
+
   function renderRows(r) {
     const idEnc = encodeURIComponent(r.id);
     const tw = `<span class="badge ${r.jenis_kinerja === 'Tambahan' ? 'badge-tambahan' : 'badge-tw'}">${r.triwulan === 'TAMBAHAN' ? 'Tmb' : 'TW ' + r.triwulan}</span>`;
@@ -245,6 +258,7 @@
             <button class="btn btn-sm btn-outline-primary btn-edit-rhk" data-rhk-id="${attr(r.id)}" title="Edit"><i class="bi bi-pencil"></i></button>
             <a class="btn btn-sm btn-outline-success" href="#/eviden/${idEnc}" title="Generate Eviden"><i class="bi bi-file-earmark-plus"></i></a>
             ${r.is_custom ? `<button class="btn btn-sm btn-outline-danger btn-del-rhk" data-rhk-id="${attr(r.id)}" title="Hapus RHK custom"><i class="bi bi-trash"></i></button>` : ''}
+            ${renderPkpmBadges(r)}
           </div>
           <div class="actions-edit d-none d-flex gap-1 justify-content-center flex-wrap">
             <button class="btn btn-sm btn-success btn-save-rhk" data-rhk-id="${attr(r.id)}" title="Simpan"><i class="bi bi-save"></i> Simpan</button>
